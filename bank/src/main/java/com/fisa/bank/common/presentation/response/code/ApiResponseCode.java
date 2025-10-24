@@ -1,4 +1,4 @@
-package com.fisa.bank.common.presentation.response;
+package com.fisa.bank.common.presentation.response.code;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,6 +1,5 @@
-package com.fisa.bank.common.presentation.response;
+package com.fisa.bank.common.presentation.response.code;
 
-import com.fisa.bank.common.presentation.MessageCode;
 import org.springframework.http.HttpStatus;
 
 public class ResponseCode implements ApiResponseCode {

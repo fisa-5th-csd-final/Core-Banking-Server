@@ -1,6 +1,8 @@
 package com.fisa.bank.common.presentation.response;
 
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
+import com.fisa.bank.common.presentation.response.code.ApiResponseCode;
+import com.fisa.bank.common.presentation.response.code.ResponseCode;
 
 public class ApiResponseGenerator {
 
