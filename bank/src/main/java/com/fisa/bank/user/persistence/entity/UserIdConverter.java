@@ -1,7 +1,9 @@
 package com.fisa.bank.user.persistence.entity;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
+@Converter(autoApply = true)
 public class UserIdConverter implements AttributeConverter<UserId, Long> {
 
     @Override
