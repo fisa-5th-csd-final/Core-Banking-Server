@@ -25,9 +25,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class User extends BaseEntity {
 
+    // TODO: Id 생성기 적용
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private String userId;
 
     @Column(nullable = false)
     private String name;
@@ -56,6 +56,7 @@ public class User extends BaseEntity {
     private UserAuth userAuth;
 
     public static User create(
+            String userId,
             String name,
             String address,
             LocalDateTime birthday,
@@ -64,6 +65,7 @@ public class User extends BaseEntity {
             String password
     ){
         return User.builder()
+                .userId(userId)
                 .name(name)
                 .address(address)
                 .birthday(birthday)
