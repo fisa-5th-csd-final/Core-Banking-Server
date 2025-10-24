@@ -1,4 +1,4 @@
-package com.fisa.bank.common.presentation.response;
+package com.fisa.bank.common.presentation.response.body;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

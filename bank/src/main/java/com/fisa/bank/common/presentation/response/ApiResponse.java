@@ -1,5 +1,6 @@
 package com.fisa.bank.common.presentation.response;
 
+import com.fisa.bank.common.presentation.response.body.ApiResponseBody;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
