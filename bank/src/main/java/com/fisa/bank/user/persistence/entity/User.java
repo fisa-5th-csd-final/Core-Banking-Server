@@ -3,6 +3,8 @@ package com.fisa.bank.user.persistence.entity;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,9 +27,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class User extends BaseEntity {
 
-    // TODO: Id 생성기 적용
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Convert(converter = UserIdConverter.class)
+    private UserId userId;
 
     @Column(nullable = false)
     private String name;
@@ -56,7 +59,6 @@ public class User extends BaseEntity {
     private UserAuth userAuth;
 
     public static User create(
-            String userId,
             String name,
             String address,
             LocalDateTime birthday,
@@ -65,7 +67,6 @@ public class User extends BaseEntity {
             String password
     ){
         return User.builder()
-                .userId(userId)
                 .name(name)
                 .address(address)
                 .birthday(birthday)
