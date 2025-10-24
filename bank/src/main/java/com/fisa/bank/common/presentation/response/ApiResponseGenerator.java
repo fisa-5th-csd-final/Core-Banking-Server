@@ -1,6 +1,6 @@
-package com.fisa.bank.common.presentation;
+package com.fisa.bank.common.presentation.response;
 
-import com.fisa.bank.common.presentation.ApiResponse.SuccessBody;
+import com.fisa.bank.common.presentation.MessageCode;
 import org.springframework.http.HttpStatus;
 
 public class ApiResponseGenerator {
@@ -27,9 +27,13 @@ public class ApiResponseGenerator {
      * @param <T>
      */
     public static <T> ApiResponse<SuccessBody<T>> create(HttpStatus status, MessageCode messageCode, T body){
+
+        String code = messageCode.getCode();
+        String message = messageCode.getMessage();
+
         return new ApiResponse<>(
                 status,
-                new SuccessBody<>(messageCode, body)
+                new SuccessBody<>(code, message, body)
         );
     }
 
