@@ -32,6 +32,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // Authorization Server
+    implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
 }
 
 tasks.named('test') {
