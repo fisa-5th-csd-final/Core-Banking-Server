@@ -1,5 +1,6 @@
 package com.fisa.bank.common.presentation.response;
 
+import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode;
 import com.fisa.bank.common.presentation.response.code.MessageCode;
@@ -40,6 +41,10 @@ public class ApiResponseGenerator {
         String code = messageCode.getCode();
         String message = messageCode.getMessage();
         return new ApiResponse<>(status, new SuccessBody<>(code, message, body));
+    }
+
+    public static ApiResponse<FailureBody> fail(HttpStatus status, String errorCode, String message){
+        return new ApiResponse<>(status, new FailureBody(errorCode, message));
     }
 
 }
