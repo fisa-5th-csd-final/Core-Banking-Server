@@ -39,7 +39,6 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     }
 
     public static ErrorResponseCode<BusinessException> find(BusinessException exception){
-        Class<? extends BusinessException> eClass = exception.getClass();
         return Arrays.stream(BusinessErrorCode.values())
                 .filter(errorCode -> errorCode.isSupport(exception))
                 .findAny()
