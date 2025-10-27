@@ -180,3 +180,6 @@ Temporary Items
 ### env
 env.properties
 .env
+
+### build
+bank/build/**
