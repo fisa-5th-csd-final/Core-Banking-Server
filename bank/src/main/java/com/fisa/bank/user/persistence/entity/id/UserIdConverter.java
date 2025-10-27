@@ -1,4 +1,4 @@
-package com.fisa.bank.user.persistence.entity;
+package com.fisa.bank.user.persistence.entity.id;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
