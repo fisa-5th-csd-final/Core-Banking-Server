@@ -19,4 +19,18 @@ public abstract class BaseId<T> {
 
         this.value = value;
     }
+
+    // 공통 유효성 처리 로직
+    private void commonValidate(T value) {
+        if (value instanceof Long l) {
+            if (l < 0) {
+                throw new IllegalArgumentException(
+                        "Id가 0보다 작음: " + this.getClass().getSimpleName());
+            }
+        }
+    }
+
+    protected void specificValidate(T value) {
+        // 추가로 자식 클래스에서 구현할 검증 로직
+    }
 }
