@@ -50,7 +50,7 @@ public class AccountEntity extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal balance;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 3)
     private String bankCode;
 
     public static AccountEntity create(String accountNumber, Long userId, String bankCode) {
