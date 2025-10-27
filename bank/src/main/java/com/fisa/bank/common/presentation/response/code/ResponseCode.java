@@ -1,8 +1,9 @@
 package com.fisa.bank.common.presentation.response.code;
 
+import com.fisa.bank.common.presentation.response.code.ApiResponseCode.SuccessResponseCode;
 import org.springframework.http.HttpStatus;
 
-public class ResponseCode implements ApiResponseCode {
+public class ResponseCode implements SuccessResponseCode {
 
     public static final ResponseCode CREATE = new ResponseCode(HttpStatus.CREATED, MessageCode.CREATE);
     public static final ResponseCode UPDATE = new ResponseCode(HttpStatus.OK, MessageCode.UPDATE);
