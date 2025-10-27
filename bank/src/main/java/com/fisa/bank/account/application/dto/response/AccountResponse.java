@@ -17,7 +17,7 @@ public class AccountResponse {
 
     public static AccountResponse of(AccountEntity entity, String message) {
         return AccountResponse.builder()
-                .accountId(entity.getAccountId())
+                .accountId(entity.getAccountId().getValue())
                 .accountNumber(entity.getAccountNumber())
                 .userId(entity.getUserId())
                 .bankCode(entity.getBankCode())

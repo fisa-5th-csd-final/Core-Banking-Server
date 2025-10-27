@@ -20,9 +20,8 @@
 
 package com.fisa.bank.account.persistence.entity;
 
+import com.fisa.bank.account.persistence.entity.id.*;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
-import com.fisa.bank.user.persistence.entity.id.UserIdConverter;
-import com.fisa.bank.user.persistence.entity.id.UserIdJavaType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JavaType;
@@ -41,8 +40,9 @@ public class AccountEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Convert(converter = AccountIdConverter.class)
+    @JavaType(AccountIdJavaType.class)
     @JdbcTypeCode(SqlTypes.BIGINT)
-    private Long accountId;
+    private AccountId accountId;
 
     @Column(nullable = false, unique = true)
     private String accountNumber;
