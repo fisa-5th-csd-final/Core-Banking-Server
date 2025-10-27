@@ -9,4 +9,11 @@ public interface ApiResponseCode {
     public String getCode();
     public String getMessage();
 
+    /**
+     * 정상 응답과 예외 발생 시 응답 구조는 동일하게 설계
+     * @param <T>
+     */
+    public static interface ErrorResponseCode<T extends Throwable> extends ApiResponseCode{}
+    public static interface SuccessResponseCode extends ApiResponseCode {}
+
 }
