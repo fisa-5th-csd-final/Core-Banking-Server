@@ -25,6 +25,7 @@ public class UserService {
                 request.address(),
                 request.birthday(),
                 BigInteger.valueOf(request.salary()),
+                request.job(),
                 request.loginId(),
                 encryptedPassword);
 

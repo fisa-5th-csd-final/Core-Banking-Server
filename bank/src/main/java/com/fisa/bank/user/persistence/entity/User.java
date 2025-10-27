@@ -66,6 +66,7 @@ public class User extends BaseEntity {
             String address,
             LocalDateTime birthday,
             BigInteger income,
+            String job,
             String loginId,
             String password
     ){
@@ -74,6 +75,7 @@ public class User extends BaseEntity {
                 .address(address)
                 .birthday(birthday)
                 .income(income)
+                .job(job)
                 .creditLevel(CreditRating.B)
                 .customerLevel(CustomerLevel.BRONZE)
                 .userAuth(UserAuth.create(loginId, password))
