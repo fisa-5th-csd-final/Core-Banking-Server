@@ -13,6 +13,6 @@ public class AccountIdConverter implements AttributeConverter<AccountId, Long> {
 
     @Override
     public AccountId convertToEntityAttribute(Long dbData) {
-        return AccountId.of(dbData);
+        return dbData == null ? null : AccountId.of(dbData);
     }
 }
