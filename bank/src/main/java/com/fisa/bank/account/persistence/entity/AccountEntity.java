@@ -1,0 +1,75 @@
+/**
+ * AccountEntity
+ *
+ * 은행 계좌 정보를 나타내는 엔티티 클래스입니다.
+ * 사용자 ID, 계좌번호, 잔액, 은행 코드 등의 필드를 포함하며,
+ * 계좌 생성 및 입출금 관련 비즈니스 로직을 제공
+ *
+ * 주요 필드:
+ * - accountId : 계좌 식별자
+ * - accountNumber : 계좌 번호
+ * - userId : 사용자 식별자
+ * - balance : 계좌 잔액
+ * - bankCode : 은행 코드
+ *
+ * 주요 메서드:
+ * - create() : 신규 계좌 생성 팩토리 메서드
+ * - deposit() : 입금 처리
+ * - withdraw() : 출금 처리
+ */
+
+package com.fisa.bank.account.persistence.entity;
+
+import com.fisa.bank.account.persistence.entity.id.*;
+import com.fisa.bank.common.persistence.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "account")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+public class AccountEntity extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Convert(converter = AccountIdConverter.class)
+    @JavaType(AccountIdJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private AccountId accountId;
+
+    @Column(nullable = false, unique = true)
+    private String accountNumber;
+
+    @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
+    private BigDecimal balance;
+
+    @Column(nullable = false, length = 3)
+    private String bankCode;
+
+    public static AccountEntity create(String accountNumber, Long userId, String bankCode) {
+        return AccountEntity.builder()
+                .accountNumber(accountNumber)
+                .userId(userId)
+                .bankCode(bankCode)
+                .balance(BigDecimal.ZERO)
+                .build();
+    }
+
+    public void deposit(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+    public void withdraw(BigDecimal amount) {
+        this.balance = this.balance.subtract(amount);
+    }
+}

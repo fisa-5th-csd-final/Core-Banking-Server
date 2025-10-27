@@ -181,6 +181,7 @@ Temporary Items
 
 ### env
 env.properties
+bank/src/main/resources/env.properties
 .env
 
 ### build
