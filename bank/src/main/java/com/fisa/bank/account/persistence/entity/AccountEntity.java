@@ -44,7 +44,7 @@ public class AccountEntity extends BaseEntity {
     @JdbcTypeCode(SqlTypes.BIGINT)
     private Long accountId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String accountNumber;
 
     @Column(nullable = false)
