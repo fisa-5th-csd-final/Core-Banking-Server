@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "transaction_account")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

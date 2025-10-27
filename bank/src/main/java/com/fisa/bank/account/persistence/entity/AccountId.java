@@ -14,7 +14,7 @@ public class AccountId implements Serializable {
     private final Long value;
 
     public static AccountId of(Long value){
-        if(value < 0) throw new IllegalArgumentException("AccontId value is not negative");
+        if(value < 0) throw new IllegalArgumentException("AccountId value is not negative");
         return new AccountId(value);
     }
 }

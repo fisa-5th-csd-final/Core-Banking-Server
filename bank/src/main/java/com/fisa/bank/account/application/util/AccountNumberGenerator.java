@@ -1,9 +1,11 @@
-package com.fisa.bank.account.application.util; /**
+/**
  * 계좌번호 생성 유틸
  *
  * 형식: XXXXYYYZZZZZZ (총 13자리 숫자)
  * 예시: 4821307591204
  */
+
+package com.fisa.bank.account.application.util;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

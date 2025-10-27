@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "transaction_card")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
