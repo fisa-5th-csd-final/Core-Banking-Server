@@ -19,10 +19,9 @@ public class GlobalExceptionHandler {
      * BusinessException에, 예외 정보에 대한 구조를 정해서, Http Response를 쉽게 작성할 수 있다.
      * @param e
      * @return
-     * @param <T>
      */
     @ExceptionHandler(BusinessException.class)
-    public <T> ApiResponse<FailureBody> handle(BusinessException e){
+    public ApiResponse<FailureBody> handle(BusinessException e){
         // BusinessException 과 관련된 HttpStatus, ErrorCode, Message 를 가져오기
         ErrorResponseCode<BusinessException> errorCode = BusinessErrorCode.find(e);
 
