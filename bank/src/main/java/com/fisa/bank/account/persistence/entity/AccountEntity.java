@@ -57,12 +57,12 @@ public class AccountEntity extends BaseEntity {
     private String bankCode;
 
     public static AccountEntity create(String accountNumber, Long userId, String bankCode) {
-        AccountEntity account = new AccountEntity();
-        account.accountNumber = accountNumber;
-        account.userId = userId;
-        account.bankCode = bankCode;
-        account.balance = BigDecimal.ZERO;
-        return account;
+        return AccountEntity.builder()
+                .accountNumber(accountNumber)
+                .userId(userId)
+                .bankCode(bankCode)
+                .balance(BigDecimal.ZERO)
+                .build();
     }
 
     public void deposit(BigDecimal amount) {
