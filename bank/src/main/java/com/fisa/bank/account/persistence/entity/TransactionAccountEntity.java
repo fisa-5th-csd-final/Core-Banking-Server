@@ -1,3 +1,21 @@
+/**
+ * TransactionAccountEntity
+ *
+ * 계좌 거래 내역을 저장하는 엔티티 클래스
+ *
+ * 계좌(AccountEntity)와 연관,
+ * 입금, 출금, 송금 등 계좌 단위의 거래 이력을 관리
+ *
+ * 주요 필드:
+ * - trxAId : 거래 식별자
+ * - account : 거래가 발생한 계좌
+ * - type : 거래 유형 (입금 / 출금 / 송금 등)
+ * - amount : 거래 금액
+ * - date : 거래 일시
+ * - destinationAccount : 상대 계좌 (송금 시)
+ * - isIncome : 입금 여부
+ */
+
 package com.fisa.bank.account.persistence.entity;
 
 import com.fisa.bank.account.persistence.enums.TransactionType;

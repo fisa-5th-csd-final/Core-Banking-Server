@@ -1,54 +1,72 @@
+/**
+ * AccountEntity
+ *
+ * 은행 계좌 정보를 나타내는 엔티티 클래스입니다.
+ * 사용자 ID, 계좌번호, 잔액, 은행 코드 등의 필드를 포함하며,
+ * 계좌 생성 및 입출금 관련 비즈니스 로직을 제공
+ *
+ * 주요 필드:
+ * - accountId : 계좌 식별자
+ * - accountNumber : 계좌 번호
+ * - userId : 사용자 식별자
+ * - balance : 계좌 잔액
+ * - bankCode : 은행 코드
+ *
+ * 주요 메서드:
+ * - create() : 신규 계좌 생성 팩토리 메서드
+ * - deposit() : 입금 처리
+ * - withdraw() : 출금 처리
+ */
+
 package com.fisa.bank.account.persistence.entity;
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "account")
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class AccountEntity extends BaseEntity {
+
     @Id
-    @Column(name = "account_id", length = 20)
-    private String accountId;
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private AccountId accountId;
 
-    @Column(name = "user_id", nullable = false, length = 20)
-    private String userId;
-
-    @Column(name = "account_number", nullable = false, unique = true, length = 30)
+    @Column(nullable = false)
     private String accountNumber;
 
-    @Column(name = "account_balance", nullable = false)
-    private BigDecimal accountBalance;
+    @Column(nullable = false)
+    private Long userId;
 
-    // TODO: 추후 UserEntity와 합칠 때 작성
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private UserEntity user;
-     */
+    @Column(nullable = false)
+    private BigDecimal balance;
+
+    @Column(nullable = false)
+    private String bankCode;
+
+    public static AccountEntity create(String accountNumber, Long userId, String bankCode) {
+        AccountEntity account = new AccountEntity();
+        account.accountNumber = accountNumber;
+        account.userId = userId;
+        account.bankCode = bankCode;
+        account.balance = BigDecimal.ZERO;
+        return account;
+    }
 
     public void deposit(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("입금 금액은 0보다 커야 함");
-        }
-        this.accountBalance = this.accountBalance.add(amount);
+        this.balance = this.balance.add(amount);
     }
 
     public void withdraw(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("출금 금액은 0보다 커야 함");
-        }
-        if (this.accountBalance.compareTo(amount) < 0) {
-            throw new IllegalStateException("잔액 부족");
-        }
-        this.accountBalance = this.accountBalance.subtract(amount);
+        this.balance = this.balance.subtract(amount);
     }
 }
