@@ -12,7 +12,7 @@ public class ApiResponse<B extends ApiResponseBody> extends ResponseEntity<B> {
     private final B body;
 
     /**
-     * // Spring이 제공하는 HttpStatus를 사용하여 응답을 생성하는 생성자
+     * Spring이 제공하는 HttpStatus를 사용하여 응답을 생성하는 생성자
      * @param statusCode
      */
     public ApiResponse(HttpStatus statusCode) {
@@ -21,7 +21,7 @@ public class ApiResponse<B extends ApiResponseBody> extends ResponseEntity<B> {
     }
 
     /**
-     * Spring 이제공하는 HttpStatus를 사용하고, ApiResponseBody를 사용하여 응답을 생성하는 생성자
+     * Spring이 제공하는 HttpStatus를 사용하고, ApiResponseBody를 사용하여 응답을 생성하는 생성자
      * @param statusCode
      * @param body
      */
