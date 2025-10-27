@@ -1,5 +1,6 @@
 package com.fisa.bank.account.application.dto.response;
 
+import com.fisa.bank.account.persistence.entity.AccountEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,4 +14,14 @@ public class AccountResponse {
     private Long userId;
     private String bankCode;
     private String message;
+
+    public static AccountResponse of(AccountEntity entity, String message) {
+        return AccountResponse.builder()
+                .accountId(entity.getAccountId())
+                .accountNumber(entity.getAccountNumber())
+                .userId(entity.getUserId())
+                .bankCode(entity.getBankCode())
+                .message(message)
+                .build();
+    }
 }
