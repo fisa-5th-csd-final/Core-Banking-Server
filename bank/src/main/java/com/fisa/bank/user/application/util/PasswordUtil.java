@@ -1,5 +1,6 @@
 package com.fisa.bank.user.application.util;
 
+import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ public class PasswordUtil {
     public String encrypt(String password){
 
         if(!validator.validate(password))
-            throw new IllegalArgumentException("Password format is Invalid");
+            throw new InvalidPasswordFormatException();
 
         return passwordEncoder.encode(password);
     }
