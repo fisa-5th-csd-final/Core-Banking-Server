@@ -6,6 +6,8 @@ import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResp
 import com.fisa.bank.user.application.exception.InvalidAuthInfoException;
 import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -39,9 +41,19 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     }
 
     public static ErrorResponseCode<BusinessException> find(BusinessException exception){
-        return Arrays.stream(BusinessErrorCode.values())
-                .filter(errorCode -> errorCode.isSupport(exception))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Not Mapped Exception"));
+        Class<? extends BusinessException> eClass = exception.getClass();
+        if(map.containsKey(eClass)) return map.get(eClass);
+
+        throw new IllegalArgumentException("Not mapped Exception");
+    }
+
+    private static final Map<Class<? extends BusinessException>, BusinessErrorCode> map = new ConcurrentHashMap<>();
+
+    static {
+        Arrays.stream(BusinessErrorCode.values())
+                .forEach(errorCode -> {
+                    Class<? extends BusinessException> eClass = errorCode.exception.getClass();
+                    map.put(eClass, errorCode);
+                });
     }
 }
