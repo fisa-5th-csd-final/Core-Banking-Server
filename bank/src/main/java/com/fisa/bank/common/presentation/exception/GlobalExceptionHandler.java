@@ -6,6 +6,7 @@ import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -26,6 +27,16 @@ public class GlobalExceptionHandler {
         ErrorResponseCode<BusinessException> errorCode = BusinessErrorCode.find(e);
 
         return ApiResponseGenerator.fail(errorCode);
+    }
+
+    /**
+     * BusinessException 종류가 아닌, 모든 런타임 예외는 아래의 ExceptionHandler가 캐치한다.
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public ApiResponse<FailureBody> handle(RuntimeException e){
+        return ApiResponseGenerator.fail(HttpStatus.INTERNAL_SERVER_ERROR, "500", e.getMessage());
     }
 
 }
