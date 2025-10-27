@@ -13,6 +13,10 @@ import org.springframework.http.HttpStatus;
 
 public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
 
+    /**
+     * 여기에 커스텀 BusinessException을 정의하면 됩니다.
+     */
+
     INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.EXCEPTION),
     INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.EXCEPTION);
 
@@ -35,8 +39,9 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     public String getMessage() { return exception.getMessage(); }
 
     public static ErrorResponseCode<BusinessException> find(BusinessException exception){
-        Class<? extends BusinessException> eClass = exception.getClass();
-        if(map.containsKey(eClass)) return map.get(eClass);
+        BusinessErrorCode errorResponseCode =  map.get(exception.getClass());
+
+        if(errorResponseCode!=null) return errorResponseCode;
 
         throw new IllegalArgumentException("Not mapped Exception");
     }
