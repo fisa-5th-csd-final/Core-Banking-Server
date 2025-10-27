@@ -34,12 +34,6 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     @Override
     public String getMessage() { return exception.getMessage(); }
 
-    public boolean isSupport(BusinessException exception){
-        Class<? extends BusinessException> mine = this.exception.getClass();
-        Class<? extends BusinessException> target = exception.getClass();
-        return mine.equals(target);
-    }
-
     public static ErrorResponseCode<BusinessException> find(BusinessException exception){
         Class<? extends BusinessException> eClass = exception.getClass();
         if(map.containsKey(eClass)) return map.get(eClass);
