@@ -19,6 +19,4 @@ public class ApiResponse<B extends ApiResponseBody> extends ResponseEntity<B> {
         super(statusCode);
         this.body = body;
     }
-
-
 }
