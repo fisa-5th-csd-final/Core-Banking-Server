@@ -14,8 +14,8 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.EXCEPTION),
     INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.EXCEPTION);
 
-    HttpStatus status;
-    @Getter  BusinessException exception;
+    private final HttpStatus status;
+    @Getter  private final BusinessException exception;
 
     <T extends BusinessException> BusinessErrorCode(HttpStatus status, T exception){
         this.status = status;
