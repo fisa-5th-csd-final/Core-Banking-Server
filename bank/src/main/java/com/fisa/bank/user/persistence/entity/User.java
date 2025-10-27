@@ -1,10 +1,12 @@
 package com.fisa.bank.user.persistence.entity;
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.user.persistence.entity.id.UserId;
+import com.fisa.bank.user.persistence.entity.id.UserIdConverter;
+import com.fisa.bank.user.persistence.entity.id.UserIdJavaType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -32,6 +35,7 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Convert(converter = UserIdConverter.class)
+    @JavaType(UserIdJavaType.class)
     @JdbcTypeCode(SqlTypes.BIGINT)
     private UserId userId;
 
@@ -67,8 +71,7 @@ public class User extends BaseEntity {
             LocalDateTime birthday,
             BigInteger income,
             String job,
-            String loginId,
-            String password
+            UserAuth userAuth
     ){
         return User.builder()
                 .name(name)
@@ -78,7 +81,7 @@ public class User extends BaseEntity {
                 .job(job)
                 .creditLevel(CreditRating.B)
                 .customerLevel(CustomerLevel.BRONZE)
-                .userAuth(UserAuth.create(loginId, password))
+                .userAuth(userAuth)
                 .build();
     }
 
