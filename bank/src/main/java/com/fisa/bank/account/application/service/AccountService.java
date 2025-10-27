@@ -4,7 +4,7 @@ import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.account.persistence.entity.AccountEntity;
-import com.fisa.bank.common.persistence.repository.AccountRepository;
+import com.fisa.bank.account.persistence.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
