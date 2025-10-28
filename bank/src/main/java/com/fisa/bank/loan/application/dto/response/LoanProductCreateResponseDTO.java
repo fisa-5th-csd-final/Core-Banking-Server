@@ -13,10 +13,10 @@ import java.util.List;
 
 @Builder
 public class LoanProductCreateResponseDTO {
-    private long loanProductId;
+    private final long loanProductId;
 
-    public String name;
+    private final String name;
 
-    public LoanType type;
+    private final LoanType type;
 
 }
