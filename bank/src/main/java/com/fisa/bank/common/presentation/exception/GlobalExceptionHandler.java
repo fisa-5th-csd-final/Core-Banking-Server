@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public ApiResponse<FailureBody> handle(BusinessException e){
-        log.warn(e.getMessage());
+        log.warn(e.getMessage(), e);
         ErrorResponseCode<BusinessException> errorCode = BusinessErrorCode.find(e);
 
         return ApiResponseGenerator.fail(errorCode, e);
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public ApiResponse<FailureBody> handle(RuntimeException e){
-        log.warn(e.getMessage());
+        log.error(e.getMessage(), e);
         return ApiResponseGenerator.fail(HttpStatus.INTERNAL_SERVER_ERROR, "500", e.getMessage());
     }
 
