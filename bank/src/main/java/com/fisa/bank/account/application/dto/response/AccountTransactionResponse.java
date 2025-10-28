@@ -1,6 +1,6 @@
 package com.fisa.bank.account.application.dto.response;
 
-import com.fisa.bank.account.persistence.entity.TransactionAccountEntity;
+import com.fisa.bank.account.persistence.entity.AccountTransactionEntity;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record AccountTransactionResponse(
-        String transactionId,     // 거래 ID
+        Long transactionId,     // 거래 ID
         Long accountId,           // 계좌 ID
         String type,              // 거래 타입 (DEPOSIT, WITHDRAW)
         BigDecimal amount,        // 거래 금액
@@ -17,9 +17,9 @@ public record AccountTransactionResponse(
         boolean isIncome,         // 입금 여부
         LocalDateTime transactionAt // 거래 일시
 ) {
-    public static AccountTransactionResponse from(TransactionAccountEntity entity) {
+    public static AccountTransactionResponse from(AccountTransactionEntity entity) {
         return AccountTransactionResponse.builder()
-                .transactionId(entity.getTrxAId())
+                .transactionId(entity.getTrxAId().getValue())
                 .accountId(entity.getAccount().getAccountId().getValue())
                 .type(entity.getType().name())
                 .amount(entity.getAmount())
