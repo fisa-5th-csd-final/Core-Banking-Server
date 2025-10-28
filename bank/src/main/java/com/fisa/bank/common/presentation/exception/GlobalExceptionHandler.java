@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         // BusinessException 과 관련된 HttpStatus, ErrorCode, Message 를 가져오기
         ErrorResponseCode<BusinessException> errorCode = BusinessErrorCode.find(e);
 
-        return ApiResponseGenerator.fail(errorCode);
+        return ApiResponseGenerator.fail(errorCode, e);
     }
 
     /**
