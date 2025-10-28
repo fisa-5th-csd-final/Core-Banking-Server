@@ -29,6 +29,11 @@ public class LoanController {
         return ApiResponseGenerator.success(ResponseCode.CREATE, response);
     }
 
+    @GetMapping("/products")
+    public void getLoanProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
+        loanService.findProducts(pageable);
+    }
+
     @DeleteMapping("/products/{loanProductId}")
     public ApiResponse<SuccessBody<ResponseCode>> deleteLoanProduct(@PathVariable Long loanProductId){
 

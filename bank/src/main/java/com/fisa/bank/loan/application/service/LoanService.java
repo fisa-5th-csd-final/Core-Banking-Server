@@ -1,11 +1,14 @@
 package com.fisa.bank.loan.application.service;
 
+import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,4 +43,7 @@ public class LoanService {
         loanRepository.deleteById(loanProductId);
     }
 
+    public void findProducts(Pageable pageable) {
+        Page<LoanProduct> all = loanRepository.findAll(pageable);
+    }
 }

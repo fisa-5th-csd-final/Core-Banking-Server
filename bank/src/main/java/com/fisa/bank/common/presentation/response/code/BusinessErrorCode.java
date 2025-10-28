@@ -3,6 +3,7 @@ package com.fisa.bank.common.presentation.response.code;
 
 import com.fisa.bank.common.application.exception.BusinessException;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
+import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.user.application.exception.InvalidAuthInfoException;
 import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 import java.util.Arrays;
@@ -18,7 +19,8 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
      */
 
     INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.class),
-    INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class);
+    INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class),
+    LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, LoanProductNotFoundException.class);
 
     private final HttpStatus status;
     @Getter private final Class<? extends BusinessException> exception;
