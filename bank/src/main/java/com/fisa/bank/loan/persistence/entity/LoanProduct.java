@@ -17,7 +17,7 @@ public class LoanProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long loanProductId;
+    private Long loanProductId;
 
     // LoanProduct 1 : N LoanLedger
     @OneToMany(mappedBy = "loanProduct")

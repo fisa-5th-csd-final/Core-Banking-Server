@@ -4,23 +4,24 @@ package com.fisa.bank.loan.persistence.entity;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.persistence.repository.InterestRateRepository;
 import jakarta.persistence.*;
-import org.springframework.security.core.parameters.P;
-
-import java.sql.Timestamp;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /*
     금리 테이블
  */
 @Entity
-//@EntityListeners(InterestRateListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class InterestRate extends BaseEntity {
     // 금리 id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long interestRateId;
+    private Long interestRateId;
 
     // 대출 상품 id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loanProductId", nullable = false)
     LoanProduct loanProduct;
 
