@@ -1,16 +1,11 @@
 package com.fisa.bank.account.persistence.entity.id;
 
 import com.fisa.bank.common.persistence.id.BaseId;
-import com.fisa.bank.user.persistence.entity.id.UserId;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccountId extends BaseId<Long> {
-
+@NoArgsConstructor (access = AccessLevel.PRIVATE)
+public final class AccountId extends BaseId<Long> {
     // 생성자
     private AccountId(Long value) {
         super(value);
