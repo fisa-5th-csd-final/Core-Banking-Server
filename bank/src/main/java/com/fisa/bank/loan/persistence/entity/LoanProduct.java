@@ -3,8 +3,7 @@ package com.fisa.bank.loan.persistence.entity;
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,8 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoanProduct {
 
     @Id
@@ -20,10 +21,12 @@ public class LoanProduct {
 
     // LoanProduct 1 : N LoanLedger
     @OneToMany(mappedBy = "loanProduct")
+    @Builder.Default
     private List<LoanLedger> loanLedgerList = new ArrayList<>();
 
     // LoanProduct 1 : N InterestRate
     @OneToMany(mappedBy = "loanProduct")
+    @Builder.Default
     private List<InterestRate> interestRateList = new ArrayList<>();
 
     @Column(nullable = false)

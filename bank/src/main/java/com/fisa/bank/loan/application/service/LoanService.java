@@ -13,16 +13,16 @@ import org.springframework.stereotype.Service;
 public class LoanService {
     private final LoanRepository loanRepository;
 
-    public LoanProductCreateResponseDTO createLoanProduct(String name, LoanType type){
+    public LoanProductCreateResponseDTO createLoanProduct(LoanProductCreateRequestDTO requestDTO){
 
         LoanProduct loanProduct = loanRepository.save(LoanProduct.builder()
-                .name(name)
-                .type(type)
+                .name(requestDTO.getName())
+                .type(requestDTO.getType())
                 .build());
 
         LoanProductCreateResponseDTO response = LoanProductCreateResponseDTO.builder()
-                .name(name)
-                .type(type)
+                .name(loanProduct.getName())
+                .type(loanProduct.getType())
                 .loanProductId(loanProduct.getLoanProductId())
                 .build();
 

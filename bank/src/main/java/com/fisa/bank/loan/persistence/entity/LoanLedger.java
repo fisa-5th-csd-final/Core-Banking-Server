@@ -3,8 +3,10 @@ package com.fisa.bank.loan.persistence.entity;
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.loan.persistence.enums.RepaymentType;
+import com.fisa.bank.user.persistence.entity.User;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class LoanLedger {
 
     // LoanLedger 1 : N TranscationcLoan
     @OneToMany(mappedBy = "loanLedger")
-    private List<TranscationLoan> transcationLoanList = new ArrayList<>();
+    private List<TransactionLoan> transactionLoanList = new ArrayList<>();
 
 
     @ManyToOne
@@ -29,21 +31,21 @@ public class LoanLedger {
     private LoanProduct loanProduct;
 
     // LoanLedger N : 1 User
-//    @ManyToOne
-//    @JoinColumn(name = "userId", nullable = false)
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
 
     // 최종 금리
     @Column(nullable = false)
-    private float completedInterest;
+    private BigDecimal completedInterest;
 
     // 원금
     @Column(nullable = false)
-    private long principal;
+    private BigDecimal principal;
 
     // 남은 원금
     @Column(nullable = false)
-    private long remainPrincipal;
+    private BigDecimal remainPrincipal;
 
     // 상환 타입 - 원리금, 원금, 만기
     @Enumerated(EnumType.STRING)

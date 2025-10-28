@@ -7,6 +7,7 @@ import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequestDTO;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponseDTO;
 import com.fisa.bank.loan.application.service.LoanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +20,9 @@ public class LoanController {
     private final LoanService loanService;
 
     @PostMapping
-    public ApiResponse<SuccessBody<LoanProductCreateResponseDTO>> createLoanProduct(@RequestBody LoanProductCreateRequestDTO body){
+    public ApiResponse<SuccessBody<LoanProductCreateResponseDTO>> createLoanProduct(@Valid @RequestBody LoanProductCreateRequestDTO body){
 
-        LoanProductCreateResponseDTO response = loanService.createLoanProduct(body.name, body.type);
+        LoanProductCreateResponseDTO response = loanService.createLoanProduct(body);
 
         return ApiResponseGenerator.success(ResponseCode.CREATE, response);
     }
