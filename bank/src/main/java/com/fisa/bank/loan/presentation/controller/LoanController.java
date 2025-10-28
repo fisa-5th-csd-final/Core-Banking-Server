@@ -9,6 +9,8 @@ import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.service.LoanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 

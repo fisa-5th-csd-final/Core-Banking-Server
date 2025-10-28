@@ -1,15 +1,13 @@
 package com.fisa.bank.loan.application.exception;
 
-public class LoanProductNotFoundException extends LoanProductException {
+import com.fisa.bank.common.application.exception.BusinessException;
 
-    // 404 Not Found에 적합
-    private static final String DEFAULT_MESSAGE = "요청하신 대출 상품을 찾을 수 없습니다.";
+public class LoanProductNotFoundException extends BusinessException {
 
-    public LoanProductNotFoundException(Long productId) {
-        super(DEFAULT_MESSAGE + " (ID: " + productId + ")");
+    private static final String errorCode = "L001";
+    private static final String message = "요청하신 대출 상품을 찾을 수 없습니다. (ID: %s)";
+    public LoanProductNotFoundException(Long loanProductId) {
+        super(errorCode, String.format(message, loanProductId));
     }
 
-    public LoanProductNotFoundException(String message) {
-        super(message);
-    }
 }
