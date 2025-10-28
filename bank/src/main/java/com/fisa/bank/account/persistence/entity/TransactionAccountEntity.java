@@ -49,6 +49,12 @@ public class TransactionAccountEntity extends BaseEntity {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
+    @Column(name = "balance_before", nullable = false)
+    private BigDecimal balanceBefore; // 거래 전 잔액
+
+    @Column(name = "balance_after", nullable = false)
+    private BigDecimal balanceAfter; // 거래 후 잔액
+
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
