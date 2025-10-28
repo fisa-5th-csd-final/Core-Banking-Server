@@ -29,6 +29,7 @@ public class AuthorizationConfig {
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
+        // Builder를 사용해서 어떤 URI를 사용할 것인지 커스텀 가능
         return AuthorizationServerSettings.builder().build();
     }
 
