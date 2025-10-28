@@ -2,6 +2,10 @@ package com.fisa.bank.loan.persistence.entity;
 
 import com.fisa.bank.loan.persistence.enums.TransactionType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,16 +13,19 @@ import java.time.LocalDateTime;
 /*
     대출 이력성 테이블
  */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 public class TransactionLoan {
 
     // 거래 id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long trxLId;
+    private Long trxLId;
 
     // LoanLedger 1 : N TranscationLoan
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loanLedgerId", nullable = false)
     private LoanLedger loanLedger;
 
@@ -29,7 +36,7 @@ public class TransactionLoan {
     // 거래 유형
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionType transcationType;
+    private TransactionType transactionType;
 
     // 거래 금액
     @Column(nullable = false)

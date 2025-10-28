@@ -19,19 +19,19 @@ public class LoanLedger {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long loanLedgerId;
+    private Long loanLedgerId;
 
     // LoanLedger 1 : N TranscationcLoan
     @OneToMany(mappedBy = "loanLedger")
     private List<TransactionLoan> transactionLoanList = new ArrayList<>();
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loanProductId", nullable = false)
     private LoanProduct loanProduct;
 
     // LoanLedger N : 1 User
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
@@ -64,7 +64,7 @@ public class LoanLedger {
 
     // 중도 상환 수수료율 - 금리 유형과 대출 유형에 따라 표 참고해서 정하기
     @Column(nullable = false)
-    private float earlyRepayInterestRate;
+    private BigDecimal earlyRepayInterestRate;
 
     // 다음 상환, 마지막 거래 일시, 상환 마감 기한
     @Column(nullable = false)
