@@ -64,11 +64,8 @@ public class AccountEntity extends BaseEntity {
                 .build();
     }
 
-    public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
-    }
-
-    public void withdraw(BigDecimal amount) {
-        this.balance = this.balance.subtract(amount);
+    // 거래 후 잔액으로 balance 변경
+    public void updateBalance(BigDecimal after) {
+        this.balance = after;
     }
 }
