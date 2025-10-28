@@ -2,18 +2,22 @@ package com.fisa.bank.loan.application.service;
 
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequestDTO;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponseDTO;
+import com.fisa.bank.loan.application.exception.LoanProductException;
+import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
-import com.fisa.bank.loan.persistence.enums.LoanType;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class LoanService {
     private final LoanRepository loanRepository;
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public LoanProductCreateResponseDTO createLoanProduct(LoanProductCreateRequestDTO requestDTO){
 
         LoanProduct loanProduct = loanRepository.save(LoanProduct.builder()
@@ -28,5 +32,14 @@ public class LoanService {
                 .build();
 
         return response;
+    }
+
+    @Transactional
+    public void deleteLoanProduct(Long loanProductId) {
+        // 있는지 확인 후
+        if (!loanRepository.existsById(loanProductId)) {
+            throw new LoanProductNotFoundException(loanProductId);
+        }
+        loanRepository.deleteById(loanProductId);
     }
 }
