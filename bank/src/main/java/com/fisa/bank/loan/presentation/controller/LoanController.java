@@ -20,9 +20,9 @@ public class LoanController {
     private final LoanService loanService;
 
     @PostMapping
-    public ApiResponse<SuccessBody<LoanProductCreateResponseDTO>> createLoanProduct(@Valid @RequestBody LoanProductCreateRequestDTO body){
+    public ApiResponse<SuccessBody<LoanProductCreateResponseDTO>> createLoanProduct(@Valid @RequestBody LoanProductCreateRequestDTO requestDTO){
 
-        LoanProductCreateResponseDTO response = loanService.createLoanProduct(body);
+        LoanProductCreateResponseDTO response = loanService.createLoanProduct(requestDTO);
 
         return ApiResponseGenerator.success(ResponseCode.CREATE, response);
     }
