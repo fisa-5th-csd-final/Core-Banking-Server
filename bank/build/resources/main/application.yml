@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: bank
-
-  profiles:
-    include:
-      - db
