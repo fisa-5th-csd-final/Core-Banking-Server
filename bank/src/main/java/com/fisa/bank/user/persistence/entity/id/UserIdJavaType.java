@@ -1,41 +1,20 @@
 package com.fisa.bank.user.persistence.entity.id;
 
-import org.hibernate.type.descriptor.WrapperOptions;
-import org.hibernate.type.descriptor.java.AbstractClassJavaType;
+import com.fisa.bank.common.persistence.id.BaseIdJavaType;
+import org.hibernate.type.descriptor.java.LongJavaType;
 import org.hibernate.type.descriptor.jdbc.BigIntJdbcType;
-import org.hibernate.type.descriptor.jdbc.JdbcType;
-import org.hibernate.type.descriptor.jdbc.JdbcTypeIndicators;
 
-public class UserIdJavaType extends AbstractClassJavaType<UserId> {
+public class UserIdJavaType extends BaseIdJavaType<Long, UserId> {
+
     public static final UserIdJavaType INSTANCE = new UserIdJavaType();
-    public UserIdJavaType(){ super(UserId.class); }
 
-    @Override
-    public UserId fromString(CharSequence s) {
-        return UserId.of(Long.valueOf(s.toString()));
-    }
-
-    @Override
-    public <X> X unwrap(UserId v, Class<X> type, WrapperOptions o) {
-        if (v == null) return null;
-        Long raw = v.getValue();
-        if (type.isAssignableFrom(Long.class))   return type.cast(raw);
-        if (type.isAssignableFrom(String.class)) return type.cast(String.valueOf(raw));
-        if (Number.class.isAssignableFrom(type)) return type.cast(raw);
-        throw unknownUnwrap(type);
-    }
-
-    @Override
-    public <X> UserId wrap(X value, WrapperOptions o) {
-        if (value == null) return null;
-        if (value instanceof Long l)         return UserId.of(l);
-        if (value instanceof Number n)       return UserId.of(n.longValue());
-        if (value instanceof CharSequence s) return UserId.of(Long.valueOf(s.toString()));
-        throw unknownWrap(value.getClass());
-    }
-
-    @Override
-    public JdbcType getRecommendedJdbcType(JdbcTypeIndicators indicators) {
-        return BigIntJdbcType.INSTANCE;
+    // 생성자에서 부모 클래스로 필요한 데이터 전달
+    public UserIdJavaType() {
+        super(
+                UserId.class,               // 1. ID 클래스
+                UserId::of,                 // 2. ID 생성 팩토리 메서드
+                LongJavaType.INSTANCE,      // 3. ID의 기본 타입 (Long)에 대한 Descriptor
+                BigIntJdbcType.INSTANCE     // 4. DB에서 사용할 JDBC 타입
+        );
     }
 }
