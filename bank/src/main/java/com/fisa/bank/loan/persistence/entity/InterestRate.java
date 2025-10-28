@@ -1,0 +1,39 @@
+package com.fisa.bank.loan.persistence.entity;
+
+
+import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.loan.persistence.repository.InterestRateRepository;
+import jakarta.persistence.*;
+import org.springframework.security.core.parameters.P;
+
+import java.sql.Timestamp;
+
+/*
+    금리 테이블
+ */
+@Entity
+//@EntityListeners(InterestRateListener.class)
+public class InterestRate extends BaseEntity {
+    // 금리 id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    long interestRateId;
+
+    // 대출 상품 id
+    @ManyToOne
+    @JoinColumn(name = "loanProductId", nullable = false)
+    LoanProduct loanProduct;
+
+    // 기준 금리
+    @Column(nullable = false)
+    float baseInterest;
+
+    // 가산 금리
+    @Column(nullable = false)
+    float addInterest;
+
+    // 우대 금리 상한
+    @Column(nullable = false)
+    float limitPreferInterest;
+
+}
