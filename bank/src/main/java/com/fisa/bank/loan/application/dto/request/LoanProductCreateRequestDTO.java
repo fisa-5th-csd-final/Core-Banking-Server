@@ -6,10 +6,8 @@ import jakarta.validation.constraints.NotNull;
 
 public class LoanProductCreateRequestDTO {
     @NotBlank
-    @NotNull
-    public String name;
+    private String name;
 
-    @NotBlank
     @NotNull
-    public LoanType type;
+    private LoanType type;
 }
