@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionCardEntity extends BaseEntity {
+public class CardTransactionEntity extends BaseEntity {
 
     @Id
     @Column(name = "trx_c_id", length = 20)
