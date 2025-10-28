@@ -23,7 +23,7 @@ public class UserService {
     @Transactional
     public boolean create(UserCreateRequest request){
         if(authRepository.existsById(request.loginId()))
-            throw new InvalidAuthInfoException();
+            throw InvalidAuthInfoException.EXCEPTION;
 
         String encryptedPassword = passwordUtil.encrypt(request.password());
 

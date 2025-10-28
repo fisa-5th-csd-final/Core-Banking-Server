@@ -39,7 +39,6 @@ import java.math.BigDecimal;
 public class AccountEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Convert(converter = AccountIdConverter.class)
     @JavaType(AccountIdJavaType.class)
     @JdbcTypeCode(SqlTypes.BIGINT)
     private AccountId accountId;
