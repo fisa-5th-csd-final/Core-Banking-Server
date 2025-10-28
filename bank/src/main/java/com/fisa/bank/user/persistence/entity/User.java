@@ -2,11 +2,9 @@ package com.fisa.bank.user.persistence.entity;
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.user.persistence.entity.id.UserId;
-import com.fisa.bank.user.persistence.entity.id.UserIdConverter;
 import com.fisa.bank.user.persistence.entity.id.UserIdJavaType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,7 +32,6 @@ public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Convert(converter = UserIdConverter.class)
     @JavaType(UserIdJavaType.class)
     @JdbcTypeCode(SqlTypes.BIGINT)
     private UserId userId;

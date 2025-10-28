@@ -1,20 +1,18 @@
 package com.fisa.bank.account.persistence.entity.id;
 
+import com.fisa.bank.common.persistence.id.BaseId;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+@NoArgsConstructor (access = AccessLevel.PRIVATE)
+public final class AccountId extends BaseId<Long> {
+    // 생성자
+    private AccountId(Long value) {
+        super(value);
+    }
 
-
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccountId implements Serializable {
-
-    private final Long value;
-
+    // 팩토리 메서드
     public static AccountId of(Long value){
-        if(value < 0) throw new IllegalArgumentException("AccountId value is not negative");
         return new AccountId(value);
     }
 }
