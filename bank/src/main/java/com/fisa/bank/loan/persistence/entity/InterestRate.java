@@ -26,14 +26,14 @@ public class InterestRate extends BaseEntity {
 
     // 기준 금리
     @Column(nullable = false)
-    float baseInterest;
+    private java.math.BigDecimal baseInterest;
 
     // 가산 금리
     @Column(nullable = false)
-    float addInterest;
+    private java.math.BigDecimal addInterest;
 
     // 우대 금리 상한
     @Column(nullable = false)
-    float limitPreferInterest;
+    private java.math.BigDecimal limitPreferInterest;
 
 }
