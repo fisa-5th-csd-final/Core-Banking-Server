@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class LoanService {
     private final LoanRepository loanRepository;
 
+    @org.springframework.transaction.annotation.Transactional
     public LoanProductCreateResponseDTO createLoanProduct(LoanProductCreateRequestDTO requestDTO){
 
         LoanProduct loanProduct = loanRepository.save(LoanProduct.builder()
