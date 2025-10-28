@@ -25,20 +25,17 @@ public class SecurityFilterChainConfig {
         OAuth2AuthorizationServerConfigurer authorizationServer = OAuth2AuthorizationServerConfigurer.authorizationServer();
 
         http
-                // SAS 엔드포인트만 이 체인에 매칭
+                // SAS 엔드포인트만 매칭
                 .securityMatcher(authorizationServer.getEndpointsMatcher())
                 // SAS 기능 활성화(OIDC 포함)
                 .with(authorizationServer, as -> as.oidc(Customizer.withDefaults()))
-                // CSRF 제외(토큰/메타데이터 엔드포인트)
                 .csrf(csrf -> csrf.ignoringRequestMatchers(authorizationServer.getEndpointsMatcher()))
-                // 접근 정책
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 // 인증 안 된 HTML 요청은 /login으로
                 .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
                         new LoginUrlAuthenticationEntryPoint("/login"),
                         new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                 ))
-                // 실제 로그인 폼 켜기(없으면 404)
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
