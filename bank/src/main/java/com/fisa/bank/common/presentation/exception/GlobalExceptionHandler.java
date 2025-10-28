@@ -6,6 +6,8 @@ import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
+import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 // 애플리케이션 전역 Exception 핸들러
 // BusinessException을 제외하고, 다른 종류의 예외들도 추가할 수 있다.
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     /**
@@ -23,7 +26,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public ApiResponse<FailureBody> handle(BusinessException e){
-        // BusinessException 과 관련된 HttpStatus, ErrorCode, Message 를 가져오기
+        log.warn(e.getMessage());
         ErrorResponseCode<BusinessException> errorCode = BusinessErrorCode.find(e);
 
         return ApiResponseGenerator.fail(errorCode, e);
@@ -36,6 +39,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public ApiResponse<FailureBody> handle(RuntimeException e){
+        log.warn(e.getMessage());
         return ApiResponseGenerator.fail(HttpStatus.INTERNAL_SERVER_ERROR, "500", e.getMessage());
     }
 
