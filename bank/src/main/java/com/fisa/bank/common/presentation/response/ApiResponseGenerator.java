@@ -1,12 +1,11 @@
 package com.fisa.bank.common.presentation.response;
 
+import com.fisa.bank.common.application.exception.BusinessException;
 import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
-import com.fisa.bank.common.presentation.response.code.ApiResponseCode;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.SuccessResponseCode;
 import com.fisa.bank.common.presentation.response.code.MessageCode;
-import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import org.springframework.http.HttpStatus;
 
 public class ApiResponseGenerator {
@@ -45,13 +44,26 @@ public class ApiResponseGenerator {
         return new ApiResponse<>(status, new SuccessBody<>(code, message, body));
     }
 
-    public static ApiResponse<FailureBody> fail(ErrorResponseCode<? extends Throwable> responseCode){
+    /**
+     * BusinessException 과 ErrorResponseCode를 사용해서 응답 객체를 생성합니다.
+     * @param responseCode
+     * @param e
+     * @return
+     */
+    public static ApiResponse<FailureBody> fail(ErrorResponseCode<? extends Throwable> responseCode, BusinessException e){
         HttpStatus status = responseCode.getStatus();
-        String errorCode = responseCode.getCode();
-        String message = responseCode.getMessage();
+        String errorCode = e.getErrorCode();
+        String message = e.getMessage();
         return new ApiResponse<>(status, new FailureBody(errorCode, message));
     }
 
+    /**
+     * BusinessException이 아닌, status, errorCode, message를 전부 받아서 응답 객체를 생성합니다.
+     * @param status
+     * @param errorCode
+     * @param message
+     * @return
+     */
     public static ApiResponse<FailureBody> fail(HttpStatus status, String errorCode, String message){
         return new ApiResponse<>(status, new FailureBody(errorCode, message));
     }

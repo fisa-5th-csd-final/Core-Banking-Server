@@ -15,7 +15,7 @@ public class PasswordUtil {
     public String encrypt(String password){
 
         if(!validator.validate(password))
-            throw InvalidPasswordFormatException.EXCEPTION;
+            throw new InvalidPasswordFormatException();
 
         return passwordEncoder.encode(password);
     }
