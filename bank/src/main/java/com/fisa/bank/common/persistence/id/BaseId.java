@@ -11,6 +11,11 @@ public abstract class BaseId<T> {
 
     private final T value;
 
+    // 자식 클래스에서 lombok을 쓰기 위해 부모 클래스에 기본 생성자를 필요로 함
+    protected BaseId() {
+        this.value = null;
+    }
+
     // 외부에서 인스턴스화 불가하게 처리
     protected BaseId(T value) {
         if (value == null) {
