@@ -1,7 +1,10 @@
 package com.fisa.bank.common.presentation.response;
 
+import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode;
+import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
+import com.fisa.bank.common.presentation.response.code.ApiResponseCode.SuccessResponseCode;
 import com.fisa.bank.common.presentation.response.code.MessageCode;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import org.springframework.http.HttpStatus;
@@ -15,7 +18,7 @@ public class ApiResponseGenerator {
      * @return
      * @param <T>
      */
-    public static <T> ApiResponse<SuccessBody<T>> success(ApiResponseCode responseCode, T body){
+    public static <T> ApiResponse<SuccessBody<T>> success(SuccessResponseCode responseCode, T body){
 
         String code = responseCode.getCode();
         String message = responseCode.getMessage();
@@ -26,7 +29,7 @@ public class ApiResponseGenerator {
         );
     }
 
-    public static <T> ApiResponse<SuccessBody<T>> success(ApiResponseCode responseCode){
+    public static <T> ApiResponse<SuccessBody<T>> success(SuccessResponseCode responseCode){
         String code = responseCode.getCode();
         String message = responseCode.getMessage();
 
@@ -40,6 +43,17 @@ public class ApiResponseGenerator {
         String code = messageCode.getCode();
         String message = messageCode.getMessage();
         return new ApiResponse<>(status, new SuccessBody<>(code, message, body));
+    }
+
+    public static ApiResponse<FailureBody> fail(ErrorResponseCode<? extends Throwable> responseCode){
+        HttpStatus status = responseCode.getStatus();
+        String errorCode = responseCode.getCode();
+        String message = responseCode.getMessage();
+        return new ApiResponse<>(status, new FailureBody(errorCode, message));
+    }
+
+    public static ApiResponse<FailureBody> fail(HttpStatus status, String errorCode, String message){
+        return new ApiResponse<>(status, new FailureBody(errorCode, message));
     }
 
 }
