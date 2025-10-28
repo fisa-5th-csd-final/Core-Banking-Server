@@ -6,7 +6,6 @@ import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
