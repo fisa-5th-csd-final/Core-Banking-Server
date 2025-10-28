@@ -18,7 +18,7 @@ public class AccountTransactionIdJavaType
     private AccountTransactionIdJavaType() {
         super(
                 AccountTransactionId.class,
-                AccountTransactionId::new,
+                AccountTransactionId::of,
                 LongJavaType.INSTANCE,
                 BigIntJdbcType.INSTANCE
         );

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccountTransactionId extends BaseId<Long> {
 
-    public AccountTransactionId(Long value) {
+    private AccountTransactionId(Long value) {
         super(value);
     }
 

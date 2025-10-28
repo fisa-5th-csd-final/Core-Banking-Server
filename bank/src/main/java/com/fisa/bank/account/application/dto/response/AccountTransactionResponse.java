@@ -17,7 +17,7 @@ public record AccountTransactionResponse(
         boolean isIncome,         // 입금 여부
         LocalDateTime transactionAt // 거래 일시
 ) {
-    public static AccountTransactionResponse from(AccountTransactionEntity entity) {
+    public static AccountTransactionResponse of(AccountTransactionEntity entity) {
         return AccountTransactionResponse.builder()
                 .transactionId(entity.getTrxAId().getValue())
                 .accountId(entity.getAccount().getAccountId().getValue())
