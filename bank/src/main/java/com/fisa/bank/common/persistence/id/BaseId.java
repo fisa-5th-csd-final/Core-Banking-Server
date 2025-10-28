@@ -21,7 +21,8 @@ public abstract class BaseId<T> {
         if (value == null) {
             throw new IllegalArgumentException(this.getClass().getSimpleName() + "null 값 예외 발생");
         }
-
+        commonValidate(value);
+        specificValidate(value);
         this.value = value;
     }
 
