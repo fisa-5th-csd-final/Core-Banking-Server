@@ -18,10 +18,15 @@
 
 package com.fisa.bank.account.persistence.entity;
 
+import com.fisa.bank.account.persistence.entity.id.AccountTransactionId;
+import com.fisa.bank.account.persistence.entity.id.AccountTransactionIdJavaType;
 import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -32,15 +37,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionAccountEntity extends BaseEntity {
+public class AccountTransaction extends BaseEntity {
 
     @Id
-    @Column(name = "trx_a_id", length = 20)
-    private String trxAId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JavaType(AccountTransactionIdJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private AccountTransactionId trxAId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
-    private AccountEntity account;
+    private Account account;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 20)
@@ -48,6 +55,12 @@ public class TransactionAccountEntity extends BaseEntity {
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
+
+    @Column(name = "balance_before", nullable = false)
+    private BigDecimal balanceBefore; // 거래 전 잔액
+
+    @Column(name = "balance_after", nullable = false)
+    private BigDecimal balanceAfter; // 거래 후 잔액
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
