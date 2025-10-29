@@ -1,10 +1,10 @@
 package com.fisa.bank.common.config.oauth2;
 
+import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.UserAuth;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserAuth userAuth = authRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("Username not found : %s", username)));
 
-        return new User(userAuth.getLoginId(), userAuth.getPassword(), Collections.emptyList());
+        User user = userAuth.getUser();
+
+        return new CustomUserDetails(user.getUserId(), userAuth.getLoginId(), userAuth.getPassword(), Collections.emptyList());
     }
 }
