@@ -1,6 +1,7 @@
 package com.fisa.bank.account.application.service;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
+import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
@@ -73,6 +74,34 @@ public class AccountService {
 
         return AccountTransactionResponse.of(saved);
     }
+
+    @Transactional
+    public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
+        AccountId id = AccountId.of(accountId);
+
+        AccountEntity account = accountRepository.findById(id)
+                .orElseThrow(() -> AccountNotFoundException.EXCEPTION);
+
+        BigDecimal before = account.getBalance();
+        BigDecimal after = before.add(request.amount());
+
+        account.updateBalance(after);
+
+        AccountTransactionEntity trx = AccountTransactionEntity.builder()
+                .account(account)
+                .type(TransactionType.DEPOSIT)
+                .amount(request.amount())
+                .balanceBefore(before)
+                .balanceAfter(after)
+                .isIncome(true)
+                .date(LocalDateTime.now())
+                .build();
+
+        accountTransactionRepository.save(trx);
+
+        return AccountTransactionResponse.of(trx);
+    }
+
 
 
 }

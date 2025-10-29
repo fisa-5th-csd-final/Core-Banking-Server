@@ -1,4 +1,4 @@
-package com.fisa.bank.account.application.dto;
+package com.fisa.bank.account.application.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

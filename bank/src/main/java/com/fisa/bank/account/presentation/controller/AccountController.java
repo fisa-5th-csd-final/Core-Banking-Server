@@ -1,6 +1,7 @@
 package com.fisa.bank.account.presentation.controller;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
+import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
@@ -37,4 +38,12 @@ public class AccountController {
         return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
     }
 
+    @PostMapping("/{id}/deposit")
+    public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
+            @PathVariable("id") Long accountId,
+            @RequestBody AccountDepositRequest request) {
+
+        AccountTransactionResponse response = accountService.deposit(accountId, request);
+        return ApiResponseGenerator.success(ResponseCode.CREATE, response);
+    }
 }
