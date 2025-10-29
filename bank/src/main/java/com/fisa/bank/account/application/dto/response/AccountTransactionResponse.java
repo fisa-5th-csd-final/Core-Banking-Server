@@ -26,7 +26,7 @@ public record AccountTransactionResponse(
                 .balanceBefore(entity.getBalanceBefore())
                 .balanceAfter(entity.getBalanceAfter())
                 .isIncome(entity.getIsIncome())
-                .transactionAt(entity.getCreatedAt())
+                .transactionAt(entity.getDate())
                 .build();
     }
 }
