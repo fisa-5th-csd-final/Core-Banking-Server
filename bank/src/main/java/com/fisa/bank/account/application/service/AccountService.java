@@ -58,10 +58,10 @@ public class AccountService {
     public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
         AccountId id = AccountId.of(accountId);
         AccountEntity account = accountRepository.findById(id)
-                .orElseThrow(() -> AccountNotFoundException.EXCEPTION);
+                .orElseThrow(AccountNotFoundException::new);
 
         if (account.getBalance().compareTo(request.amount()) < 0) {
-            throw InsufficientBalanceException.EXCEPTION;
+            throw new InsufficientBalanceException();
         }
 
         BigDecimal before = account.getBalance();
@@ -88,7 +88,7 @@ public class AccountService {
         AccountId id = AccountId.of(accountId);
 
         AccountEntity account = accountRepository.findById(id)
-                .orElseThrow(() -> AccountNotFoundException.EXCEPTION);
+                .orElseThrow(AccountNotFoundException::new);
 
         BigDecimal before = account.getBalance();
         BigDecimal after = before.add(request.amount());
