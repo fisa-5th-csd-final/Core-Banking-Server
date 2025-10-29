@@ -35,6 +35,7 @@ public class AccountService {
 
     private static final String DEFAULT_BANK_CODE = "020";
 
+    // 계좌 생성 서비스
     @Transactional
     public AccountResponse createAccount(AccountCreateRequest request) {
         User user = userRepository.findById(UserId.of(request.getUserId()))
@@ -53,7 +54,7 @@ public class AccountService {
         return AccountResponse.of(saved, "계좌가 성공적으로 생성되었습니다.");
     }
 
-    // 출금 서비스 로직
+    // 출금 서비스
     @Transactional
     public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
         AccountId id = AccountId.of(accountId);
@@ -83,6 +84,7 @@ public class AccountService {
         return AccountTransactionResponse.of(saved);
     }
 
+    // 예금 서비스
     @Transactional
     public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
         AccountId id = AccountId.of(accountId);
