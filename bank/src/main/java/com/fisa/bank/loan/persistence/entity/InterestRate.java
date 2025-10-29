@@ -2,11 +2,17 @@ package com.fisa.bank.loan.persistence.entity;
 
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.loan.persistence.entity.id.InterestRateId;
+import com.fisa.bank.loan.persistence.entity.id.InterestRateIdJavaType;
+import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
 import com.fisa.bank.loan.persistence.repository.InterestRateRepository;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /*
     금리 테이블
@@ -18,7 +24,9 @@ public class InterestRate extends BaseEntity {
     // 금리 id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long interestRateId;
+    @JavaType(InterestRateIdJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private InterestRateId interestRateId;
 
     // 대출 상품 id
     @ManyToOne(fetch = FetchType.LAZY)
