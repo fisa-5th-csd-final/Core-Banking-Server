@@ -17,7 +17,7 @@ import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
 import com.fisa.bank.account.persistence.repository.CardTransactionRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
