@@ -1,6 +1,6 @@
 package com.fisa.bank.account.application.dto.response;
 
-import com.fisa.bank.account.persistence.entity.AccountTransactionEntity;
+import com.fisa.bank.account.persistence.entity.AccountTransaction;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -17,7 +17,7 @@ public record AccountTransactionResponse(
         boolean isIncome,         // 입금 여부
         LocalDateTime transactionAt // 거래 일시
 ) {
-    public static AccountTransactionResponse of(AccountTransactionEntity entity) {
+    public static AccountTransactionResponse of(AccountTransaction entity) {
         return AccountTransactionResponse.builder()
                 .transactionId(entity.getTrxAId().getValue())
                 .accountId(entity.getAccount().getAccountId().getValue())

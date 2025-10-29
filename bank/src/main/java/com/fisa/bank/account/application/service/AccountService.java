@@ -8,8 +8,8 @@ import com.fisa.bank.account.application.dto.response.AccountTransactionResponse
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
-import com.fisa.bank.account.persistence.entity.AccountEntity;
-import com.fisa.bank.account.persistence.entity.AccountTransactionEntity;
+import com.fisa.bank.account.persistence.entity.Account;
+import com.fisa.bank.account.persistence.entity.AccountTransaction;
 import com.fisa.bank.account.persistence.entity.id.AccountId;
 import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
@@ -42,13 +42,13 @@ public class AccountService {
 
         String accountNumber = AccountNumberGenerator.generate();
 
-        AccountEntity account = AccountEntity.create(
+        Account account = Account.create(
                 accountNumber,
                 user,
                 DEFAULT_BANK_CODE
         );
 
-        AccountEntity saved = accountRepository.save(account);
+        Account saved = accountRepository.save(account);
 
         return AccountResponse.of(saved, "계좌가 성공적으로 생성되었습니다.");
     }
@@ -57,7 +57,7 @@ public class AccountService {
     @Transactional
     public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
         AccountId id = AccountId.of(accountId);
-        AccountEntity account = accountRepository.findById(id)
+        Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
         if (account.getBalance().compareTo(request.amount()) < 0) {
@@ -68,7 +68,7 @@ public class AccountService {
         BigDecimal after = before.subtract(request.amount());
         account.updateBalance(after);
 
-        AccountTransactionEntity trx = AccountTransactionEntity.builder()
+        AccountTransaction trx = AccountTransaction.builder()
                 .account(account)
                 .type(TransactionType.WITHDRAW)
                 .amount(request.amount())
@@ -78,7 +78,7 @@ public class AccountService {
                 .date(LocalDateTime.now())
                 .build();
 
-        AccountTransactionEntity saved = accountTransactionRepository.save(trx);
+        AccountTransaction saved = accountTransactionRepository.save(trx);
 
         return AccountTransactionResponse.of(saved);
     }
@@ -87,7 +87,7 @@ public class AccountService {
     public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
         AccountId id = AccountId.of(accountId);
 
-        AccountEntity account = accountRepository.findById(id)
+        Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
         BigDecimal before = account.getBalance();
@@ -95,7 +95,7 @@ public class AccountService {
 
         account.updateBalance(after);
 
-        AccountTransactionEntity trx = AccountTransactionEntity.builder()
+        AccountTransaction trx = AccountTransaction.builder()
                 .account(account)
                 .type(TransactionType.DEPOSIT)
                 .amount(request.amount())

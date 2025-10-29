@@ -37,7 +37,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccountTransactionEntity extends BaseEntity {
+public class AccountTransaction extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +47,7 @@ public class AccountTransactionEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
-    private AccountEntity account;
+    private Account account;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 20)

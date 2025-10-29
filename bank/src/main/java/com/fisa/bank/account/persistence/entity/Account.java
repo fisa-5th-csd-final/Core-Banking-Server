@@ -37,7 +37,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class AccountEntity extends BaseEntity {
+public class Account extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JavaType(AccountIdJavaType.class)
@@ -57,8 +57,8 @@ public class AccountEntity extends BaseEntity {
     @Column(nullable = false, length = 3)
     private String bankCode;
 
-    public static AccountEntity create(String accountNumber, User user, String bankCode) {
-        return AccountEntity.builder()
+    public static Account create(String accountNumber, User user, String bankCode) {
+        return Account.builder()
                 .accountNumber(accountNumber)
                 .user(user)
                 .bankCode(bankCode)
