@@ -10,7 +10,10 @@ import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.fisa.bank.user.application.exception.UserNotFoundException;
 import lombok.Getter;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 
 public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
@@ -22,7 +25,8 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.class),
     INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class),
     ACCOUNT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, AccountNotFoundException .class),
-    INSUFFICIENT_BALANCE_EXCEPTION(HttpStatus.BAD_REQUEST, InsufficientBalanceException .class);
+    INSUFFICIENT_BALANCE_EXCEPTION(HttpStatus.BAD_REQUEST, InsufficientBalanceException .class),
+    USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class);
 
     private final HttpStatus status;
     @Getter private final Class<? extends BusinessException> exception;
