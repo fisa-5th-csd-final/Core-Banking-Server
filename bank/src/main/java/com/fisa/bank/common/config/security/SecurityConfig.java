@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config;
+package com.fisa.bank.common.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

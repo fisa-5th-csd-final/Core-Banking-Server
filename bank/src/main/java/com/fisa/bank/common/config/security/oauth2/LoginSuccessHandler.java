@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.oauth2;
+package com.fisa.bank.common.config.security.oauth2;
 
 import com.fisa.bank.user.application.exception.UserNotFoundException;
 import com.fisa.bank.user.persistence.entity.User;

@@ -1,8 +1,7 @@
-package com.fisa.bank.common.config.oauth2;
+package com.fisa.bank.common.config.security.oauth2;
 
 import com.fisa.bank.user.persistence.entity.id.UserId;
 import java.util.Collection;
-import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

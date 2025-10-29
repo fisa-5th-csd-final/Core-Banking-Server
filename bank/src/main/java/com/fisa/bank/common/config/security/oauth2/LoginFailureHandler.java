@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.oauth2;
+package com.fisa.bank.common.config.security.oauth2;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
