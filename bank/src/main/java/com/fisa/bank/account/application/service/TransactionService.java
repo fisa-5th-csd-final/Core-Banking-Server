@@ -41,7 +41,7 @@ public class TransactionService {
 
         AccountTransaction trx = AccountTransaction.builder()
                 .account(account)
-                .type(TransactionType.WITHDRAW)
+                .type(TransactionType.ATM_WITHDRAW)
                 .amount(request.amount())
                 .balanceBefore(before)
                 .balanceAfter(after)
@@ -69,7 +69,7 @@ public class TransactionService {
 
         AccountTransaction trx = AccountTransaction.builder()
                 .account(account)
-                .type(TransactionType.DEPOSIT)
+                .type(TransactionType.ATM_DEPOSIT)
                 .amount(request.amount())
                 .balanceBefore(before)
                 .balanceAfter(after)
