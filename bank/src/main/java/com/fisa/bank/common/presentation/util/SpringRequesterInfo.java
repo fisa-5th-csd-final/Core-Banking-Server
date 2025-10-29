@@ -1,9 +1,10 @@
 package com.fisa.bank.common.presentation.util;
 
 import com.fisa.bank.common.application.util.RequesterInfo;
+import com.fisa.bank.common.config.security.auth.UserIdAuthentication;
 import com.fisa.bank.user.persistence.entity.id.UserId;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,15 @@ public class SpringRequesterInfo implements RequesterInfo {
     @Override
     public UserId getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication instanceof UsernamePasswordAuthenticationToken){
-            return (UserId) authentication.getPrincipal();
+
+        if(Objects.isNull(authentication)) {
+            throw new IllegalStateException("Authentication should be not null");
         }
 
-        // Security Context에 저장된 Authentication 이 존재하지 않을 경우 발생하는 에러
-        throw new IllegalStateException("Authentication not found");
+        if(!(authentication instanceof UserIdAuthentication)){
+            throw new IllegalStateException("UserIdAuthentication not found");
+        }
+
+        return (UserId) authentication.getPrincipal();
     }
 }
