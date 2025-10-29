@@ -41,7 +41,7 @@ public class LoanController {
     }
 
     @DeleteMapping("/products/{loanProductId}")
-    public ApiResponse<SuccessBody<ResponseCode>> deleteLoanProduct(@PathVariable Long loanProductId){
+    public ApiResponse<SuccessBody<Void>> deleteLoanProduct(@PathVariable Long loanProductId){
 
         loanService.deleteLoanProduct(loanProductId);
 
