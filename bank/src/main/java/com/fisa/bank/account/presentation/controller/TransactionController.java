@@ -58,11 +58,12 @@ public class TransactionController {
     }
 
     // 카드결제
-    @PostMapping("/pay")
+    @PostMapping("{accountId}/pay")
     public ApiResponse<SuccessBody<CardPaymentResponse>> pay(
+            @PathVariable Long accountId,
             @Valid @RequestBody CardPaymentRequest request
     ) {
-        CardPaymentResponse response = transactionService.payByCard(request);
+        CardPaymentResponse response = transactionService.payByCard(accountId, request);
         return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
     }
 }

@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record CardPaymentRequest(
-        @NotNull Long accountId,
         @Positive BigDecimal amount,
         @NotBlank String storeName,
         @NotNull ConsumptionCategory category

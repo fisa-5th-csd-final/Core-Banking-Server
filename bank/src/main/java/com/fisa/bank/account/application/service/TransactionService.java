@@ -132,8 +132,8 @@ public class TransactionService {
 
     // 카드 결제
     @Transactional
-    public CardPaymentResponse payByCard(CardPaymentRequest request) {
-        Account account = accountRepository.findById(AccountId.of(request.accountId()))
+    public CardPaymentResponse payByCard(Long accountId, CardPaymentRequest request) {
+        Account account = accountRepository.findById(AccountId.of(accountId))
                 .orElseThrow(AccountNotFoundException::new);
 
         // 계좌에도 로그 남기기위해 반영
