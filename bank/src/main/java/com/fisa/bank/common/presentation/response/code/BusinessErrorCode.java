@@ -1,15 +1,22 @@
 package com.fisa.bank.common.presentation.response.code;
 
 
+import com.fisa.bank.account.application.exception.AccountNotFoundException;
+import com.fisa.bank.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.common.application.exception.BusinessException;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
+import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.user.application.exception.InvalidAuthInfoException;
 import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.fisa.bank.user.application.exception.UserNotFoundException;
 import lombok.Getter;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 
 public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
@@ -20,7 +27,10 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
 
     INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.class),
     INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class),
-    LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, LoanProductNotFoundException.class);
+    ACCOUNT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, AccountNotFoundException.class),
+    INSUFFICIENT_BALANCE_EXCEPTION(HttpStatus.BAD_REQUEST, InsufficientBalanceException.class),
+    USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class),
+    LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, LoanProductNotFoundException .class);
 
     private final HttpStatus status;
     @Getter private final Class<? extends BusinessException> exception;

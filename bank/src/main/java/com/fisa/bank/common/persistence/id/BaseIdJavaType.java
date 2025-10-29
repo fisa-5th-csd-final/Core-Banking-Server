@@ -54,10 +54,11 @@ public abstract class BaseIdJavaType<T, ID extends BaseId<T>>
 
     @Override
     public <X> ID wrap(X value, WrapperOptions options) {
-        if (value == null) return null;
+        if (value instanceof BaseId<?> baseId) {
+            return (ID) baseId;
+        }
 
         T baseValue = baseJavaType.wrap(value, options);
-
         return factory.apply(baseValue);
     }
 }

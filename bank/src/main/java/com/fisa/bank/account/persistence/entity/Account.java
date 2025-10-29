@@ -22,6 +22,7 @@ package com.fisa.bank.account.persistence.entity;
 
 import com.fisa.bank.account.persistence.entity.id.*;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.user.persistence.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JavaType;
@@ -36,7 +37,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class AccountEntity extends BaseEntity {
+public class Account extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JavaType(AccountIdJavaType.class)
@@ -46,8 +47,9 @@ public class AccountEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private BigDecimal balance;
@@ -55,20 +57,17 @@ public class AccountEntity extends BaseEntity {
     @Column(nullable = false, length = 3)
     private String bankCode;
 
-    public static AccountEntity create(String accountNumber, Long userId, String bankCode) {
-        return AccountEntity.builder()
+    public static Account create(String accountNumber, User user, String bankCode) {
+        return Account.builder()
                 .accountNumber(accountNumber)
-                .userId(userId)
+                .user(user)
                 .bankCode(bankCode)
                 .balance(BigDecimal.ZERO)
                 .build();
     }
 
-    public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
-    }
-
-    public void withdraw(BigDecimal amount) {
-        this.balance = this.balance.subtract(amount);
+    // 거래 후 잔액으로 balance 변경
+    public void updateBalance(BigDecimal after) {
+        this.balance = after;
     }
 }
