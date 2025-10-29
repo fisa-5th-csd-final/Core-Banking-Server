@@ -1,19 +1,10 @@
 package com.fisa.bank.account.application.service;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
-import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
-import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
-import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
-import com.fisa.bank.account.application.exception.AccountNotFoundException;
-import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.account.persistence.entity.Account;
-import com.fisa.bank.account.persistence.entity.AccountTransaction;
-import com.fisa.bank.account.persistence.entity.id.AccountId;
-import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
 import com.fisa.bank.user.application.exception.UserNotFoundException;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.id.UserId;
@@ -21,9 +12,6 @@ import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
