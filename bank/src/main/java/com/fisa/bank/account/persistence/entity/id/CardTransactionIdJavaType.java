@@ -4,8 +4,9 @@ import com.fisa.bank.common.persistence.id.BaseIdJavaType;
 import org.hibernate.type.descriptor.java.LongJavaType;
 import org.hibernate.type.descriptor.jdbc.BigIntJdbcType;
 
-public class CardTransactionJavaType extends BaseIdJavaType<Long, CardTransactionId> {
-    private CardTransactionJavaType() {
+public class CardTransactionIdJavaType extends BaseIdJavaType<Long, CardTransactionId> {
+
+    private CardTransactionIdJavaType() {
         super(
                 CardTransactionId.class,
                 CardTransactionId::of,

@@ -16,9 +16,8 @@
 
 package com.fisa.bank.account.persistence.entity;
 
-import com.fisa.bank.account.persistence.entity.id.AccountTransactionIdJavaType;
 import com.fisa.bank.account.persistence.entity.id.CardTransactionId;
-import com.fisa.bank.account.persistence.entity.id.CardTransactionJavaType;
+import com.fisa.bank.account.persistence.entity.id.CardTransactionIdJavaType;
 import com.fisa.bank.account.persistence.enums.ConsumptionCategory;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -39,7 +38,7 @@ public class CardTransaction extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JavaType(CardTransactionJavaType.class)
+    @JavaType(CardTransactionIdJavaType.class)
     @JdbcTypeCode(SqlTypes.BIGINT)
     private CardTransactionId trxCId;
 
