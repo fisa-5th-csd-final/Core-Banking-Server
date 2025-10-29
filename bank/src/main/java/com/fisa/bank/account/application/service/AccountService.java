@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccountTransactionRepository accountTransactionRepository;
     private final UserRepository userRepository;
 
     private static final String DEFAULT_BANK_CODE = "020";
@@ -53,64 +52,6 @@ public class AccountService {
 
         return AccountResponse.of(saved, "계좌가 성공적으로 생성되었습니다.");
     }
-
-    // 출금 서비스
-    @Transactional
-    public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
-        AccountId id = AccountId.of(accountId);
-        Account account = accountRepository.findById(id)
-                .orElseThrow(AccountNotFoundException::new);
-
-        if (account.getBalance().compareTo(request.amount()) < 0) {
-            throw new InsufficientBalanceException();
-        }
-
-        BigDecimal before = account.getBalance();
-        BigDecimal after = before.subtract(request.amount());
-        account.updateBalance(after);
-
-        AccountTransaction trx = AccountTransaction.builder()
-                .account(account)
-                .type(TransactionType.WITHDRAW)
-                .amount(request.amount())
-                .balanceBefore(before)
-                .balanceAfter(after)
-                .isIncome(false)
-                .date(LocalDateTime.now())
-                .build();
-
-        AccountTransaction saved = accountTransactionRepository.save(trx);
-
-        return AccountTransactionResponse.of(saved);
-    }
-
-    // 예금 서비스
-    @Transactional
-    public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
-        AccountId id = AccountId.of(accountId);
-
-        Account account = accountRepository.findById(id)
-                .orElseThrow(AccountNotFoundException::new);
-
-        BigDecimal before = account.getBalance();
-        BigDecimal after = before.add(request.amount());
-
-        account.updateBalance(after);
-
-        AccountTransaction trx = AccountTransaction.builder()
-                .account(account)
-                .type(TransactionType.DEPOSIT)
-                .amount(request.amount())
-                .balanceBefore(before)
-                .balanceAfter(after)
-                .isIncome(true)
-                .date(LocalDateTime.now())
-                .build();
-
-        AccountTransaction saved = accountTransactionRepository.save(trx);
-        return AccountTransactionResponse.of(saved);
-    }
-
 
 
 }
