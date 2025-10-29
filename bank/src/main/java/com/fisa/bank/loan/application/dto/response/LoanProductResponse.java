@@ -4,6 +4,7 @@ import com.fisa.bank.loan.application.service.LoanService;
 import com.fisa.bank.loan.persistence.entity.InterestRate;
 import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
+import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -17,7 +18,7 @@ import java.util.List;
 public class LoanProductResponse<T> {
     private List<T> data;
 
-    private final Long id;
+    private final LoanProductId id;
     private final String name;
     private final LoanType type;
 //    private List<InterestRate> interestRateList;
@@ -31,7 +32,7 @@ public class LoanProductResponse<T> {
 //                entity.getInterestRateList()
         );
     }
-    public LoanProductResponse(Long id, String name, LoanType type){
+    public LoanProductResponse(LoanProductId id, String name, LoanType type){
         this.id = id;
         this.name = name;
         this.type = type;

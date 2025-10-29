@@ -27,7 +27,7 @@ public class LoanLedger {
     private Long loanLedgerId;
 
     // LoanLedger 1 : N LoanTransaction
-    @OneToMany(mappedBy = "loanLedger")
+    @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 
 

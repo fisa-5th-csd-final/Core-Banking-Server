@@ -7,6 +7,7 @@ import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
 import com.fisa.bank.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
+import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class LoanService {
         LoanProductCreateResponse response = LoanProductCreateResponse.builder()
                 .name(loanProduct.getName())
                 .type(loanProduct.getType())
-//                .loanProductId(LoanProductId.)
+                .loanProductId(loanProduct.getLoanProductId())
                 .build();
 
         return response;
