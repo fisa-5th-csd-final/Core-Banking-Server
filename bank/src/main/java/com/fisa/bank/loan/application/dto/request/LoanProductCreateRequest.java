@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class LoanProductCreateRequestDTO {
+public class LoanProductCreateRequest {
     @NotBlank
     private String name;
 
