@@ -2,6 +2,7 @@ package com.fisa.bank.common.presentation.response.code;
 
 
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
+import com.fisa.bank.account.application.exception.AccountOwnerMismatchException;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.common.application.exception.BusinessException;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
@@ -26,7 +27,8 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class),
     ACCOUNT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, AccountNotFoundException.class),
     INSUFFICIENT_BALANCE_EXCEPTION(HttpStatus.BAD_REQUEST, InsufficientBalanceException.class),
-    USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class);
+    USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class),
+    ACCOUNT_OWNER_MISMATCH_EXCEPTION(HttpStatus.BAD_REQUEST, AccountOwnerMismatchException.class);
 
     private final HttpStatus status;
     @Getter private final Class<? extends BusinessException> exception;
