@@ -11,9 +11,9 @@ import com.fisa.bank.account.persistence.entity.id.AccountId;
 import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,64 +21,69 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
+
     private final AccountRepository accountRepository;
     private final AccountTransactionRepository accountTransactionRepository;
 
-    // 출금 서비스
-    @Transactional
-    public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
-        AccountId id = AccountId.of(accountId);
-        Account account = accountRepository.findById(id)
-                .orElseThrow(AccountNotFoundException::new);
+    // 거래 시 거래 전, 거래 후 금액, 잔액 부족 등의 공통의 로직을 작성
+    private AccountTransaction processTransaction(
+            Account account,
+            BigDecimal amount,
+            TransactionType type,
+            boolean isIncome
+    ) {
+        BigDecimal before = account.getBalance();
+        BigDecimal after = isIncome ? before.add(amount) : before.subtract(amount);
 
-        if (account.getBalance().compareTo(request.amount()) < 0) {
+        // 출금 시 잔액 부족 검증
+        if (!isIncome && before.compareTo(amount) < 0) {
             throw new InsufficientBalanceException();
         }
 
-        BigDecimal before = account.getBalance();
-        BigDecimal after = before.subtract(request.amount());
         account.updateBalance(after);
 
         AccountTransaction trx = AccountTransaction.builder()
                 .account(account)
-                .type(TransactionType.ATM_WITHDRAW)
-                .amount(request.amount())
+                .type(type)
+                .amount(amount)
                 .balanceBefore(before)
                 .balanceAfter(after)
-                .isIncome(false)
+                .isIncome(isIncome)
                 .date(LocalDateTime.now())
                 .build();
 
-        AccountTransaction saved = accountTransactionRepository.save(trx);
-
-        return AccountTransactionResponse.of(saved);
+        return accountTransactionRepository.save(trx);
     }
 
-    // 예금 서비스
+    // 출금
     @Transactional
-    public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
-        AccountId id = AccountId.of(accountId);
-
-        Account account = accountRepository.findById(id)
+    public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
+        Account account = accountRepository.findById(AccountId.of(accountId))
                 .orElseThrow(AccountNotFoundException::new);
 
-        BigDecimal before = account.getBalance();
-        BigDecimal after = before.add(request.amount());
+        AccountTransaction trx = processTransaction(
+                account,
+                request.amount(),
+                TransactionType.ATM_WITHDRAW,
+                false
+        );
 
-        account.updateBalance(after);
-
-        AccountTransaction trx = AccountTransaction.builder()
-                .account(account)
-                .type(TransactionType.ATM_DEPOSIT)
-                .amount(request.amount())
-                .balanceBefore(before)
-                .balanceAfter(after)
-                .isIncome(true)
-                .date(LocalDateTime.now())
-                .build();
-
-        AccountTransaction saved = accountTransactionRepository.save(trx);
-        return AccountTransactionResponse.of(saved);
+        return AccountTransactionResponse.of(trx);
     }
 
+    // 입금
+    @Transactional
+    public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
+        Account account = accountRepository.findById(AccountId.of(accountId))
+                .orElseThrow(AccountNotFoundException::new);
+
+        AccountTransaction trx = processTransaction(
+                account,
+                request.amount(),
+                TransactionType.ATM_DEPOSIT,
+                true
+        );
+
+        return AccountTransactionResponse.of(trx);
+    }
 }
