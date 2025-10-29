@@ -14,6 +14,10 @@ import com.fisa.bank.account.persistence.entity.id.AccountId;
 import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
+import com.fisa.bank.user.application.exception.UserNotFoundException;
+import com.fisa.bank.user.persistence.entity.User;
+import com.fisa.bank.user.persistence.entity.id.UserId;
+import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,17 +31,21 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountTransactionRepository accountTransactionRepository;
+    private final UserRepository userRepository;
 
     private static final String DEFAULT_BANK_CODE = "020";
 
     @Transactional
     public AccountResponse createAccount(AccountCreateRequest request) {
+        User user = userRepository.findById(UserId.of(request.getUserId()))
+                .orElseThrow(UserNotFoundException::new);
+
         String accountNumber = AccountNumberGenerator.generate();
 
         AccountEntity account = AccountEntity.create(
-                accountNumber, // 계좌번호
-                request.getUserId(), // 사용자 Id
-                DEFAULT_BANK_CODE // 은행 코드
+                accountNumber,
+                user,
+                DEFAULT_BANK_CODE
         );
 
         AccountEntity saved = accountRepository.save(account);

@@ -19,7 +19,7 @@ public class AccountResponse {
         return AccountResponse.builder()
                 .accountId(entity.getAccountId().getValue())
                 .accountNumber(entity.getAccountNumber())
-                .userId(entity.getUserId())
+                .userId(entity.getUser().getUserId().getValue())
                 .bankCode(entity.getBankCode())
                 .message(message)
                 .build();

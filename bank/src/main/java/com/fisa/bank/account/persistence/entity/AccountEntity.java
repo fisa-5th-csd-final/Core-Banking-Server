@@ -22,6 +22,7 @@ package com.fisa.bank.account.persistence.entity;
 
 import com.fisa.bank.account.persistence.entity.id.*;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.user.persistence.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JavaType;
@@ -46,8 +47,9 @@ public class AccountEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private BigDecimal balance;
@@ -55,10 +57,10 @@ public class AccountEntity extends BaseEntity {
     @Column(nullable = false, length = 3)
     private String bankCode;
 
-    public static AccountEntity create(String accountNumber, Long userId, String bankCode) {
+    public static AccountEntity create(String accountNumber, User user, String bankCode) {
         return AccountEntity.builder()
                 .accountNumber(accountNumber)
-                .userId(userId)
+                .user(user)
                 .bankCode(bankCode)
                 .balance(BigDecimal.ZERO)
                 .build();
