@@ -26,9 +26,9 @@ public class LoanLedger {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long loanLedgerId;
 
-    // LoanLedger 1 : N TranscationcLoan
+    // LoanLedger 1 : N LoanTransaction
     @OneToMany(mappedBy = "loanLedger")
-    private List<TransactionLoan> transactionLoanList = new ArrayList<>();
+    private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 
 
     @ManyToOne(fetch = FetchType.LAZY)
