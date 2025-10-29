@@ -30,7 +30,7 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
     ACCOUNT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, AccountNotFoundException.class),
     INSUFFICIENT_BALANCE_EXCEPTION(HttpStatus.BAD_REQUEST, InsufficientBalanceException.class),
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class),
-    LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, LoanProductNotFoundException .class);
+    LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanProductNotFoundException.class);
 
     private final HttpStatus status;
     @Getter private final Class<? extends BusinessException> exception;
