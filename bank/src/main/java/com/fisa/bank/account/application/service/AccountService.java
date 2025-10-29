@@ -107,9 +107,8 @@ public class AccountService {
                 .date(LocalDateTime.now())
                 .build();
 
-        accountTransactionRepository.save(trx);
-
-        return AccountTransactionResponse.of(trx);
+        AccountTransaction saved = accountTransactionRepository.save(trx);
+        return AccountTransactionResponse.of(saved);
     }
 
 
