@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.oauth2;
+package com.fisa.bank.common.config.security.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

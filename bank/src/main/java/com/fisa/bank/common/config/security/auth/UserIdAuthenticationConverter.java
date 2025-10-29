@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.oauth2;
+package com.fisa.bank.common.config.security.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
