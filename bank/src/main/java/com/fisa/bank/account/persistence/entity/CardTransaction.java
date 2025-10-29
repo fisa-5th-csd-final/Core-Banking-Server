@@ -16,10 +16,16 @@
 
 package com.fisa.bank.account.persistence.entity;
 
+import com.fisa.bank.account.persistence.entity.id.AccountTransactionIdJavaType;
+import com.fisa.bank.account.persistence.entity.id.CardTransactionId;
+import com.fisa.bank.account.persistence.entity.id.CardTransactionJavaType;
 import com.fisa.bank.account.persistence.enums.ConsumptionCategory;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 
@@ -32,8 +38,10 @@ import java.math.BigDecimal;
 public class CardTransaction extends BaseEntity {
 
     @Id
-    @Column(name = "trx_c_id", length = 20)
-    private String trxCId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JavaType(CardTransactionJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private CardTransactionId trxCId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
