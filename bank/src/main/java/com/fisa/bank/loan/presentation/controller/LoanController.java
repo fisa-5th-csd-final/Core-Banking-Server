@@ -6,7 +6,10 @@ import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
+import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
+import com.fisa.bank.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.loan.application.service.LoanService;
+import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +33,11 @@ public class LoanController {
     }
 
     @GetMapping("/products")
-    public void getLoanProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
-        loanService.findProducts(pageable);
+    public ApiResponse<SuccessBody<PagedResponse<LoanProductResponse<LoanProduct>>>> getLoanProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
+
+        PagedResponse<LoanProductResponse<LoanProduct>> allProducts = loanService.findAllProducts(pageable);
+
+        return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
     }
 
     @DeleteMapping("/products/{loanProductId}")
