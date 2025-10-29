@@ -2,7 +2,9 @@ package com.fisa.bank.account.application.service;
 
 import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
+import com.fisa.bank.account.application.dto.request.TransferRequest;
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
+import com.fisa.bank.account.application.dto.response.TransferResponse;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.persistence.entity.Account;
@@ -30,7 +32,8 @@ public class TransactionService {
             Account account,
             BigDecimal amount,
             TransactionType type,
-            boolean isIncome
+            boolean isIncome,
+            String destinationAccount
     ) {
         BigDecimal before = account.getBalance();
         BigDecimal after = isIncome ? before.add(amount) : before.subtract(amount);
@@ -50,6 +53,7 @@ public class TransactionService {
                 .balanceAfter(after)
                 .isIncome(isIncome)
                 .date(LocalDateTime.now())
+                .destinationAccount(destinationAccount)
                 .build();
 
         return accountTransactionRepository.save(trx);
@@ -65,7 +69,8 @@ public class TransactionService {
                 account,
                 request.amount(),
                 TransactionType.ATM_WITHDRAW,
-                false
+                false,
+                null
         );
 
         return AccountTransactionResponse.of(trx);
@@ -81,9 +86,41 @@ public class TransactionService {
                 account,
                 request.amount(),
                 TransactionType.ATM_DEPOSIT,
-                true
+                true,
+                null
         );
 
         return AccountTransactionResponse.of(trx);
+    }
+
+    @Transactional
+    public TransferResponse transfer(TransferRequest request) {
+        Account from = accountRepository.findById(AccountId.of(request.fromAccountId()))
+                .orElseThrow(AccountNotFoundException::new);
+
+        Account to = accountRepository.findById(AccountId.of(request.toAccountId()))
+                .orElseThrow(AccountNotFoundException::new);
+
+        BigDecimal amount = request.amount();
+
+        // 출금 (보내는 사람)
+        AccountTransaction withdrawTx = processTransaction(
+                from,
+                amount,
+                TransactionType.TRANSFER_SEND,
+                false,
+                to.getAccountNumber()
+        );
+
+        // 입금 (받는 사람)
+        AccountTransaction depositTx = processTransaction(
+                to,
+                amount,
+                TransactionType.TRANSFER_RECEIVE,
+                true,
+                from.getAccountNumber()
+        );
+
+        return TransferResponse.of(from, to, amount);
     }
 }
