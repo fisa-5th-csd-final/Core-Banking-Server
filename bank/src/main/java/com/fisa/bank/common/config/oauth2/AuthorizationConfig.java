@@ -12,25 +12,71 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.web.authentication.AuthenticationConverter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 // OAuth2.0 Authorization Server 를 설정하는 Config
 @Configuration
 public class AuthorizationConfig {
 
+
+    // OAuth 2.0 클라이언트 저장소 등록
+    // 인메모리, JDBC 선택 가능
     @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
-        // Builder를 사용해서 어떤 URI를 사용할 것인지 커스텀 가능
-        return AuthorizationServerSettings.builder().build();
+    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbc) {
+        return new JdbcRegisteredClientRepository(jdbc);
+    }
+
+    // 인증/인가 동의 저장소
+    @Bean
+    OAuth2AuthorizationService authorizationService(JdbcTemplate jdbc,
+                                                    RegisteredClientRepository repo) {
+        return new JdbcOAuth2AuthorizationService(jdbc, repo);
+    }
+
+    @Bean
+    OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbc,
+                                                                  RegisteredClientRepository repo) {
+        return new JdbcOAuth2AuthorizationConsentService(jdbc, repo);
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationFilter authenticationFilter(AuthenticationManager authenticationManager,
+                                                     AuthenticationConverter authenticationConverter,
+                                                     AuthenticationSuccessHandler successHandler,
+                                                     AuthenticationFailureHandler failureHandler){
+
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, authenticationConverter);
+        RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
+
+        authenticationFilter.setRequestMatcher(requestMatcher);
+        authenticationFilter.setSuccessHandler(successHandler);
+        authenticationFilter.setFailureHandler(failureHandler);
+
+        return authenticationFilter;
     }
 
     // Spring 에서 정의한, JwtDecoder 빈 등록
@@ -39,27 +85,13 @@ public class AuthorizationConfig {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
-    // OAuth 2.0 클라이언트 저장소 등록
-    // 인메모리, JDBC 선택 가능
+    // Spring 에서 정의한, JwtEncoder 빈 등록
     @Bean
-    public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client")
-                .clientSecret("{noop}secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client")
-                .postLogoutRedirectUri("http://127.0.0.1:8080/")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-                .build();
-
-        return new InMemoryRegisteredClientRepository(oidcClient);
+    public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource){
+        return new NimbusJwtEncoder(jwkSource);
     }
 
-    // JWK 생성 빈 등록
+    // JWT에 사용되는 비밀키, 공개키 정보 빈으로 등록
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = generateRsaKey();
