@@ -42,10 +42,10 @@ public class LoanService {
     @Transactional
     public void deleteLoanProduct(Long loanProductId) {
         // 있는지 확인 후
-        if (!loanRepository.existsById(loanProductId)) {
+        if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
             throw new LoanProductNotFoundException(loanProductId);
         }
-        loanRepository.deleteById(loanProductId);
+        loanRepository.deleteById(LoanProductId.of(loanProductId));
     }
 
     @Transactional

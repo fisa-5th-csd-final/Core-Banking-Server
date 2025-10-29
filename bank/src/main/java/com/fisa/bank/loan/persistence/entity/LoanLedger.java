@@ -1,5 +1,8 @@
 package com.fisa.bank.loan.persistence.entity;
 
+import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
+import com.fisa.bank.loan.persistence.entity.id.LoanLedgerIdJavaType;
+import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.loan.persistence.enums.RepaymentType;
@@ -8,6 +11,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +30,9 @@ public class LoanLedger {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long loanLedgerId;
+    @JavaType(LoanLedgerIdJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private LoanLedgerId loanLedgerId;
 
     // LoanLedger 1 : N LoanTransaction
     @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -5,8 +5,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class LoanProductId extends BaseId<Long> {
-    private LoanProductId(Long value){ super(value); }
+public class InterestRateId extends BaseId<Long> {
+    private InterestRateId(Long value){ super(value); }
 
-    public static LoanProductId of(Long value) { return new LoanProductId(value);};
+    public static InterestRateId of(Long value) { return new InterestRateId(value);};
 }

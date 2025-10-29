@@ -4,13 +4,13 @@ import com.fisa.bank.common.persistence.id.BaseIdJavaType;
 import org.hibernate.type.descriptor.java.LongJavaType;
 import org.hibernate.type.descriptor.jdbc.BigIntJdbcType;
 
-public class LoanProductIdJavaType extends BaseIdJavaType<Long, LoanProductId>{
-    public static final LoanProductIdJavaType INSTANCE = new LoanProductIdJavaType();
+public class InterestRateIdJavaType extends BaseIdJavaType<Long, InterestRateId>{
+    public static final InterestRateIdJavaType INSTANCE = new InterestRateIdJavaType();
 
-    public LoanProductIdJavaType(){
+    public InterestRateIdJavaType(){
         super(
-                LoanProductId.class,
-                LoanProductId::of,
+                InterestRateId.class,
+                InterestRateId::of,
                 LongJavaType.INSTANCE,
                 BigIntJdbcType.INSTANCE
         );
