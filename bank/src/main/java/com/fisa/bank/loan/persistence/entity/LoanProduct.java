@@ -1,9 +1,13 @@
 package com.fisa.bank.loan.persistence.entity;
 
-import com.fisa.bank.loan.persistence.enums.InterestType;
+import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
+import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +21,9 @@ public class LoanProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long loanProductId;
+    @JavaType(LoanProductIdJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private LoanProductId loanProductId;
 
     // LoanProduct 1 : N LoanLedger
     @OneToMany(mappedBy = "loanProduct")

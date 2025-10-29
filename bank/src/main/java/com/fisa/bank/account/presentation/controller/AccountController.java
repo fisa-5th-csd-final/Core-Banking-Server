@@ -17,6 +17,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    // 계좌 생성 API
     @PostMapping
     public ApiResponse<SuccessBody<AccountResponse>> createAccount(@RequestBody AccountCreateRequest request) {
         AccountResponse response = accountService.createAccount(request);

@@ -1,11 +1,17 @@
 package com.fisa.bank.loan.persistence.entity;
 
+import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
+import com.fisa.bank.loan.persistence.entity.id.LoanTransactionId;
+import com.fisa.bank.loan.persistence.entity.id.LoanTransactionIdJavaType;
 import com.fisa.bank.loan.persistence.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,12 +23,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
-public class TransactionLoan {
+public class LoanTransaction {
 
     // 거래 id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long trxLId;
+    @JavaType(LoanTransactionIdJavaType.class)
+    @JdbcTypeCode(SqlTypes.BIGINT)
+    private LoanTransactionId trxLId;
 
     // LoanLedger 1 : N TranscationLoan
     @ManyToOne(fetch = FetchType.LAZY)
