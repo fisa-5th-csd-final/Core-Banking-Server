@@ -38,10 +38,10 @@ public class AccountController {
         return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
     }
 
-    @PostMapping("/{id}/deposit")
+    @PostMapping("/{accountId}/deposit")
     public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
-            @PathVariable("id") Long accountId,
-            @RequestBody AccountDepositRequest request) {
+            @PathVariable Long accountId,
+            @Valid @RequestBody AccountDepositRequest request) {
 
         AccountTransactionResponse response = accountService.deposit(accountId, request);
         return ApiResponseGenerator.success(ResponseCode.CREATE, response);
