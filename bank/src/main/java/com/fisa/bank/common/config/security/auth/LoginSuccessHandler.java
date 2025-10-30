@@ -1,5 +1,7 @@
 package com.fisa.bank.common.config.security.auth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Component;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtEncoder jwtEncoder;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -62,9 +66,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                 response.setStatus(HttpStatus.OK.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter()
-                        .write("""
-                                {"access_token":"%s","refresh_token":"%s"}
-                                """.formatted(accessToken, refreshToken));
+                        .write(createBody(accessToken, refreshToken));
                 response.flushBuffer();
                 return;
             }
@@ -74,5 +76,14 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         // UserIdAuthentication 이 아니면 예외
         throw new IllegalStateException("Authentication is not UserIdAuthentication");
 
+    }
+
+    // AccessToken, RefreshToken 이 담긴 바디를 만드는 과정
+    private String createBody(String accessToken, String refreshToken){
+        try {
+            return objectMapper.writeValueAsString(Map.of("access_token", accessToken, "refresh_token", refreshToken));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Exception occur in json processing");
+        }
     }
 }
