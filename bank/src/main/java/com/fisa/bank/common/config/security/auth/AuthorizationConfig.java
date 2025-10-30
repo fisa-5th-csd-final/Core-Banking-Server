@@ -1,6 +1,7 @@
 package com.fisa.bank.common.config.security.auth;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,18 +28,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 // OAuth2.0 Authorization Server 를 설정하는 Config
 @Configuration
 public class AuthorizationConfig {
-
-    private final AuthenticationConverter appUnAuthConverter;
-    private final AuthenticationConverter appAuthConverter;
-
-    public AuthorizationConfig(
-            @Qualifier("AppAuthenticationConverter") AuthenticationConverter appAuthConverter,
-            @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter
-    ){
-        this.appAuthConverter = appAuthConverter;
-        this.appUnAuthConverter = appUnAuthConverter;
-    }
-
 
     // OAuth 2.0 클라이언트 저장소 등록
     // 인메모리, JDBC 선택 가능
@@ -69,12 +58,14 @@ public class AuthorizationConfig {
     /**
      * 사용자로부터 자격 증명 (ID/PW)를 받고
      * 인증을 수행하는 필터
+     *
+     * UsernamePasswordAuthentication 사용
      */
     @Bean("unAuthenticatedFilter")
-    public AuthenticationFilter unAuthenticated(AuthenticationSuccessHandler successHandler,
+    public AuthenticationFilter unAuthenticated(AuthenticationManager authenticationManager,
+                                                AuthenticationSuccessHandler successHandler,
                                                 AuthenticationFailureHandler failureHandler,
-                                                @Qualifier("JwtAuthenticationProvider")AuthenticationProvider authenticationProvider){
-        AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
+                                                @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter){
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, appUnAuthConverter);
         RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
 
@@ -88,10 +79,14 @@ public class AuthorizationConfig {
     /**
      * 이미 인증이 완료된 사용자가 Jwt를 보내면
      * 이를 Authentication으로 변환해서 저장하는 필터
+     *
+     * JwtAuthentication 사용
      */
     @Bean("authenticatedFilter")
-    public AuthenticationFilter authenticated(AuthenticationManager authenticationManager){
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, appAuthConverter);
+    public AuthenticationFilter authenticated(@Qualifier("AppAuthenticationProvider")AuthenticationProvider authenticationProvider,
+                                              @Qualifier("AppAuthenticationConverter") AuthenticationConverter authenticationConverter){
+        AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
+        AuthenticationFilter authenticationFilter = new JwtAuthenticationFilter(authenticationManager, authenticationConverter);
         RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/**");
         authenticationFilter.setRequestMatcher(requestMatcher);
 
@@ -101,6 +96,13 @@ public class AuthorizationConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(@Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter){
+        FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>(authenticationFilter);
+        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+        return registrationBean;
     }
 
 }
