@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         UserAuth userAuth = authRepository.findById(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("Username not found : %s", username)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Username not found : %s", username)));
 
         User user = userAuth.getUser();
 
