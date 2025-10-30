@@ -54,7 +54,26 @@ public class LoanService {
 
         Page<LoanProductResponse<LoanProduct>> response = productPage.map(LoanProductResponse::from);
 
-
         return new PagedResponse<>(response);
+    }
+
+    @Transactional
+    public void applyForLoan(){
+        // 받아야 하는 데이터
+            // 유저 아이디, 대출 상품 아이디, 원금, 금리 유형
+            // 상환 방법(원리금, 원금, 만기)
+
+        // 미리 세팅해둘 데이터
+            // 남은 상환액(원금) - 초기값은 원금과 동일
+            // 대출 상태 - 초기값은 정상
+
+        // 요청해서 세팅해야 하는 데이터
+            // 대출 유형 - 대출 상품에서 조회
+            // 우대 금리 - 유저의 신용등급과 고객등급으로 조회
+            // 중도 상환 수수료 - 금리 유형, 대출 유형으로 조회
+            // 기본 금리 - Loan 도메인에 전역변수로 선언
+            // TODO: 가산 금리, 최종 금리
+            // 가산 금리 - 대출 상품의 id로 금리 테이블에서 조회해야 함.
+            // 최종 금리 = 기본 금리 + 가산 금리 - 우대 금리
     }
 }
