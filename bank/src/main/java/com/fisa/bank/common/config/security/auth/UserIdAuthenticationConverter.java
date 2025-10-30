@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
  * 사용자가 요청한 HTTP Request에서 자격 증명(ID/PW)을 꺼내서
  * Authentication으로 만드는 역할
  */
-@Component
+@Component("AppUnAuthenticationConverter")
 @RequiredArgsConstructor
 public class UserIdAuthenticationConverter implements AuthenticationConverter {
 

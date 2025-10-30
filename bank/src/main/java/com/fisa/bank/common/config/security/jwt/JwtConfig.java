@@ -1,7 +1,6 @@
 package com.fisa.bank.common.config.security.jwt;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -11,10 +10,9 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 @Configuration
-@RequiredArgsConstructor
 public class JwtConfig {
 
-    @Bean(name = "AppJwtDecoder")
+    @Bean("AppJwtDecoder")
     public JwtDecoder jwtDecoder(JwtProperties jwtProperties){
         return NimbusJwtDecoder
                 .withSecretKey(jwtProperties.getSecretKey())
@@ -22,7 +20,7 @@ public class JwtConfig {
                 .build();
     }
 
-    @Bean(name = "AppJwtEncoder")
+    @Bean("AppJwtEncoder")
     public JwtEncoder jwtEncoder(JwtProperties jwtProperties){
         return new NimbusJwtEncoder(new ImmutableSecret<>(jwtProperties.getSecretKey()));
     }

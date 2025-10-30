@@ -1,6 +1,5 @@
 package com.fisa.bank.common.config.security.jwk;
 
-import com.fisa.bank.common.config.security.util.AsymmetricKeyUtils;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import lombok.Getter;
@@ -14,8 +13,10 @@ public class JwkProperties {
     private final PublicKey publicKey;
 
     public JwkProperties(String publicKey, String privateKey){
-        this.privateKey = AsymmetricKeyUtils.createPrivateKey(privateKey, "RSA");
-        this.publicKey = AsymmetricKeyUtils.createPublicKey(publicKey, "RSA");
+//        this.privateKey = AsymmetricKeyUtils.createPrivateKey(privateKey, "RSA");
+//        this.publicKey = AsymmetricKeyUtils.createPublicKey(publicKey, "RSA");
+        this.publicKey = null;
+        this.privateKey = null;
     }
 
 }
