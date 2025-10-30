@@ -38,4 +38,23 @@ public class LoanService {
 
         return response;
     }
+   
+    @Transactional
+    public void deleteLoanProduct(Long loanProductId) {
+        // 있는지 확인 후
+        if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
+            throw new LoanProductNotFoundException(loanProductId);
+        }
+        loanRepository.deleteById(LoanProductId.of(loanProductId));
+    }
+
+    @Transactional
+    public PagedResponse<LoanProductResponse<LoanProduct>> findAllProducts(Pageable pageable) {
+        Page<LoanProduct> productPage = loanRepository.findAll(pageable);
+
+        Page<LoanProductResponse<LoanProduct>> response = productPage.map(LoanProductResponse::from);
+
+
+        return new PagedResponse<>(response);
+    }
 }
