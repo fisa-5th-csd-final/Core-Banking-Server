@@ -4,6 +4,7 @@ import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.request.CardPaymentRequest;
 import com.fisa.bank.account.application.dto.request.TransferRequest;
+import com.fisa.bank.account.application.dto.response.AccountTransactionListResponse;
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
 import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
@@ -22,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -156,6 +159,29 @@ public class TransactionService {
         CardTransaction saved = cardTransactionRepository.save(cardTrx);
 
         return CardPaymentResponse.of(saved);
+    }
+
+    public AccountTransactionListResponse getTransactions(Long accountId, LocalDate startDate, LocalDate endDate) {
+        AccountId id = AccountId.of(accountId);
+        Account account = accountRepository.findById(id)
+                .orElseThrow(AccountNotFoundException::new);
+
+        // 거래내역 조회
+        List<AccountTransactionResponse> transactions = accountTransactionRepository
+                .findByAccountAndDateBetween(
+                        account,
+                        startDate.atStartOfDay(),
+                        endDate.atTime(23, 59, 59)
+                )
+                .stream()
+                .map(AccountTransactionResponse::of)
+                .toList();
+
+        // 응답 DTO 생성
+        return AccountTransactionListResponse.builder()
+                .accountId(id.getValue())
+                .transactions(transactions)
+                .build();
     }
 
 }
