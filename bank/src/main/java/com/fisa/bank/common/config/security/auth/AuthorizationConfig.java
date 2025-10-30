@@ -66,7 +66,7 @@ public class AuthorizationConfig {
                                                 AuthenticationSuccessHandler successHandler,
                                                 AuthenticationFailureHandler failureHandler,
                                                 @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter){
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, appUnAuthConverter);
+        AuthenticationFilter authenticationFilter = new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
         RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
 
         authenticationFilter.setRequestMatcher(requestMatcher);
@@ -98,8 +98,21 @@ public class AuthorizationConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * jwt 인증필터 서블릿 필터에서 제외
+     */
     @Bean
     public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(@Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter){
+        FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>(authenticationFilter);
+        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+        return registrationBean;
+    }
+
+    /**
+     * 로그인 전용 필터 서블릿 필터에서 제외
+     */
+    @Bean
+    public FilterRegistrationBean<AuthenticationFilter> loginFilterRegistrationBean(@Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter){
         FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>(authenticationFilter);
         registrationBean.setEnabled(false); // 서블릿 필터에서 제거
         return registrationBean;
