@@ -6,6 +6,8 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class JwtGenerator {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    private static final JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
 
     private final JwtProperties jwtProperties;
     private final JwtEncoder jwtEncoder;
@@ -37,7 +40,7 @@ public class JwtGenerator {
                 .expiresAt(now.toInstant().plus(jwtProperties.getAccessTokenExpiration()))
                 .build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
+        return jwtEncoder.encode(JwtEncoderParameters.from(header,claimsSet));
     }
 
     public Jwt createRefreshToken(Long userId){
@@ -49,7 +52,7 @@ public class JwtGenerator {
                 .expiresAt(now.toInstant().plus(jwtProperties.getRefreshTokenExpiration()))
                 .build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
+        return jwtEncoder.encode(JwtEncoderParameters.from(header,claimsSet));
     }
 
 }
