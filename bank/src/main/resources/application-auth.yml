@@ -5,12 +5,10 @@ spring:
 
 jwt:
   secret-key: ${TOKEN_SECRET}
-  accessToken:
+  access-token:
     expiry: ${ACCESS_TOKEN_EXPIRY}
-    secret-key: ${ACCESS_TOKEN_SECRET}
   refresh-token:
     expiry: ${REFRESH_TOKEN_EXPIRY}
-    secret-key: ${REFRESH_TOKEN_SECRET}
 
 jwk:
   private-key: ${JWK_PRIVATE_KEY}
