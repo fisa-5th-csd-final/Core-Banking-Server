@@ -186,3 +186,6 @@ bank/src/main/resources/env.properties
 
 ### build
 bank/build/**
+
+## 개발용 초기 데이터 구성 파일
+bank/src/main/java/com/fisa/bank/common/config/DataInitializer.java
