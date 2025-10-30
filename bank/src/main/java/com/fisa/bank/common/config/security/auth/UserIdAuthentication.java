@@ -9,20 +9,30 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public class UserIdAuthentication extends AbstractAuthenticationToken {
 
+    // jwt token
+    private final String credentials;
     private final Long userId;
+
+    public UserIdAuthentication(String credentials){
+        super(null);
+        this.userId = null;
+        this.credentials = credentials;
+    }
 
     public UserIdAuthentication(Long userId, Collection<? extends GrantedAuthority> authorities){
         super(authorities);
+        super.setAuthenticated(true);
         this.userId = userId;
+        this.credentials = null;
     }
 
     @Override
     public Object getCredentials() {
-        return null;
+        return this.credentials;
     }
 
     @Override
     public Object getPrincipal() {
-        return userId;
+        return this.userId;
     }
 }
