@@ -2,6 +2,7 @@ package com.fisa.bank.common.config.security.auth;
 
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -20,11 +21,14 @@ import org.springframework.stereotype.Component;
 /**
  * UserIdAuthentication의 인증을 수행하는 Provider
  */
-@Component
-@RequiredArgsConstructor
+@Component("JwtAuthenticationProvider")
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final JwtDecoder jwtDecoder;
+
+    public JwtAuthenticationProvider(@Qualifier("AppJwtDecoder") JwtDecoder jwtDecoder){
+        this.jwtDecoder = jwtDecoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

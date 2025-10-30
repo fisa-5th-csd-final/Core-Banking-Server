@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -69,10 +71,10 @@ public class AuthorizationConfig {
      * 인증을 수행하는 필터
      */
     @Bean("unAuthenticatedFilter")
-    public AuthenticationFilter unAuthenticated(AuthenticationManager authenticationManager,
-                                                     AuthenticationSuccessHandler successHandler,
-                                                     AuthenticationFailureHandler failureHandler){
-
+    public AuthenticationFilter unAuthenticated(AuthenticationSuccessHandler successHandler,
+                                                AuthenticationFailureHandler failureHandler,
+                                                @Qualifier("JwtAuthenticationProvider")AuthenticationProvider authenticationProvider){
+        AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, appUnAuthConverter);
         RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
 
