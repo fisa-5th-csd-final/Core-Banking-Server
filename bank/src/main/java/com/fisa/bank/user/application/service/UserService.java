@@ -1,10 +1,13 @@
 package com.fisa.bank.user.application.service;
 
 import com.fisa.bank.user.application.dto.UserCreateRequest;
+import com.fisa.bank.user.application.dto.UserInfoResponse;
 import com.fisa.bank.user.application.exception.InvalidAuthInfoException;
+import com.fisa.bank.user.application.exception.UserNotFoundException;
 import com.fisa.bank.user.application.util.PasswordUtil;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.UserAuth;
+import com.fisa.bank.user.persistence.entity.id.UserId;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import com.fisa.bank.user.persistence.repository.UserRepository;
 import java.math.BigInteger;
@@ -35,6 +38,13 @@ public class UserService {
         userRepository.save(user);
 
         return true;
+    }
+
+    public UserInfoResponse getUserInfo(UserId userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        return UserInfoResponse.of(user);
     }
 
 }
