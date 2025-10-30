@@ -1,9 +1,14 @@
 package com.fisa.bank.account.application.service;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
+import com.fisa.bank.account.application.dto.response.AccountDetailResponse;
+import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
+import com.fisa.bank.account.application.exception.AccountNotDeletableException;
+import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.account.persistence.entity.Account;
+import com.fisa.bank.account.persistence.entity.id.AccountId;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.user.application.exception.UserNotFoundException;
 import com.fisa.bank.user.persistence.entity.User;
@@ -12,6 +17,8 @@ import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +48,38 @@ public class AccountService {
         return AccountResponse.of(saved, "계좌가 성공적으로 생성되었습니다.");
     }
 
+    @Transactional(readOnly = true)
+    public AccountDetailResponse getAccountDetail(Long accountId) {
+        AccountId id = AccountId.of(accountId);
+        Account account = accountRepository.findById(id)
+                .orElseThrow(AccountNotFoundException::new);
+
+        return AccountDetailResponse.of(account);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountListResponse> getAccountsByUserId(Long userId) {
+        UserId id = UserId.of(userId);
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        return accountRepository.findAllByUser(user).stream()
+                .map(AccountListResponse::of)
+                .toList();
+    }
+
+    // 계좌 삭제
+    @Transactional
+    public void deleteAccount(Long accountId) {
+        AccountId id = AccountId.of(accountId);
+        Account account = accountRepository.findById(id)
+                        .orElseThrow(AccountNotFoundException::new);
+
+        if (account.getBalance().compareTo(java.math.BigDecimal.ZERO) != 0) {
+            throw new AccountNotDeletableException();
+        }
+
+        accountRepository.delete(account);
+    }
 
 }

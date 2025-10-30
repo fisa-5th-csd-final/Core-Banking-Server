@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: auth
+
+jwt:
+  secret-key: ${TOKEN_SECRET}
+  access-token:
+    expiry: ${ACCESS_TOKEN_EXPIRY}
+  refresh-token:
+    expiry: ${REFRESH_TOKEN_EXPIRY}
+
+jwk:
+  private-key: ${JWK_PRIVATE_KEY}
+  public-key: ${JWK_PUBLIC_KEY}

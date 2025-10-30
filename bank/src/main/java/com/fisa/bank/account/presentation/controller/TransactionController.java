@@ -4,6 +4,7 @@ import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.request.CardPaymentRequest;
 import com.fisa.bank.account.application.dto.request.TransferRequest;
+import com.fisa.bank.account.application.dto.response.AccountTransactionListResponse;
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
 import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
@@ -14,7 +15,10 @@ import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 /**
  * TransactionController
@@ -65,5 +69,16 @@ public class TransactionController {
     ) {
         CardPaymentResponse response = transactionService.payByCard(accountId, request);
         return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
+    }
+
+    // 거래내역 조회
+    @GetMapping("/{accountId}/transactions")
+    public ApiResponse<SuccessBody<AccountTransactionListResponse>> getTransactions(
+            @PathVariable Long accountId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
+    ) {
+        AccountTransactionListResponse response = transactionService.getTransactions(accountId, startDate, endDate);
+        return ApiResponseGenerator.success(ResponseCode.GET, response);
     }
 }
