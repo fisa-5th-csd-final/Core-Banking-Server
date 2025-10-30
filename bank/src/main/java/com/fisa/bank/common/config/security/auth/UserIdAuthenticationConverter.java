@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Reader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
@@ -37,8 +38,7 @@ public class UserIdAuthenticationConverter implements AuthenticationConverter {
 
             return new UsernamePasswordAuthenticationToken(loginId, password);
         } catch (IOException e){
-            // TODO: 여기서는 어떤 종류의 예외를 던져야 하는지?
-            throw new IllegalArgumentException("Exception occur in request body parsing process");
+            throw new AuthenticationServiceException("Failed to parse authentication request body", e);
         }
     }
 }
