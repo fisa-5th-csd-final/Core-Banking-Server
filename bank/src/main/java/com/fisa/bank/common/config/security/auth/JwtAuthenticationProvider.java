@@ -1,6 +1,7 @@
 package com.fisa.bank.common.config.security.auth;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,7 +40,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         try {
             Jwt jwt = jwtDecoder.decode(token);
             Long userId = jwt.getClaim("userId");
-            List<String> roles = jwt.getClaim("role");
+            List<String> roles = jwt.getClaim("role")==null ? Collections.emptyList() : jwt.getClaim("role");
             Collection<? extends GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
 
             return new UserIdAuthentication(userId, authorities); // 자동으로 authenticated = true
