@@ -53,14 +53,7 @@ public class AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
-        return new AccountDetailResponse(
-                account.getAccountId().getValue(),
-                account.getAccountNumber(),
-                account.getUser().getName(),
-                account.getBankCode(),
-                account.getBalance(),
-                account.getCreatedAt()
-        );
+        return AccountDetailResponse.of(account);
     }
 
     @Transactional(readOnly = true)
@@ -70,12 +63,7 @@ public class AccountService {
                 .orElseThrow(UserNotFoundException::new);
 
         return accountRepository.findAllByUser(user).stream()
-                .map(account -> new AccountListResponse(
-                        account.getAccountId().getValue(),
-                        account.getAccountNumber(),
-                        account.getBalance(),
-                        account.getCreatedAt()
-                ))
+                .map(AccountListResponse::of)
                 .toList();
     }
 
