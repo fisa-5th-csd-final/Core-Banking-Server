@@ -50,12 +50,29 @@ public class LoanController {
         return ApiResponseGenerator.success(ResponseCode.DELETE);
     }
 
+
+    @GetMapping("/products")
+    public ApiResponse<SuccessBody<PagedResponse<LoanProductResponse<LoanProduct>>>> getLoanProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
+
+        PagedResponse<LoanProductResponse<LoanProduct>> allProducts = loanService.findAllProducts(pageable);
+
+        return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
+    }
+
+    @DeleteMapping("/products/{loanProductId}")
+    public ApiResponse<SuccessBody<Void>> deleteLoanProduct(@PathVariable Long loanProductId){
+
+        loanService.deleteLoanProduct(loanProductId);
+
+        return ApiResponseGenerator.success(ResponseCode.DELETE);
+    }
+
     // 사용자
     @PostMapping("/{loanProductId}")
     public void applyForLoan(@PathVariable Long loanProductId){
 
         loanService.applyForLoan(loanProductId);
-        
+
         // TODO: ApiResponse~로 바꾸기
         return;
     }

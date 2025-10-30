@@ -4,7 +4,6 @@ package com.fisa.bank.loan.persistence.entity;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.persistence.entity.id.InterestRateId;
 import com.fisa.bank.loan.persistence.entity.id.InterestRateIdJavaType;
-import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
 import com.fisa.bank.loan.persistence.repository.InterestRateRepository;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
