@@ -1,6 +1,5 @@
 package com.fisa.bank.common.config.security.auth;
 
-import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtEncoder jwtEncoder;
-    private final UserAuthRepository authRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
