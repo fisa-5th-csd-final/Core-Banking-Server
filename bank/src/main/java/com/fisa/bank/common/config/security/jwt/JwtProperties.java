@@ -1,23 +1,28 @@
 package com.fisa.bank.common.config.security.jwt;
 
+import com.fisa.bank.common.config.security.util.KeyUtils;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.Duration;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 @Getter
-@Setter
 @ConfigurationProperties(prefix="jwt")
 public class JwtProperties {
 
     private final AccessToken accessToken;
     private final RefreshToken refreshToken;
+    private final PublicKey publicKey;
+    private final PrivateKey privateKey;
 
     @ConstructorBinding
-    public JwtProperties(AccessToken accessToken, RefreshToken refreshToken){
+    public JwtProperties(AccessToken accessToken, RefreshToken refreshToken, String publicKey, String privateKey){
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.privateKey = KeyUtils.createPrivateKey(privateKey, "RSA");
+        this.publicKey = KeyUtils.createPublicKey(publicKey, "RSA");
     }
 
     public record AccessToken(Duration expiry) {
