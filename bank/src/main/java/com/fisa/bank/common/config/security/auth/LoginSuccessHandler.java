@@ -1,7 +1,5 @@
 package com.fisa.bank.common.config.security.auth;
 
-import com.fisa.bank.user.application.exception.UserNotFoundException;
-import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -40,10 +37,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        if(authentication instanceof UsernamePasswordAuthenticationToken) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        if (authentication instanceof UsernamePasswordAuthenticationToken) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             if (Objects.nonNull(userDetails)) {
-                Long userId = getUserId(userDetails.getUsername());
+                Long userId = userDetails.getUserId().getValue();
                 ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
 
                 JwtClaimsSet accessClaims = JwtClaimsSet.builder()
@@ -80,13 +77,4 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         throw new IllegalStateException("Authentication is not UserIdAuthentication");
 
     }
-
-    private Long getUserId(String loginId){
-        User user = authRepository.findById(loginId)
-                .orElseThrow(UserNotFoundException::new)
-                .getUser();
-
-        return user.getUserId().getValue();
-    }
-
 }
