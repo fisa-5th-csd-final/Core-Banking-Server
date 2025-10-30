@@ -2,10 +2,8 @@ package com.fisa.bank.loan.application.model;
 
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.LoanType;
-import com.fisa.bank.loan.persistence.enums.RepaymentType;
 
 import java.math.BigDecimal;
-import java.nio.channels.ReadPendingException;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
