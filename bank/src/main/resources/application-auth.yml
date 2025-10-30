@@ -8,3 +8,5 @@ jwt:
     expiry: ${ACCESS_TOKEN_EXPIRY}
   refreshToken:
     expiry: ${REFRESH_TOKEN_EXPIRY}
+  private-key: ${JWK_PUBLIC_KEY}
+  public-key: ${JWK_PRIVATE_KEY}
