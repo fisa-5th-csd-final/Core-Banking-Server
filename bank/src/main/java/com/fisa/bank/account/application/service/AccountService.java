@@ -2,6 +2,7 @@ package com.fisa.bank.account.application.service;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
 import com.fisa.bank.account.application.dto.response.AccountBalanceResponse;
+import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
@@ -15,6 +16,8 @@ import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,4 +62,21 @@ public class AccountService {
                 account.getUpdatedAt()
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<AccountListResponse> getAccountsByUserId(Long userId) {
+        UserId id = UserId.of(userId);
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        return accountRepository.findAllByUser(user).stream()
+                .map(account -> new AccountListResponse(
+                        account.getAccountId().getValue(),
+                        account.getAccountNumber(),
+                        account.getBalance(),
+                        account.getCreatedAt()
+                ))
+                .toList();
+    }
+
 }

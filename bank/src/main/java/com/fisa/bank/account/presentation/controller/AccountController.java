@@ -2,6 +2,7 @@ package com.fisa.bank.account.presentation.controller;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
 import com.fisa.bank.account.application.dto.response.AccountBalanceResponse;
+import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.service.AccountService;
 import com.fisa.bank.common.presentation.response.ApiResponse;
@@ -10,6 +11,8 @@ import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -29,6 +32,13 @@ public class AccountController {
     @GetMapping("/{accountId}/balance")
     public ApiResponse<SuccessBody<AccountBalanceResponse>> getAccountBalance(@PathVariable Long accountId) {
         AccountBalanceResponse response = accountService.getAccountBalance(accountId);
+        return ApiResponseGenerator.success(ResponseCode.GET, response);
+    }
+
+    // 계좌 리스트 조회
+    @GetMapping
+    public ApiResponse<SuccessBody<List<AccountListResponse>>> getAccountsByUserId(@RequestParam Long userId) {
+        List<AccountListResponse> response = accountService.getAccountsByUserId(userId);
         return ApiResponseGenerator.success(ResponseCode.GET, response);
     }
 }
