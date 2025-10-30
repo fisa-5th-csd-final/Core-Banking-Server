@@ -1,10 +1,13 @@
 package com.fisa.bank.common.config.security.auth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoginFailureHandler implements AuthenticationFailureHandler {
 
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -28,9 +32,15 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.getWriter().write("""
-                {"error" : "unAuthorized","message" : "인증 정보가 올바르지 않습니다."}
-                """);
+        response.getWriter().write(createFailureBody());
         response.flushBuffer();
+    }
+
+    private String createFailureBody(){
+        try {
+            return objectMapper.writeValueAsString(Map.of("error", "unauthorized", "message", "인증 정보가 올바르지 않습니다."));
+        } catch (JsonProcessingException e){
+            throw new IllegalStateException("Exception occur in json processing");
+        }
     }
 }
