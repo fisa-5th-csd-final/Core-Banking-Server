@@ -1,7 +1,7 @@
 package com.fisa.bank.account.application.service;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
-import com.fisa.bank.account.application.dto.response.AccountBalanceResponse;
+import com.fisa.bank.account.application.dto.response.AccountDetailResponse;
 import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
@@ -48,18 +48,18 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountBalanceResponse getAccountBalance(Long accountId) {
+    public AccountDetailResponse getAccountDetail(Long accountId) {
         AccountId id = AccountId.of(accountId);
-        var account = accountRepository.findById(id)
+        Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
-
-        return new AccountBalanceResponse(
+        return new AccountDetailResponse(
                 account.getAccountId().getValue(),
                 account.getAccountNumber(),
-                account.getBalance(),
                 account.getUser().getName(),
-                account.getUpdatedAt()
+                account.getBankCode(),
+                account.getBalance(),
+                account.getCreatedAt()
         );
     }
 

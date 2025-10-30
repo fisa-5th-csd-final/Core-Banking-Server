@@ -1,7 +1,7 @@
 package com.fisa.bank.account.presentation.controller;
 
 import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
-import com.fisa.bank.account.application.dto.response.AccountBalanceResponse;
+import com.fisa.bank.account.application.dto.response.AccountDetailResponse;
 import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
 import com.fisa.bank.account.application.service.AccountService;
@@ -28,10 +28,10 @@ public class AccountController {
         return ApiResponseGenerator.success(ResponseCode.CREATE, response);
     }
 
-    // 계좌 잔액 조회
-    @GetMapping("/{accountId}/balance")
-    public ApiResponse<SuccessBody<AccountBalanceResponse>> getAccountBalance(@PathVariable Long accountId) {
-        AccountBalanceResponse response = accountService.getAccountBalance(accountId);
+    // 계좌 상세 조회
+    @GetMapping("/{accountId}")
+    public ApiResponse<SuccessBody<AccountDetailResponse>> getAccountDetail(@PathVariable Long accountId) {
+        AccountDetailResponse response = accountService.getAccountDetail(accountId);
         return ApiResponseGenerator.success(ResponseCode.GET, response);
     }
 
