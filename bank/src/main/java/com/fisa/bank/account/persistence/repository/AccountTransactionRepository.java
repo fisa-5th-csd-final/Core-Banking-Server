@@ -11,6 +11,6 @@ import java.util.List;
 public interface AccountTransactionRepository
         extends JpaRepository<AccountTransaction, AccountTransactionId> {
 
-    List<AccountTransaction> findByAccountAndDateBetween(Account account, LocalDateTime start, LocalDateTime end);
+    List<AccountTransaction> findByAccountAndDateGreaterThanEqualAndDateBefore(Account account, LocalDateTime start, LocalDateTime end);
 }
 
