@@ -168,10 +168,10 @@ public class TransactionService {
 
         // 거래내역 조회
         List<AccountTransactionResponse> transactions = accountTransactionRepository
-                .findByAccountAndDateBetween(
+                .findByAccountAndDateGreaterThanEqualAndDateBefore(
                         account,
                         startDate.atStartOfDay(),
-                        endDate.atTime(23, 59, 59)
+                        endDate.plusDays(1).atStartOfDay()
                 )
                 .stream()
                 .map(AccountTransactionResponse::of)
