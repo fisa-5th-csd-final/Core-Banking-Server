@@ -37,7 +37,7 @@ public class UserIdAuthenticationConverter implements AuthenticationConverter {
 
             return new UsernamePasswordAuthenticationToken(loginId, password);
         } catch (IOException e){
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Exception occur in request body parsing process");
         }
     }
 }
