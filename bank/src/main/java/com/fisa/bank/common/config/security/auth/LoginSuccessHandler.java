@@ -2,10 +2,12 @@ package com.fisa.bank.common.config.security.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.JwtProperties;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -18,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -35,6 +38,7 @@ import org.springframework.stereotype.Component;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtEncoder jwtEncoder;
+    private final JwtProperties jwtProperties;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -53,28 +57,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                         따라서 보안이 중요한 서비스의 경우에는, 외부에서 어떤 권한인지 식별할 수 없도록 별도로 매핑해서 토큰을 생성해야 한다.
                  */
                 Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+                String accessToken = createAccessToken(userId, authorities, jwtProperties.getAccessTokenExpiration()).getTokenValue();
+                String refreshToken = createRefreshToken(userId, jwtProperties.getRefreshTokenExpiration()).getTokenValue();
 
-                ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
-
-                JwtClaimsSet accessClaims = JwtClaimsSet.builder()
-                        .claim("userId", userId)
-                        .claim("role", authorities)
-                        .issuer("core-bank")
-                        .issuedAt(now.toInstant())
-                        .expiresAt(now.plusHours(1).toInstant())
-                        .build();
-
-                JwtClaimsSet refreshClaims = JwtClaimsSet.builder()
-                        .claim("userId", userId)
-                        .issuer("core-bank")
-                        .issuedAt(now.toInstant())
-                        .expiresAt(now.plusHours(6).toInstant())
-                        .build();
-
-                String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(accessClaims)).getTokenValue();
-                String refreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();
-
-                // body에 담기
                 response.setStatus(HttpStatus.OK.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter()
@@ -88,6 +73,33 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         // UserIdAuthentication 이 아니면 예외
         throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
 
+    }
+
+    // TODO: Token 발급 컴포넌트 추가해서
+    //  토큰 생성의 책임은 별도의 컴포넌트가 수행하기
+    private Jwt createAccessToken(Long userId, Collection<? extends GrantedAuthority> authorities, Duration expiry){
+        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
+        JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+                .claim("userId", userId)
+                .claim("role", authorities)
+                .issuer("core-bank")
+                .issuedAt(now.toInstant())
+                .expiresAt(now.toInstant().plus(expiry))
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
+    }
+
+    private Jwt createRefreshToken(Long userId, Duration expiry){
+        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
+        JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+                .claim("userId", userId)
+                .issuer("core-bank")
+                .issuedAt(now.toInstant())
+                .expiresAt(now.toInstant().plus(expiry))
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
     }
 
     // AccessToken, RefreshToken 이 담긴 바디를 만드는 과정
