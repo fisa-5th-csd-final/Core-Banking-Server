@@ -70,6 +70,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
@@ -83,6 +84,7 @@ public class SecurityFilterChainConfig {
         http.securityMatcher("/**");
         http.authorizeHttpRequests( auth -> auth.anyRequest().authenticated());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
         return http.build();
     }
 
