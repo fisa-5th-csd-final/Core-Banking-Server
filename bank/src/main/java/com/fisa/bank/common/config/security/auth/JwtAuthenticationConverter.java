@@ -17,8 +17,14 @@ public class JwtAuthenticationConverter implements AuthenticationConverter {
 
     @Override
     public Authentication convert(HttpServletRequest request) {
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION).replace("Bearer ", "");
-        if(token.isBlank()) throw new InvalidBearerTokenException("Invalid Bearer Token");
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new InvalidBearerTokenException("Invalid Bearer Token");
+        }
+        String token = header.substring(7);
+        if (token.isBlank()) {
+            throw new InvalidBearerTokenException("Invalid Bearer Token");
+        }
         return new UserIdAuthentication(token);
     }
 
