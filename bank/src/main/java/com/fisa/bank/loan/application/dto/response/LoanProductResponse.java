@@ -1,5 +1,7 @@
 package com.fisa.bank.loan.application.dto.response;
 
+import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
+import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.enums.LoanType;
@@ -14,22 +16,23 @@ public class LoanProductResponse<T> {
     private final LoanProductId id;
     private final String name;
     private final LoanType type;
-//    private List<InterestRate> interestRateList;
+    private final InterestRateResponse interestRateResponse;
 
-
-    public static LoanProductResponse<LoanProduct> from(LoanProduct entity){
+    public static LoanProductResponse<LoanProduct> from(LoanProduct entity, InterestRateResponse interestRateResponse){
         return new LoanProductResponse<LoanProduct>(
                 entity.getLoanProductId(),
                 entity.getName(),
-                entity.getType()
-//                entity.getInterestRateList()
+                entity.getType(),
+                interestRateResponse // 가장 최신 금리만 저장
         );
     }
-    public LoanProductResponse(LoanProductId id, String name, LoanType type){
+    public LoanProductResponse(LoanProductId id, String name, LoanType type, InterestRateResponse interestRateResponse){
         this.id = id;
         this.name = name;
         this.type = type;
-//        this.interestRateList = interestRateList;
+        this.interestRateResponse = interestRateResponse;
     }
+
+
 }
 

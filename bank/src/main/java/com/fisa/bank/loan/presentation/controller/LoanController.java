@@ -42,6 +42,13 @@ public class LoanController {
         return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
     }
 
+    @GetMapping("/{loanProductId}")
+    public ApiResponse<SuccessBody<LoanProductResponse<LoanProduct>>> getLoanProductById(@PathVariable Long loanProductId){
+        LoanProductResponse<LoanProduct> loanProduct = loanService.findProductById(loanProductId);
+
+        return ApiResponseGenerator.success(ResponseCode.GET,loanProduct);
+    }
+
     @DeleteMapping("/products/{loanProductId}")
     public ApiResponse<SuccessBody<Void>> deleteLoanProduct(@PathVariable Long loanProductId){
 

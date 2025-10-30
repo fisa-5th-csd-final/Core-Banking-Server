@@ -1,6 +1,7 @@
 package com.fisa.bank.loan.application.service;
 
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
+import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.service.InterestService;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
@@ -19,6 +20,8 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LoanService {
@@ -33,19 +36,19 @@ public class LoanService {
                 .type(requestDTO.getType())
                 .build());
 
-        InterestRate interestRate = interestService.createInterestRate(loanProduct, requestDTO.getAddInterest(), requestDTO.getLimitPreferInterest());
+        InterestRateResponse interestRateResponse = interestService.createInterestRate(loanProduct, requestDTO.getAddInterest(), requestDTO.getLimitPreferInterest());
 
         LoanProductCreateResponse response = LoanProductCreateResponse.builder()
                 .name(loanProduct.getName())
                 .type(loanProduct.getType())
                 .loanProductId(loanProduct.getLoanProductId())
-                .addInterest(interestRate.getAddInterest())
-                .limitPreferInterest(interestRate.getLimitPreferInterest())
+                .addInterest(interestRateResponse.getAddInterest())
+                .limitPreferInterest(interestRateResponse.getLimitPreferInterest())
                 .build();
 
         return response;
     }
-   
+
     @Transactional
     public void deleteLoanProduct(Long loanProductId) {
         // 있는지 확인 후
@@ -59,11 +62,29 @@ public class LoanService {
     public PagedResponse<LoanProductResponse<LoanProduct>> findAllProducts(Pageable pageable) {
         Page<LoanProduct> productPage = loanRepository.findAll(pageable);
 
-        Page<LoanProductResponse<LoanProduct>> response = productPage.map(LoanProductResponse::from);
+        Page<LoanProductResponse<LoanProduct>> response = productPage.map(
+                (loanProduct)->{
+                    InterestRate interestRate = loanProduct.getInterestRateList().get(0);
+                    InterestRateResponse interestRateResponse = InterestRateResponse.from(interestRate);
+                    return LoanProductResponse.from(loanProduct, interestRateResponse);
+                }
+        );
 
         return new PagedResponse<>(response);
     }
 
+    @Transactional
+    public LoanProductResponse<LoanProduct> findProductById(Long loanProductId) {
+
+        LoanProduct loanProduct = loanRepository.findById(LoanProductId.of(loanProductId))
+                .orElseThrow(()-> new LoanProductNotFoundException(loanProductId));
+
+        InterestRateResponse interestRateResponse = InterestRateResponse.from(loanProduct.getInterestRateList().get(0));
+
+        LoanProductResponse<LoanProduct> response = LoanProductResponse.from(loanProduct, interestRateResponse);
+
+        return response;
+    }
 
     @Transactional
     public void applyForLoan(){
@@ -84,4 +105,5 @@ public class LoanService {
             // 가산 금리 - 대출 상품의 id로 금리 테이블에서 조회해야 함.
             // 최종 금리 = 기본 금리 + 가산 금리 - 우대 금리
     }
+
 }

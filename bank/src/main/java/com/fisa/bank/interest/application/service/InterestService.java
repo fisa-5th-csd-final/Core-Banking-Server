@@ -1,5 +1,6 @@
 package com.fisa.bank.interest.application.service;
 
+import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.exception.InterestException;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.interest.persistence.repository.InterestRateRepository;
@@ -23,7 +24,7 @@ public class InterestService {
     private static BigDecimal baseInterest = new BigDecimal("2.5");
 
     @Transactional
-    public InterestRate createInterestRate(LoanProduct loanProduct, BigDecimal addInterest, BigDecimal limitPreferInterest){
+    public InterestRateResponse createInterestRate(LoanProduct loanProduct, BigDecimal addInterest, BigDecimal limitPreferInterest){
 
         InterestRate interestRate = InterestRate.builder()
                 .loanProduct(loanProduct)
@@ -38,7 +39,9 @@ public class InterestService {
         // 대출 상품에 금리 추가
         loanProduct.getInterestRateList().add(savedInterestRate);
 
-        return savedInterestRate;
+
+        InterestRateResponse response = InterestRateResponse.from(savedInterestRate);
+        return response;
     }
 
 //    @Transactional

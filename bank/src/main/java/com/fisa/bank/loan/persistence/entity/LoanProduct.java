@@ -1,5 +1,6 @@
 package com.fisa.bank.loan.persistence.entity;
 
+import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
@@ -28,13 +29,13 @@ public class LoanProduct {
 
     // LoanProduct 1 : N LoanLedger
     @OneToMany(mappedBy = "loanProduct")
-    @Builder.Default// 최신 순으로 정렬
+    @Builder.Default
     private List<LoanLedger> loanLedgerList = new ArrayList<>();
 
     // LoanProduct 1 : N InterestRate
     @OneToMany(mappedBy = "loanProduct")
     @Builder.Default
-    @OrderBy("createdAt DESC")
+    @OrderBy("createdAt DESC") // 최신 순으로 정렬
     private List<InterestRate> interestRateList = new ArrayList<>();
 
     @Column(nullable = false)
