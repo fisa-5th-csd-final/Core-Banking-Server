@@ -1,5 +1,6 @@
 package com.fisa.bank.common.config.security.auth;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,17 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 // OAuth2.0 Authorization Server 를 설정하는 Config
 @Configuration
 public class AuthorizationConfig {
+
+    private final AuthenticationConverter appUnAuthConverter;
+    private final AuthenticationConverter appAuthConverter;
+
+    public AuthorizationConfig(
+            @Qualifier("AppAuthenticationConverter") AuthenticationConverter appAuthConverter,
+            @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter
+    ){
+        this.appAuthConverter = appAuthConverter;
+        this.appUnAuthConverter = appUnAuthConverter;
+    }
 
 
     // OAuth 2.0 클라이언트 저장소 등록
@@ -56,18 +68,30 @@ public class AuthorizationConfig {
      * 사용자로부터 자격 증명 (ID/PW)를 받고
      * 인증을 수행하는 필터
      */
-    @Bean
-    public AuthenticationFilter authenticationFilter(AuthenticationManager authenticationManager,
-                                                     AuthenticationConverter authenticationConverter,
+    @Bean("unAuthenticatedFilter")
+    public AuthenticationFilter unAuthenticated(AuthenticationManager authenticationManager,
                                                      AuthenticationSuccessHandler successHandler,
                                                      AuthenticationFailureHandler failureHandler){
 
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, authenticationConverter);
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, appUnAuthConverter);
         RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
 
         authenticationFilter.setRequestMatcher(requestMatcher);
         authenticationFilter.setSuccessHandler(successHandler);
         authenticationFilter.setFailureHandler(failureHandler);
+
+        return authenticationFilter;
+    }
+
+    /**
+     * 이미 인증이 완료된 사용자가 Jwt를 보내면
+     * 이를 Authentication으로 변환해서 저장하는 필터
+     */
+    @Bean("authenticatedFilter")
+    public AuthenticationFilter authenticated(AuthenticationManager authenticationManager){
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, appAuthConverter);
+        RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/**");
+        authenticationFilter.setRequestMatcher(requestMatcher);
 
         return authenticationFilter;
     }
