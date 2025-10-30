@@ -31,6 +31,6 @@ public class SpringRequesterInfo implements RequesterInfo {
             throw new IllegalStateException("UserIdAuthentication not found");
         }
 
-        return (UserId) authentication.getPrincipal();
+        return UserId.of((Long) authentication.getPrincipal());
     }
 }

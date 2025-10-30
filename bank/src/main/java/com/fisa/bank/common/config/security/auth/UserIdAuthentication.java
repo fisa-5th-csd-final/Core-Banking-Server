@@ -1,6 +1,5 @@
 package com.fisa.bank.common.config.security.auth;
 
-import com.fisa.bank.user.persistence.entity.id.UserId;
 import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,9 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public class UserIdAuthentication extends AbstractAuthenticationToken {
 
-    private final UserId userId;
+    private final Long userId;
 
-    public UserIdAuthentication(UserId userId, Collection<? extends GrantedAuthority> authorities){
+    public UserIdAuthentication(Long userId, Collection<? extends GrantedAuthority> authorities){
         super(authorities);
         this.userId = userId;
     }
