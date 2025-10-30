@@ -2,15 +2,11 @@ package com.fisa.bank.common.config.security.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.common.config.security.jwt.JwtProperties;
+import com.fisa.bank.common.config.security.jwt.JwtGenerator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -20,10 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +29,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final JwtEncoder jwtEncoder;
-    private final JwtProperties jwtProperties;
+    private final JwtGenerator jwtGenerator;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -57,8 +48,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                         따라서 보안이 중요한 서비스의 경우에는, 외부에서 어떤 권한인지 식별할 수 없도록 별도로 매핑해서 토큰을 생성해야 한다.
                  */
                 Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-                String accessToken = createAccessToken(userId, authorities, jwtProperties.getAccessTokenExpiration()).getTokenValue();
-                String refreshToken = createRefreshToken(userId, jwtProperties.getRefreshTokenExpiration()).getTokenValue();
+                String accessToken = jwtGenerator.createAccessToken(userId, authorities).getTokenValue();
+                String refreshToken = jwtGenerator.createRefreshToken(userId).getTokenValue();
 
                 response.setStatus(HttpStatus.OK.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -73,33 +64,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         // UserIdAuthentication 이 아니면 예외
         throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
 
-    }
-
-    // TODO: Token 발급 컴포넌트 추가해서
-    //  토큰 생성의 책임은 별도의 컴포넌트가 수행하기
-    private Jwt createAccessToken(Long userId, Collection<? extends GrantedAuthority> authorities, Duration expiry){
-        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
-        JwtClaimsSet claimsSet = JwtClaimsSet.builder()
-                .claim("userId", userId)
-                .claim("role", authorities)
-                .issuer("core-bank")
-                .issuedAt(now.toInstant())
-                .expiresAt(now.toInstant().plus(expiry))
-                .build();
-
-        return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
-    }
-
-    private Jwt createRefreshToken(Long userId, Duration expiry){
-        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
-        JwtClaimsSet claimsSet = JwtClaimsSet.builder()
-                .claim("userId", userId)
-                .issuer("core-bank")
-                .issuedAt(now.toInstant())
-                .expiresAt(now.toInstant().plus(expiry))
-                .build();
-
-        return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
     }
 
     // AccessToken, RefreshToken 이 담긴 바디를 만드는 과정
