@@ -74,7 +74,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         }
 
         // UserIdAuthentication 이 아니면 예외
-        throw new IllegalStateException("Authentication is not UserIdAuthentication");
+        throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
 
     }
 
