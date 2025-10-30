@@ -4,6 +4,7 @@ import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
 import com.fisa.bank.account.application.dto.response.AccountDetailResponse;
 import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
+import com.fisa.bank.account.application.exception.AccountNotDeletableException;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.account.persistence.entity.Account;
@@ -73,6 +74,10 @@ public class AccountService {
         AccountId id = AccountId.of(accountId);
         Account account = accountRepository.findById(id)
                         .orElseThrow(AccountNotFoundException::new);
+
+        if (account.getBalance().compareTo(java.math.BigDecimal.ZERO) != 0) {
+            throw new AccountNotDeletableException();
+        }
 
         accountRepository.delete(account);
     }
