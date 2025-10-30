@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -41,12 +43,22 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
             if (Objects.nonNull(userDetails)) {
+
                 Long userId = userDetails.getUserId().getValue();
+
+                /*
+                    TODO: jwt에 권한 정보를 담을 경우, 토큰이 탈취되면 디코딩해서 권한 정보가 노출될 수 있다.
+                        따라서 보안이 중요한 서비스의 경우에는, 외부에서 어떤 권한인지 식별할 수 없도록 별도로 매핑해서 토큰을 생성해야 한다.
+                 */
+                Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+
                 ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
 
                 JwtClaimsSet accessClaims = JwtClaimsSet.builder()
                         .claim("userId", userId)
+                        .claim("role", authorities)
                         .issuer("core-bank")
                         .issuedAt(now.toInstant())
                         .expiresAt(now.plusHours(1).toInstant())
