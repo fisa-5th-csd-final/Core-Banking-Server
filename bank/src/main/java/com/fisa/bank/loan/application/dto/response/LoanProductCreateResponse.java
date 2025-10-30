@@ -5,6 +5,8 @@ import com.fisa.bank.loan.persistence.enums.LoanType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Builder
 public class LoanProductCreateResponse {
@@ -14,4 +16,7 @@ public class LoanProductCreateResponse {
 
     private final LoanType type;
 
+    private final BigDecimal addInterest;
+
+    private final BigDecimal limitPreferInterest;
 }

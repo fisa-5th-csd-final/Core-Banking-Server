@@ -6,9 +6,7 @@ import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.interest.persistence.id.InterestRateId;
 import com.fisa.bank.interest.persistence.id.InterestRateIdJavaType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -21,6 +19,8 @@ import java.math.BigDecimal;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
 public class InterestRate extends BaseEntity {
     // 금리 id
     @Id

@@ -1,6 +1,8 @@
 package com.fisa.bank.loan.application.service;
 
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
+import com.fisa.bank.interest.application.service.InterestService;
+import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LoanService {
     private final LoanRepository loanRepository;
+    private final InterestService interestService;
 
     @Transactional
     public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO){
@@ -30,10 +33,14 @@ public class LoanService {
                 .type(requestDTO.getType())
                 .build());
 
+        InterestRate interestRate = interestService.createInterestRate(loanProduct, requestDTO.getAddInterest(), requestDTO.getLimitPreferInterest());
+
         LoanProductCreateResponse response = LoanProductCreateResponse.builder()
                 .name(loanProduct.getName())
                 .type(loanProduct.getType())
                 .loanProductId(loanProduct.getLoanProductId())
+                .addInterest(interestRate.getAddInterest())
+                .limitPreferInterest(interestRate.getLimitPreferInterest())
                 .build();
 
         return response;
