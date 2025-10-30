@@ -14,6 +14,8 @@ import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
+
 /*
     금리 테이블
  */
@@ -35,14 +37,14 @@ public class InterestRate extends BaseEntity {
 
     // 기준 금리
     @Column(nullable = false)
-    private java.math.BigDecimal baseInterest;
+    private BigDecimal baseInterest;
 
     // 가산 금리
     @Column(nullable = false)
-    private java.math.BigDecimal addInterest;
+    private BigDecimal addInterest;
 
     // 우대 금리 상한
     @Column(nullable = false)
-    private java.math.BigDecimal limitPreferInterest;
+    private BigDecimal limitPreferInterest;
 
 }

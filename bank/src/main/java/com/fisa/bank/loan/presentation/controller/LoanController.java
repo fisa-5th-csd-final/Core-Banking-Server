@@ -24,6 +24,8 @@ public class LoanController {
 
     private final LoanService loanService;
 
+    // 은행
+
     @PostMapping
     public ApiResponse<SuccessBody<LoanProductCreateResponse>> createLoanProduct(@Valid @RequestBody LoanProductCreateRequest requestDTO){
 
@@ -48,5 +50,13 @@ public class LoanController {
         return ApiResponseGenerator.success(ResponseCode.DELETE);
     }
 
+    // 사용자
+    @PostMapping("/{loanProductId}")
+    public void applyForLoan(@PathVariable Long loanProductId){
 
+        loanService.applyForLoan(loanProductId);
+        
+        // TODO: ApiResponse~로 바꾸기
+        return;
+    }
 }

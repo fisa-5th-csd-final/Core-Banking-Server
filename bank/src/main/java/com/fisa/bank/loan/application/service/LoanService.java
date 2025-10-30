@@ -57,4 +57,19 @@ public class LoanService {
 
         return new PagedResponse<>(response);
     }
+
+    public void applyForLoan(Long loanProductId) {
+        // 해당 id를 가지고 대출 원장성 테이블에 저장
+            // 필요한 데이터
+                // - body로 받을 데이터: 사용자 id, 원금, 남은 상환원금, 상환 방법, 금리 유형
+
+                // - 최종 금리 = 기본 금리 + 가산 금리 - 우대 금리
+                    // ->
+                // - 상태 : 정상(초기 디폴트)
+
+                // - 중도 상환 수수료 - 금리 유형, 대출 유형 참고
+
+
+        // 해당 id를 가지고 대출 이력성 테이블에 '대출' 거래 타입으로 저장
+    }
 }
