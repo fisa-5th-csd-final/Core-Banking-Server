@@ -64,6 +64,7 @@ public class LoanService {
         return new PagedResponse<>(response);
     }
 
+
     @Transactional
     public void applyForLoan(){
         // 받아야 하는 데이터

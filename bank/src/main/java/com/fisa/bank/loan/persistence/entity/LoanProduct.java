@@ -28,12 +28,13 @@ public class LoanProduct {
 
     // LoanProduct 1 : N LoanLedger
     @OneToMany(mappedBy = "loanProduct")
-    @Builder.Default
+    @Builder.Default// 최신 순으로 정렬
     private List<LoanLedger> loanLedgerList = new ArrayList<>();
 
     // LoanProduct 1 : N InterestRate
     @OneToMany(mappedBy = "loanProduct")
     @Builder.Default
+    @OrderBy("createdAt DESC")
     private List<InterestRate> interestRateList = new ArrayList<>();
 
     @Column(nullable = false)
