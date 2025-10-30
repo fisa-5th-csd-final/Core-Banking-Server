@@ -2,3 +2,9 @@ spring:
   config:
     activate:
       on-profile: auth
+
+jwt:
+  accessToken:
+    expiry: ${ACCESS_TOKEN_EXPIRY}
+  refreshToken:
+    expiry: ${REFRESH_TOKEN_EXPIRY}
