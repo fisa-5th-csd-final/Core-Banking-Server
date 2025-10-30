@@ -79,4 +79,14 @@ public class AccountService {
                 .toList();
     }
 
+    // 계좌 삭제
+    @Transactional
+    public void deleteAccount(Long accountId) {
+        AccountId id = AccountId.of(accountId);
+        Account account = accountRepository.findById(id)
+                        .orElseThrow(AccountNotFoundException::new);
+
+        accountRepository.delete(account);
+    }
+
 }

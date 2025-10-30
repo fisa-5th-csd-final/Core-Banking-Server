@@ -8,6 +8,7 @@ import com.fisa.bank.account.application.service.AccountService;
 import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
+import com.fisa.bank.common.presentation.response.code.ApiResponseCode;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -41,4 +42,12 @@ public class AccountController {
         List<AccountListResponse> response = accountService.getAccountsByUserId(userId);
         return ApiResponseGenerator.success(ResponseCode.GET, response);
     }
+
+    // 계좌 삭제
+    @DeleteMapping("/{accountId}")
+    public ApiResponse<SuccessBody<Void>> deleteAccount(@PathVariable Long accountId) {
+        accountService.deleteAccount(accountId);
+        return ApiResponseGenerator.success(ResponseCode.DELETE);
+    }
+
 }
