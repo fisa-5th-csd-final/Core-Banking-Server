@@ -28,12 +28,12 @@ public class LoanProduct {
     private LoanProductId loanProductId;
 
     // LoanProduct 1 : N LoanLedger
-    @OneToMany(mappedBy = "loanProduct")
+    @OneToMany(mappedBy = "loanProduct", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<LoanLedger> loanLedgerList = new ArrayList<>();
 
     // LoanProduct 1 : N InterestRate
-    @OneToMany(mappedBy = "loanProduct")
+    @OneToMany(mappedBy = "loanProduct", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @OrderBy("createdAt DESC") // 최신 순으로 정렬
     private List<InterestRate> interestRateList = new ArrayList<>();

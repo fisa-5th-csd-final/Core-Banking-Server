@@ -64,11 +64,12 @@ public class SecurityFilterChainConfig {
     public SecurityFilterChain unAuthenticated(HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception {
         commonConfiguration(http);
 
-        http.securityMatcher("/api/users", "/api/login");
+        http.securityMatcher("/api/users", "/api/login", "/api/loans/**");
         http.authorizeHttpRequests(
                 auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll());
+                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
+                        .requestMatchers("/api/loans/**").permitAll());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
