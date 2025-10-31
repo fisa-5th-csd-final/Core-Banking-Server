@@ -1,5 +1,6 @@
 package com.fisa.bank.common.config.security.jwt;
 
+import com.nimbusds.jose.JWSAlgorithm;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -7,7 +8,10 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -19,13 +23,13 @@ import org.springframework.stereotype.Component;
 public class JwtGenerator {
 
   private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-  private static final JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+  private static final JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
 
   private final JwtProperties jwtProperties;
   private final JwtEncoder jwtEncoder;
 
   public JwtGenerator(
-      JwtProperties jwtProperties, @Qualifier("AppJwtEncoder") JwtEncoder jwtEncoder) {
+      JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
     this.jwtEncoder = jwtEncoder;
     this.jwtProperties = jwtProperties;
   }

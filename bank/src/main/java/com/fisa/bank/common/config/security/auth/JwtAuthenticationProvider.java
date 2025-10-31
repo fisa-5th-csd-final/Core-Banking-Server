@@ -27,7 +27,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   private final JwtDecoder jwtDecoder;
 
-  public JwtAuthenticationProvider(@Qualifier("AppJwtDecoder") JwtDecoder jwtDecoder) {
+  public JwtAuthenticationProvider(JwtDecoder jwtDecoder) {
     this.jwtDecoder = jwtDecoder;
   }
 

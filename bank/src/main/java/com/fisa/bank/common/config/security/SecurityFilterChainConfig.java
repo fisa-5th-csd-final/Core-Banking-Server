@@ -26,8 +26,7 @@ public class SecurityFilterChainConfig {
     @Order(1)
     // Authorization Server 필터 체인 설정
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                      @Qualifier("OidcJwtGenerator") OAuth2TokenGenerator<?> tokenGenerator,
-                                                                      @Qualifier("OidcJwtDecoder")JwtDecoder jwtDecoder) throws Exception {
+                                                                      OAuth2TokenGenerator<?> tokenGenerator, JwtDecoder jwtDecoder) throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServer = OAuth2AuthorizationServerConfigurer.authorizationServer();
 
         commonConfiguration(http); // 공통 설정
