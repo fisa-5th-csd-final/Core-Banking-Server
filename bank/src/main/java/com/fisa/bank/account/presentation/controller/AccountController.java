@@ -25,32 +25,30 @@ public class AccountController {
 
   // 계좌 생성 API
   @PostMapping
-  public ApiResponse<SuccessBody<AccountResponse>> createAccount(
-      @RequestBody AccountCreateRequest request) {
-    AccountResponse response = accountService.createAccount(request);
+  public ApiResponse<SuccessBody<AccountResponse>> createAccount() {
+    AccountResponse response = accountService.createAccount();
     return ApiResponseGenerator.success(ResponseCode.CREATE, response);
   }
 
   // 계좌 상세 조회
-  @GetMapping("/{accountId}")
+  @GetMapping("/{accountNumber}")
   public ApiResponse<SuccessBody<AccountDetailResponse>> getAccountDetail(
-      @PathVariable Long accountId) {
-    AccountDetailResponse response = accountService.getAccountDetail(accountId);
+      @PathVariable String accountNumber) {
+    AccountDetailResponse response = accountService.getAccountDetail(accountNumber);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 
   // 계좌 리스트 조회
   @GetMapping
-  public ApiResponse<SuccessBody<List<AccountListResponse>>> getAccountsByUserId(
-      @RequestParam Long userId) {
-    List<AccountListResponse> response = accountService.getAccountsByUserId(userId);
+  public ApiResponse<SuccessBody<List<AccountListResponse>>> getAccountsByUserId() {
+    List<AccountListResponse> response = accountService.getAccountsByUserId();
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 
   // 계좌 삭제
-  @DeleteMapping("/{accountId}")
-  public ApiResponse<SuccessBody<Void>> deleteAccount(@PathVariable Long accountId) {
-    accountService.deleteAccount(accountId);
+  @DeleteMapping("/{accountNumber}")
+  public ApiResponse<SuccessBody<Void>> deleteAccount(@PathVariable String accountNumber) {
+    accountService.deleteAccount(accountNumber);
     return ApiResponseGenerator.success(ResponseCode.DELETE);
   }
 }
