@@ -32,7 +32,7 @@ public class LoanProduct {
     @Builder.Default
     private List<LoanLedger> loanLedgerList = new ArrayList<>();
 
-    // LoanProduct 1 : N InterestRate
+    // LoanProduct 1 : N com.fisa.bank.interest.persistence.entity.InterestRate
     @OneToMany(mappedBy = "loanProduct", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @OrderBy("createdAt DESC") // 최신 순으로 정렬

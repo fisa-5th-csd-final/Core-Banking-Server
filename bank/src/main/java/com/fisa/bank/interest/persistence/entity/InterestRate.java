@@ -1,6 +1,5 @@
 package com.fisa.bank.interest.persistence.entity;
 
-
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.interest.persistence.id.InterestRateId;

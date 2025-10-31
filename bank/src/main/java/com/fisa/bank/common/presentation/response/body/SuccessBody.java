@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SuccessBody<T> extends ApiResponseBody {
 
-    private final String code;
-    private final String message;
-    private final T data;
-
+  private final String code;
+  private final String message;
+  private final T data;
 }

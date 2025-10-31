@@ -1,16 +1,15 @@
 package com.fisa.bank.common.config.security.auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.common.config.security.jwt.JwtGenerator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,59 +18,58 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-/**
- * 로그인 성공 핸들러
- * 스프링 시큐리티에 의해, 사용자 인증이 성공하면
- * Authentication 객체를 Jwt 토큰으로 인코딩하여
- * ResponseBody에 담는다.
- */
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.JwtGenerator;
+
+/** 로그인 성공 핸들러 스프링 시큐리티에 의해, 사용자 인증이 성공하면 Authentication 객체를 Jwt 토큰으로 인코딩하여 ResponseBody에 담는다. */
 @Component
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final JwtGenerator jwtGenerator;
-    private final ObjectMapper objectMapper;
+  private final JwtGenerator jwtGenerator;
+  private final ObjectMapper objectMapper;
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+  @Override
+  public void onAuthenticationSuccess(
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws IOException, ServletException {
 
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    if (authentication instanceof UsernamePasswordAuthenticationToken) {
+      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            if (Objects.nonNull(userDetails)) {
+      if (Objects.nonNull(userDetails)) {
 
-                Long userId = userDetails.getUserId().getValue();
+        Long userId = userDetails.getUserId().getValue();
 
-                /*
-                    TODO: jwt에 권한 정보를 담을 경우, 토큰이 탈취되면 디코딩해서 권한 정보가 노출될 수 있다.
-                        따라서 보안이 중요한 서비스의 경우에는, 외부에서 어떤 권한인지 식별할 수 없도록 별도로 매핑해서 토큰을 생성해야 한다.
-                 */
-                Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-                String accessToken = jwtGenerator.createAccessToken(userId, authorities).getTokenValue();
-                String refreshToken = jwtGenerator.createRefreshToken(userId).getTokenValue();
+        /*
+           TODO: jwt에 권한 정보를 담을 경우, 토큰이 탈취되면 디코딩해서 권한 정보가 노출될 수 있다.
+               따라서 보안이 중요한 서비스의 경우에는, 외부에서 어떤 권한인지 식별할 수 없도록 별도로 매핑해서 토큰을 생성해야 한다.
+        */
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        String accessToken = jwtGenerator.createAccessToken(userId, authorities).getTokenValue();
+        String refreshToken = jwtGenerator.createRefreshToken(userId).getTokenValue();
 
-                response.setStatus(HttpStatus.OK.value());
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter()
-                        .write(createBody(accessToken, refreshToken));
-                response.flushBuffer();
-                return;
-            }
-            throw new IllegalStateException("UserDetails should be not null");
-        }
-
-        // UserIdAuthentication 이 아니면 예외
-        throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
-
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(createBody(accessToken, refreshToken));
+        response.flushBuffer();
+        return;
+      }
+      throw new IllegalStateException("UserDetails should be not null");
     }
 
-    // AccessToken, RefreshToken 이 담긴 바디를 만드는 과정
-    private String createBody(String accessToken, String refreshToken){
-        try {
-            return objectMapper.writeValueAsString(Map.of("access_token", accessToken, "refresh_token", refreshToken));
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Exception occur in json processing");
-        }
+    // UserIdAuthentication 이 아니면 예외
+    throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
+  }
+
+  // AccessToken, RefreshToken 이 담긴 바디를 만드는 과정
+  private String createBody(String accessToken, String refreshToken) {
+    try {
+      return objectMapper.writeValueAsString(
+          Map.of("access_token", accessToken, "refresh_token", refreshToken));
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException("Exception occur in json processing");
     }
+  }
 }

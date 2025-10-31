@@ -14,20 +14,18 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserAuth {
 
+  @Id private String loginId;
+  private String password;
 
-    @Id private String loginId;
-    private String password;
+  @OneToOne(mappedBy = "userAuth")
+  private User user;
 
-    @OneToOne(mappedBy = "userAuth")
-    private User user;
+  public UserAuth(String loginId, String password) {
+    this.loginId = loginId;
+    this.password = password;
+  }
 
-    public UserAuth(String loginId, String password){
-        this.loginId = loginId;
-        this.password = password;
-    }
-
-    public static UserAuth create(String loginId, String password){
-        return new UserAuth(loginId, password);
-    }
-
+  public static UserAuth create(String loginId, String password) {
+    return new UserAuth(loginId, password);
+  }
 }

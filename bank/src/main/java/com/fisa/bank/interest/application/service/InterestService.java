@@ -60,7 +60,7 @@ public class InterestService {
 
 //    @Transactional
 //    public Map<String, BigDecimal> findInterestRate(LoanProduct loanProduct){
-//        InterestRate interestRate = interestRateRepository.findFirstByLoanProductOrderByCreatedAtDesc(loanProduct)
+//        com.fisa.bank.interest.persistence.entity.InterestRate interestRate = interestRateRepository.findFirstByLoanProductOrderByCreatedAtDesc(loanProduct)
 //                .orElseThrow(() -> new InterestException(loanProduct.getLoanProductId()));
 //        Map<String, BigDecimal> interests = Map.of(
 //                "addInterest", interestRate.getAddInterest(),

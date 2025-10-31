@@ -29,93 +29,95 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 public class AuthorizationConfig {
 
-    // OAuth 2.0 클라이언트 저장소 등록
-    // 인메모리, JDBC 선택 가능
-    @Bean
-    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbc) {
-        return new JdbcRegisteredClientRepository(jdbc);
-    }
+  // OAuth 2.0 클라이언트 저장소 등록
+  // 인메모리, JDBC 선택 가능
+  @Bean
+  RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbc) {
+    return new JdbcRegisteredClientRepository(jdbc);
+  }
 
-    // 인증/인가 동의 저장소
-    @Bean
-    OAuth2AuthorizationService authorizationService(JdbcTemplate jdbc,
-                                                    RegisteredClientRepository repo) {
-        return new JdbcOAuth2AuthorizationService(jdbc, repo);
-    }
+  // 인증/인가 동의 저장소
+  @Bean
+  OAuth2AuthorizationService authorizationService(
+      JdbcTemplate jdbc, RegisteredClientRepository repo) {
+    return new JdbcOAuth2AuthorizationService(jdbc, repo);
+  }
 
-    @Bean
-    OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbc,
-                                                                  RegisteredClientRepository repo) {
-        return new JdbcOAuth2AuthorizationConsentService(jdbc, repo);
-    }
+  @Bean
+  OAuth2AuthorizationConsentService authorizationConsentService(
+      JdbcTemplate jdbc, RegisteredClientRepository repo) {
+    return new JdbcOAuth2AuthorizationConsentService(jdbc, repo);
+  }
 
-    // Spring Security 의 AuthenticationManger 등록
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+  // Spring Security 의 AuthenticationManger 등록
+  @Bean
+  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
 
-    /**
-     * 사용자로부터 자격 증명 (ID/PW)를 받고
-     * 인증을 수행하는 필터
-     *
-     * UsernamePasswordAuthentication 사용
-     */
-    @Bean("unAuthenticatedFilter")
-    public AuthenticationFilter unAuthenticated(AuthenticationManager authenticationManager,
-                                                AuthenticationSuccessHandler successHandler,
-                                                AuthenticationFailureHandler failureHandler,
-                                                @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter){
-        AuthenticationFilter authenticationFilter = new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
-        RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
+  /**
+   * 사용자로부터 자격 증명 (ID/PW)를 받고 인증을 수행하는 필터
+   *
+   * <p>UsernamePasswordAuthentication 사용
+   */
+  @Bean("unAuthenticatedFilter")
+  public AuthenticationFilter unAuthenticated(
+      AuthenticationManager authenticationManager,
+      AuthenticationSuccessHandler successHandler,
+      AuthenticationFailureHandler failureHandler,
+      @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter) {
+    AuthenticationFilter authenticationFilter =
+        new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
+    RequestMatcher requestMatcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login");
 
-        authenticationFilter.setRequestMatcher(requestMatcher);
-        authenticationFilter.setSuccessHandler(successHandler);
-        authenticationFilter.setFailureHandler(failureHandler);
+    authenticationFilter.setRequestMatcher(requestMatcher);
+    authenticationFilter.setSuccessHandler(successHandler);
+    authenticationFilter.setFailureHandler(failureHandler);
 
-        return authenticationFilter;
-    }
+    return authenticationFilter;
+  }
 
-    /**
-     * 이미 인증이 완료된 사용자가 Jwt를 보내면
-     * 이를 Authentication으로 변환해서 저장하는 필터
-     *
-     * JwtAuthentication 사용
-     */
-    @Bean("authenticatedFilter")
-    public AuthenticationFilter authenticated(@Qualifier("AppAuthenticationProvider")AuthenticationProvider authenticationProvider,
-                                              @Qualifier("AppAuthenticationConverter") AuthenticationConverter authenticationConverter){
-        AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
-        AuthenticationFilter authenticationFilter = new JwtAuthenticationFilter(authenticationManager, authenticationConverter);
-        RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/**");
-        authenticationFilter.setRequestMatcher(requestMatcher);
+  /**
+   * 이미 인증이 완료된 사용자가 Jwt를 보내면 이를 Authentication으로 변환해서 저장하는 필터
+   *
+   * <p>JwtAuthentication 사용
+   */
+  @Bean("authenticatedFilter")
+  public AuthenticationFilter authenticated(
+      @Qualifier("AppAuthenticationProvider") AuthenticationProvider authenticationProvider,
+      @Qualifier("AppAuthenticationConverter") AuthenticationConverter authenticationConverter) {
+    AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
+    AuthenticationFilter authenticationFilter =
+        new JwtAuthenticationFilter(authenticationManager, authenticationConverter);
+    RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/**");
+    authenticationFilter.setRequestMatcher(requestMatcher);
 
-        return authenticationFilter;
-    }
+    return authenticationFilter;
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    /**
-     * jwt 인증필터 서블릿 필터에서 제외
-     */
-    @Bean
-    public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(@Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter){
-        FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>(authenticationFilter);
-        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
-        return registrationBean;
-    }
+  /** jwt 인증필터 서블릿 필터에서 제외 */
+  @Bean
+  public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(
+      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) {
+    FilterRegistrationBean<AuthenticationFilter> registrationBean =
+        new FilterRegistrationBean<>(authenticationFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
 
-    /**
-     * 로그인 전용 필터 서블릿 필터에서 제외
-     */
-    @Bean
-    public FilterRegistrationBean<AuthenticationFilter> loginFilterRegistrationBean(@Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter){
-        FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>(authenticationFilter);
-        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
-        return registrationBean;
-    }
-
+  /** 로그인 전용 필터 서블릿 필터에서 제외 */
+  @Bean
+  public FilterRegistrationBean<AuthenticationFilter> loginFilterRegistrationBean(
+      @Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter) {
+    FilterRegistrationBean<AuthenticationFilter> registrationBean =
+        new FilterRegistrationBean<>(authenticationFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
 }
