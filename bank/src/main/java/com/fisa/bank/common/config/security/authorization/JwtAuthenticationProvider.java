@@ -42,7 +42,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
       Collection<? extends GrantedAuthority> authorities =
           roles.stream().map(SimpleGrantedAuthority::new).toList();
 
-      return new UserIdAuthentication(userId, authorities); // 자동으로 authenticated = true
+      return new JwtAuthentication(userId, authorities); // 자동으로 authenticated = true
     } catch (JwtValidationException e) {
       throw new AccountExpiredException("Token is Expired", e);
     } catch (BadJwtException e) {
@@ -56,6 +56,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public boolean supports(Class<?> authentication) {
-    return authentication.equals(UserIdAuthentication.class);
+    return authentication.equals(JwtAuthentication.class);
   }
 }

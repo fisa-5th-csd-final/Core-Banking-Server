@@ -22,6 +22,6 @@ public class JwtAuthenticationConverter implements AuthenticationConverter {
     if (token.isBlank()) {
       throw new InvalidBearerTokenException("Invalid Bearer Token");
     }
-    return new UserIdAuthentication(token);
+    return new JwtAuthentication(token);
   }
 }
