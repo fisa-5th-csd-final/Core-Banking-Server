@@ -5,7 +5,6 @@ import com.fisa.bank.interest.application.exception.InterestException;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.interest.persistence.id.InterestRateId;
 import com.fisa.bank.interest.persistence.repository.InterestRateRepository;
-import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.user.application.util.PasswordUtil;
@@ -50,6 +49,9 @@ public class InterestService {
     public List<InterestRateResponse> findAllById(Long loanProductId) {
         List<InterestRate> interestRates = interestRateRepository.findAllByLoanProduct_LoanProductId(LoanProductId.of(loanProductId));
 
+        if(interestRates.isEmpty()){
+            throw new InterestException(loanProductId);
+        }
         List<InterestRateResponse> interestRateResponses = interestRates.stream()
                 .map(InterestRateResponse::from
                 )
