@@ -60,3 +60,13 @@ spotless {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register('installGitHook', Copy) {
+	from file('scripts/pre-commit')
+	into file('.git/hooks')
+	fileMode 0755
+}
+
+tasks.named('build') {
+	dependsOn 'installGitHook'
+}
