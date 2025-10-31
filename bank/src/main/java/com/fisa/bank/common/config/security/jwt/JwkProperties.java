@@ -17,12 +17,8 @@ public class JwkProperties {
   private final String jwsAlgorithm;
 
   public JwkProperties(String publicKeyPath, String privateKeyPath) {
-      try {
-          this.publicKey = AsymmetricKeyUtils.createPublicKey(Readers.readFromFile(publicKeyPath), "RSA");
-          this.privateKey = AsymmetricKeyUtils.createPrivateKey(Readers.readFromFile(privateKeyPath), "RSA");
-          this.jwsAlgorithm = JwsAlgorithms.RS256;
-      } catch (Exception e){
-          throw new IllegalStateException("Failed to initialize JWK", e);
-      }
+      this.publicKey = AsymmetricKeyUtils.createPublicKey(Readers.readFromFile(publicKeyPath), "RSA");
+      this.privateKey = AsymmetricKeyUtils.createPrivateKey(Readers.readFromFile(privateKeyPath), "RSA");
+      this.jwsAlgorithm = JwsAlgorithms.RS256;
   }
 }
