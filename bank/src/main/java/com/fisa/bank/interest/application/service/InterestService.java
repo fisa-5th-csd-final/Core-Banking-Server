@@ -48,7 +48,7 @@ public class InterestService {
     }
 
     public List<InterestRateResponse> findAllById(Long loanProductId) {
-        List<InterestRate> interestRates = interestRateRepository.findAllByInterestRateId(InterestRateId.of(loanProductId));
+        List<InterestRate> interestRates = interestRateRepository.findAllByLoanProduct_LoanProductId(LoanProductId.of(loanProductId));
 
         List<InterestRateResponse> interestRateResponses = interestRates.stream()
                 .map(InterestRateResponse::from
