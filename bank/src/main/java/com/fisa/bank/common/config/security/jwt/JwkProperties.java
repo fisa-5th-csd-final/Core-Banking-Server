@@ -1,12 +1,11 @@
 package com.fisa.bank.common.config.security.jwt;
 
-import lombok.Getter;
-
+import com.fisa.bank.common.config.security.util.AsymmetricKeyUtils;
+import com.fisa.bank.common.config.security.util.Readers;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
 import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
 
 @Getter
@@ -17,11 +16,13 @@ public class JwkProperties {
   private final PublicKey publicKey;
   private final String jwsAlgorithm;
 
-  public JwkProperties(String publicKey, String privateKey) {
-    //        this.privateKey = AsymmetricKeyUtils.createPrivateKey(privateKey, "RSA");
-    //        this.publicKey = AsymmetricKeyUtils.createPublicKey(publicKey, "RSA");
-    this.publicKey = null;
-    this.privateKey = null;
-    this.jwsAlgorithm = JwsAlgorithms.RS256;
+  public JwkProperties(String publicKeyPath, String privateKeyPath) {
+      try {
+          this.publicKey = AsymmetricKeyUtils.createPublicKey(Readers.readFromFile(publicKeyPath), "RSA");
+          this.privateKey = AsymmetricKeyUtils.createPrivateKey(Readers.readFromFile(privateKeyPath), "RSA");
+          this.jwsAlgorithm = JwsAlgorithms.RS256;
+      } catch (Exception e){
+          throw new IllegalStateException("Failed to initialize JWK", e);
+      }
   }
 }
