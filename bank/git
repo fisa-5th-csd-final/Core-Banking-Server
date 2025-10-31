@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "🔧 Running Spotless before commit..."
+
+# 빠르게 자동 포맷 적용
+./gradlew --quiet spotlessApply
+
+./gradlew --quiet spotlessCheck
