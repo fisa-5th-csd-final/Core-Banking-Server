@@ -13,11 +13,13 @@ public class JwtProperties {
 
   private final AccessToken accessToken;
   private final RefreshToken refreshToken;
+  private final String jwkSetUri;
 
   @ConstructorBinding
-  public JwtProperties(AccessToken accessToken, RefreshToken refreshToken, String secretKey) {
+  public JwtProperties(AccessToken accessToken, RefreshToken refreshToken, String jwkSetUri) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
+    this.jwkSetUri = jwkSetUri;
   }
 
   public record AccessToken(Duration expiry) {}

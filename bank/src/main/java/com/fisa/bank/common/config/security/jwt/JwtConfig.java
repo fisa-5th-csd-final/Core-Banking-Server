@@ -29,11 +29,12 @@ public class JwtConfig {
   private static final JWSAlgorithm jwsAlgorithm = JWSAlgorithm.RS256;
 
   private final JwkProperties jwkProperties;
+  private final JwtProperties jwtProperties;
 
   // 전역 JwtDecoder AuthorizationServer나 ResourceServer나 같은 JwtDecoder를 사용한다.
   @Bean
   public JwtDecoder jwtDecoder() {
-    return NimbusJwtDecoder.withJwkSetUri("http://localhost:8080/oauth2/jwks") // 공개키롤 받아오기 위함
+    return NimbusJwtDecoder.withJwkSetUri(jwtProperties.getJwkSetUri()) // 공개키롤 받아오기 위함
         .jwsAlgorithm(signatureAlgorithm) // 서명 알고리즘
         .build();
   }

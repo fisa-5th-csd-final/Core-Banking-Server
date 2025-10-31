@@ -8,6 +8,7 @@ jwt:
     expiry: ${ACCESS_TOKEN_EXPIRY}
   refresh-token:
     expiry: ${REFRESH_TOKEN_EXPIRY}
+  jwk-set-uri : ${JWK_SET_URI}
 
 jwk:
   private-key-path: ${JWK_PRIVATE_KEY_PATH}
