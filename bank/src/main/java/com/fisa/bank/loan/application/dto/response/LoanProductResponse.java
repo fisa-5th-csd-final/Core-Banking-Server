@@ -16,20 +16,20 @@ import java.util.List;
 public class LoanProductResponse<T> {
     private List<T> data;
 
-    private final LoanProductId id;
+    private final Long id;
     private final String name;
     private final LoanType type;
     private final InterestRateResponse interestRateResponse;
 
     public static LoanProductResponse<LoanProduct> from(LoanProduct entity, InterestRateResponse interestRateResponse){
         return new LoanProductResponse<LoanProduct>(
-                entity.getLoanProductId(),
+                entity.getLoanProductId().getValue(),
                 entity.getName(),
                 entity.getType(),
                 interestRateResponse // 가장 최신 금리만 저장
         );
     }
-    public LoanProductResponse(LoanProductId id, String name, LoanType type, InterestRateResponse interestRateResponse){
+    public LoanProductResponse(Long id, String name, LoanType type, InterestRateResponse interestRateResponse){
         this.id = id;
         this.name = name;
         this.type = type;
