@@ -1,6 +1,9 @@
 package com.fisa.bank.loan.application.service;
 
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
+import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
+import com.fisa.bank.interest.application.service.InterestService;
+import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;

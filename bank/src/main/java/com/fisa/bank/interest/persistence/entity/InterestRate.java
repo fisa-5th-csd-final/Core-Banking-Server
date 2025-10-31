@@ -1,5 +1,4 @@
-package com.fisa.bank.loan.persistence.entity;
-
+package com.fisa.bank.interest.persistence.entity;
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
