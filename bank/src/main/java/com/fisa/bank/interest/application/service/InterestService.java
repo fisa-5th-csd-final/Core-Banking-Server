@@ -3,6 +3,7 @@ package com.fisa.bank.interest.application.service;
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.exception.InterestException;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
+import com.fisa.bank.interest.persistence.id.InterestRateId;
 import com.fisa.bank.interest.persistence.repository.InterestRateRepository;
 import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +42,20 @@ public class InterestService {
         // 대출 상품에 금리 추가
         loanProduct.getInterestRateList().add(savedInterestRate);
 
-
         InterestRateResponse response = InterestRateResponse.from(savedInterestRate);
+
         return response;
+    }
+
+    public List<InterestRateResponse> findAllById(Long loanProductId) {
+        List<InterestRate> interestRates = interestRateRepository.findAllByInterestRateId(InterestRateId.of(loanProductId));
+
+        List<InterestRateResponse> interestRateResponses = interestRates.stream()
+                .map(InterestRateResponse::from
+                )
+                .toList();
+
+        return interestRateResponses;
     }
 
 //    @Transactional
