@@ -2,11 +2,7 @@ package com.fisa.bank.common.config.security.jwt;
 
 import lombok.Getter;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;

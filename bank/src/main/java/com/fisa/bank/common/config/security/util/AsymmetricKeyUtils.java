@@ -13,7 +13,7 @@ public class AsymmetricKeyUtils {
 
   public static PrivateKey createPrivateKey(String string, String algorithm) {
     try {
-        string = stripPem(string, "PRIVATE KEY", "PRIVATE KEY");
+      string = stripPem(string, "PRIVATE KEY", "PRIVATE KEY");
       byte[] pkcs8 = Base64.getDecoder().decode(string);
       PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(pkcs8);
       return KeyFactory.getInstance(algorithm).generatePrivate(spec);
@@ -24,7 +24,7 @@ public class AsymmetricKeyUtils {
 
   public static PublicKey createPublicKey(String string, String algorithm) {
     try {
-        string = stripPem(string, "PUBLIC KEY", "PUBLIC KEY");
+      string = stripPem(string, "PUBLIC KEY", "PUBLIC KEY");
       byte[] keyBytes = Base64.getDecoder().decode(string);
       java.security.spec.X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
       return KeyFactory.getInstance(algorithm).generatePublic(spec);
@@ -33,9 +33,9 @@ public class AsymmetricKeyUtils {
     }
   }
 
-    private static String stripPem(String pem, String begin, String end) {
-        return pem.replace("-----BEGIN " + begin + "-----", "")
-                .replace("-----END " + end + "-----", "")
-                .replaceAll("\\s+", ""); // 줄바꿈/공백 제거
-    }
+  private static String stripPem(String pem, String begin, String end) {
+    return pem.replace("-----BEGIN " + begin + "-----", "")
+        .replace("-----END " + end + "-----", "")
+        .replaceAll("\\s+", ""); // 줄바꿈/공백 제거
+  }
 }

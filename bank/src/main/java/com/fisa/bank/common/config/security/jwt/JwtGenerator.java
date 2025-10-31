@@ -1,16 +1,11 @@
 package com.fisa.bank.common.config.security.jwt;
 
-import com.nimbusds.jose.JWSAlgorithm;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
-import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -28,8 +23,7 @@ public class JwtGenerator {
   private final JwtProperties jwtProperties;
   private final JwtEncoder jwtEncoder;
 
-  public JwtGenerator(
-      JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
+  public JwtGenerator(JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
     this.jwtEncoder = jwtEncoder;
     this.jwtProperties = jwtProperties;
   }
