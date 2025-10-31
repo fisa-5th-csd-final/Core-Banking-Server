@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.authorization;
+package com.fisa.bank.common.config.security.resource;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

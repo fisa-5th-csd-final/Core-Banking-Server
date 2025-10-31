@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.authorization;
+package com.fisa.bank.common.config.security.resource;
 
 import java.util.Collection;
 
