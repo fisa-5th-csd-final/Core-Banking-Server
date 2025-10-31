@@ -4,12 +4,12 @@ spring:
       on-profile: auth
 
 jwt:
-  secret-key: ${TOKEN_SECRET}
   access-token:
     expiry: ${ACCESS_TOKEN_EXPIRY}
   refresh-token:
     expiry: ${REFRESH_TOKEN_EXPIRY}
+  jwk-set-uri : ${JWK_SET_URI}
 
 jwk:
-  private-key: ${JWK_PRIVATE_KEY}
-  public-key: ${JWK_PUBLIC_KEY}
+  private-key-path: ${JWK_PRIVATE_KEY_PATH}
+  public-key-path: ${JWK_PUBLIC_KEY_PATH}

@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.resource;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,17 +8,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 
-public class JwtAuthenticationFilter extends AuthenticationFilter {
+public class LoginAuthenticationFilter extends AuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
   private final AuthenticationConverter authenticationConverter;
 
-  public JwtAuthenticationFilter(
+  public LoginAuthenticationFilter(
       AuthenticationManager authenticationManager,
       AuthenticationConverter authenticationConverter) {
     super(authenticationManager, authenticationConverter);
@@ -34,10 +35,17 @@ public class JwtAuthenticationFilter extends AuthenticationFilter {
       // Authentication 변환
       Authentication authentication = authenticationConverter.convert(request);
       // 인증 진행
-      authentication = authenticationManager.authenticate(authentication);
+      try {
+        authentication = authenticationManager.authenticate(authentication);
 
-      // 컨텍스트 저장
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (authentication.isAuthenticated()) {
+          super.getSuccessHandler().onAuthenticationSuccess(request, response, authentication);
+        } else throw new AuthenticationServiceException("발생하면 안되는 예외");
+      } catch (AuthenticationException e) {
+        super.getFailureHandler().onAuthenticationFailure(request, response, e);
+      }
+
+      return; // 더이상 진행 X
     }
     filterChain.doFilter(request, response);
   }

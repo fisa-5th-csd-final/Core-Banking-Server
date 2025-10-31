@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.resource;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /** 사용자가 요청한 HTTP Request에서 자격 증명(ID/PW)을 꺼내서 Authentication으로 만드는 역할 */
 @Component("AppUnAuthenticationConverter")
 @RequiredArgsConstructor
-public class UserIdAuthenticationConverter implements AuthenticationConverter {
+public class UsernamePasswordAuthenticationConverter implements AuthenticationConverter {
 
   // RequestBody -> JSON 변환
   private final ObjectMapper objectMapper;

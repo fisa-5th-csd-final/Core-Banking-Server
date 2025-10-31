@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.resource;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -22,6 +22,6 @@ public class JwtAuthenticationConverter implements AuthenticationConverter {
     if (token.isBlank()) {
       throw new InvalidBearerTokenException("Invalid Bearer Token");
     }
-    return new UserIdAuthentication(token);
+    return new JwtAuthentication(token);
   }
 }

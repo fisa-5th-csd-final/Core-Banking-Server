@@ -184,6 +184,9 @@ env.properties
 bank/src/main/resources/env.properties
 .env
 
+### !!!!!!!!!keys!!!!!!! ###
+*.pem
+
 ### build
 bank/build/**
 

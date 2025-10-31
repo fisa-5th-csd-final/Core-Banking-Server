@@ -2,11 +2,7 @@ package com.fisa.bank.common.config.security.jwt;
 
 import lombok.Getter;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
@@ -17,13 +13,13 @@ public class JwtProperties {
 
   private final AccessToken accessToken;
   private final RefreshToken refreshToken;
-  private final SecretKey secretKey; // TODO: at, rt 의 secret을 다르게 해야 할까?
+  private final String jwkSetUri;
 
   @ConstructorBinding
-  public JwtProperties(AccessToken accessToken, RefreshToken refreshToken, String secretKey) {
+  public JwtProperties(AccessToken accessToken, RefreshToken refreshToken, String jwkSetUri) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+    this.jwkSetUri = jwkSetUri;
   }
 
   public record AccessToken(Duration expiry) {}

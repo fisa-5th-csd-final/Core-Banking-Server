@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.fisa.bank.common.application.util.RequesterInfo;
-import com.fisa.bank.common.config.security.auth.UserIdAuthentication;
+import com.fisa.bank.common.config.security.resource.JwtAuthentication;
 import com.fisa.bank.user.persistence.entity.id.UserId;
 
 @Component
@@ -30,7 +30,7 @@ public class SpringRequesterInfo implements RequesterInfo {
       throw new IllegalStateException("Authentication should be not null");
     }
 
-    if (!(authentication instanceof UserIdAuthentication)) {
+    if (!(authentication instanceof JwtAuthentication)) {
       throw new IllegalStateException("UserIdAuthentication not found");
     }
 

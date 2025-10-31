@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.resource;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
