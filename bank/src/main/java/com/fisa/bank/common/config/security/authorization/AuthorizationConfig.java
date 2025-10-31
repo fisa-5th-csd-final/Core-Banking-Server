@@ -35,38 +35,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 public class AuthorizationConfig {
 
-  // OAuth 2.0 클라이언트 저장소 등록
-  // 인메모리, JDBC 선택 가능
-  @Bean
-  public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbc) {
-    return new JdbcRegisteredClientRepository(jdbc);
-  }
-
-    /**
-     * OAuth2Token 생성기
-     */
-    @Bean
-    public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder) {
-        JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
-        OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
-        OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
-        return new DelegatingOAuth2TokenGenerator(
-                jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
-    }
-
-  // 인증/인가 동의 저장소
-  @Bean
-  OAuth2AuthorizationService authorizationService(
-      JdbcTemplate jdbc, RegisteredClientRepository repo) {
-    return new JdbcOAuth2AuthorizationService(jdbc, repo);
-  }
-
-  @Bean
-  OAuth2AuthorizationConsentService authorizationConsentService(
-      JdbcTemplate jdbc, RegisteredClientRepository repo) {
-    return new JdbcOAuth2AuthorizationConsentService(jdbc, repo);
-  }
-
   // Spring Security 의 AuthenticationManger 등록
   @Bean
   AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
