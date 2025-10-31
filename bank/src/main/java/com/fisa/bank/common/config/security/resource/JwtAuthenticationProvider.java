@@ -1,10 +1,9 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.resource;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -27,7 +26,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   private final JwtDecoder jwtDecoder;
 
-  public JwtAuthenticationProvider(@Qualifier("AppJwtDecoder") JwtDecoder jwtDecoder) {
+  public JwtAuthenticationProvider(JwtDecoder jwtDecoder) {
     this.jwtDecoder = jwtDecoder;
   }
 
@@ -43,7 +42,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
       Collection<? extends GrantedAuthority> authorities =
           roles.stream().map(SimpleGrantedAuthority::new).toList();
 
-      return new UserIdAuthentication(userId, authorities); // 자동으로 authenticated = true
+      return new JwtAuthentication(userId, authorities); // 자동으로 authenticated = true
     } catch (JwtValidationException e) {
       throw new AccountExpiredException("Token is Expired", e);
     } catch (BadJwtException e) {
@@ -57,6 +56,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public boolean supports(Class<?> authentication) {
-    return authentication.equals(UserIdAuthentication.class);
+    return authentication.equals(JwtAuthentication.class);
   }
 }

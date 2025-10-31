@@ -1,7 +1,5 @@
 package com.fisa.bank.loan.persistence.entity;
 
-import com.fisa.bank.user.persistence.entity.CreditRating;
-import com.fisa.bank.user.persistence.entity.CustomerLevel;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,9 +8,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+
+import com.fisa.bank.user.persistence.entity.CreditRating;
+import com.fisa.bank.user.persistence.entity.CustomerLevel;
+
 /*
-    우대금리 매핑 테이블의 복합키
- */
+   우대금리 매핑 테이블의 복합키
+*/
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,11 +22,11 @@ import java.io.Serializable;
 @Embeddable // Entity의 포함될 수 있는 타입임을 명시하는 어노테이션
 public class PreferInterestCompositeKey implements Serializable {
 
-    // 신용 등급
-    @Enumerated(EnumType.STRING)
-    private CreditRating creditRating;
+  // 신용 등급
+  @Enumerated(EnumType.STRING)
+  private CreditRating creditRating;
 
-    // 고객 등급
-    @Enumerated(EnumType.STRING)
-    private CustomerLevel customerLevel;
+  // 고객 등급
+  @Enumerated(EnumType.STRING)
+  private CustomerLevel customerLevel;
 }

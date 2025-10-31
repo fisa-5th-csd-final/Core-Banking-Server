@@ -25,47 +25,50 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 public class SecurityFilterChainConfig {
 
-    @Bean
-    @Order(1)
-    // Authorization Server 필터 체인 설정
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                      @Qualifier("OidcJwtGenerator") OAuth2TokenGenerator<?> tokenGenerator,
-                                                                      @Qualifier("OidcJwtDecoder")JwtDecoder jwtDecoder) throws Exception {
-        OAuth2AuthorizationServerConfigurer authorizationServer = OAuth2AuthorizationServerConfigurer.authorizationServer();
+  @Bean
+  @Order(1)
+  // Authorization Server 필터 체인 설정
+  public SecurityFilterChain authorizationServerSecurityFilterChain(
+      HttpSecurity http, OAuth2TokenGenerator<?> tokenGenerator, JwtDecoder jwtDecoder)
+      throws Exception {
+    OAuth2AuthorizationServerConfigurer authorizationServer =
+        OAuth2AuthorizationServerConfigurer.authorizationServer();
 
-        commonConfiguration(http); // 공통 설정
-        // SAS 엔드포인트만 매칭
+    commonConfiguration(http); // 공통 설정
+    // SAS 엔드포인트만 매칭
 
-        http.securityMatcher(authorizationServer.getEndpointsMatcher())
-            .authorizeHttpRequests(auth -> auth
-            .anyRequest().permitAll());
+    http.securityMatcher(authorizationServer.getEndpointsMatcher())
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
-        // SAS 기능 활성화(OIDC 포함)
-        http.with(authorizationServer, as ->
-                            as.tokenGenerator(tokenGenerator)
-                                .oidc(
-                                        oidc -> oidc
-                                            .clientRegistrationEndpoint(Customizer.withDefaults())
-                                            .userInfoEndpoint(Customizer.withDefaults())
-                                ))
-                // 인증 안 된 HTML 요청은 /login으로
-            .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
-                        new LoginUrlAuthenticationEntryPoint("/login"),
-                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-                ));
+    // SAS 기능 활성화(OIDC 포함)
+    http.with(
+            authorizationServer,
+            as ->
+                as.tokenGenerator(tokenGenerator)
+                    .oidc(
+                        oidc ->
+                            oidc.clientRegistrationEndpoint(Customizer.withDefaults())
+                                .userInfoEndpoint(Customizer.withDefaults())))
+        // 인증 안 된 HTML 요청은 /login으로
+        .exceptionHandling(
+            ex ->
+                ex.defaultAuthenticationEntryPointFor(
+                    new LoginUrlAuthenticationEntryPoint("/login"),
+                    new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
-        http.oauth2ResourceServer(oauth2->
-                    oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)
-            ));
+    http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    @Order(2)
-    // [일반 사용자용] 인증이 필요하지 않은 엔드포인트
-    public SecurityFilterChain unAuthenticated(HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception {
-        commonConfiguration(http);
+  @Bean
+  @Order(2)
+  // [일반 사용자용] 인증이 필요하지 않은 엔드포인트
+  public SecurityFilterChain unAuthenticated(
+      HttpSecurity http,
+      @Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter)
+      throws Exception {
+    commonConfiguration(http);
 
         RequestMatcher requestMatcher = new OrRequestMatcher(
                 PathPatternRequestMatcher.withDefaults().matcher("/api/users"),
