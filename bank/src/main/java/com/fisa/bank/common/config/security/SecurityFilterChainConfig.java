@@ -17,7 +17,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 public class SecurityFilterChainConfig {
@@ -64,7 +67,17 @@ public class SecurityFilterChainConfig {
     public SecurityFilterChain unAuthenticated(HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception {
         commonConfiguration(http);
 
-        http.securityMatcher("/api/users", "/api/login", "/api/loans/**", "/api/interests/**");
+        RequestMatcher requestMatcher = new OrRequestMatcher(
+                PathPatternRequestMatcher.withDefaults().matcher("/api/users"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/login"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/loans"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/interests/**"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/loans/products/**"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/loans"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*")
+        );
+
+        http.securityMatcher(requestMatcher);
         http.authorizeHttpRequests(
                 auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
@@ -84,7 +97,9 @@ public class SecurityFilterChainConfig {
         commonConfiguration(http);
 
         http.securityMatcher("/**");
-        http.authorizeHttpRequests( auth -> auth.anyRequest().authenticated());
+        http.authorizeHttpRequests( auth -> auth
+                .requestMatchers(HttpMethod.POST, "/api/loans/**").authenticated()
+                .anyRequest().authenticated());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
         return http.build();

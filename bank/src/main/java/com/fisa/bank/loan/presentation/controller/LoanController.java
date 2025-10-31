@@ -4,7 +4,9 @@ import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
+import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
+import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
 import com.fisa.bank.loan.application.dto.response.PagedResponse;
@@ -55,6 +57,17 @@ public class LoanController {
 
         return ApiResponseGenerator.success(ResponseCode.DELETE);
     }
+
+    // 사용자 - 대출 상품 가입, 대출 해지, 대출 상환, 대출 상환 내역 조회
+    @PostMapping("/{loanProductId}")
+    public ApiResponse<SuccessBody<LoanApplyforResponse>> applyForLoan(@PathVariable Long loanProductId, @RequestBody LoanApplyForRequest request){
+        // 받아야 하는 데이터
+            // 유저 아이디, 대출 상품 아이디, 원금, 금리 유형
+            // 상환 방법(원리금, 원금, 만기)
+        LoanApplyforResponse loanApplyforResponse = loanService.applyForLoan(request, loanProductId);
+        return ApiResponseGenerator.success(ResponseCode.GET, loanApplyforResponse);
+    }
+
 
 
 }

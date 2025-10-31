@@ -3,6 +3,7 @@ package com.fisa.bank.loan.persistence.entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ import com.fisa.bank.user.persistence.entity.User;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class LoanLedger {
 
   @Id
