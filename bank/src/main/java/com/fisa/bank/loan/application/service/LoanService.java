@@ -41,7 +41,7 @@ public class LoanService {
         LoanProductCreateResponse response = LoanProductCreateResponse.builder()
                 .name(loanProduct.getName())
                 .type(loanProduct.getType())
-                .loanProductId(loanProduct.getLoanProductId())
+                .loanProductId(loanProduct.getLoanProductId().getValue())
                 .addInterest(interestRateResponse.getAddInterest())
                 .limitPreferInterest(interestRateResponse.getLimitPreferInterest())
                 .build();

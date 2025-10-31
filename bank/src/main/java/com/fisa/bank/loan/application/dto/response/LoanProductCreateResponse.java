@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 public class LoanProductCreateResponse {
-    private final LoanProductId loanProductId;
+    private final Long loanProductId;
 
     private final String name;
 
