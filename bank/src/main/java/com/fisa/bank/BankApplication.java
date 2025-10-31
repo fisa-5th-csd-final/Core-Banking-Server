@@ -10,8 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan(basePackages = "com.fisa.bank")
 public class BankApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(BankApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(BankApplication.class, args);
+  }
 }

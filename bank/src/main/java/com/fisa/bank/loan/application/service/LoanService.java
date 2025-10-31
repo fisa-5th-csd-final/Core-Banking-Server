@@ -1,9 +1,6 @@
 package com.fisa.bank.loan.application.service;
 
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
-import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
-import com.fisa.bank.interest.application.service.InterestService;
-import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
@@ -19,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

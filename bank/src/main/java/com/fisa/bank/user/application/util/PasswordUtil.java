@@ -1,23 +1,23 @@
 package com.fisa.bank.user.application.util;
 
-import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.fisa.bank.user.application.exception.InvalidPasswordFormatException;
 
 @Component
 @RequiredArgsConstructor
 public class PasswordUtil {
 
-    private final PasswordValidator validator;
-    private final PasswordEncoder passwordEncoder;
+  private final PasswordValidator validator;
+  private final PasswordEncoder passwordEncoder;
 
-    public String encrypt(String password){
+  public String encrypt(String password) {
 
-        if(!validator.validate(password))
-            throw new InvalidPasswordFormatException();
+    if (!validator.validate(password)) throw new InvalidPasswordFormatException();
 
-        return passwordEncoder.encode(password);
-    }
-
+    return passwordEncoder.encode(password);
+  }
 }

@@ -5,8 +5,11 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.enums.LoanType;
+import jakarta.persistence.*;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -32,7 +35,6 @@ public class LoanProductResponse<T> {
         this.type = type;
         this.interestRateResponse = interestRateResponse;
     }
-
 
 }
 

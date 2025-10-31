@@ -11,24 +11,23 @@ import java.util.Base64;
 
 public class AsymmetricKeyUtils {
 
-    public static PrivateKey createPrivateKey(String string, String algorithm){
-        try {
-            byte[] pkcs8 = Base64.getDecoder().decode(string);
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(pkcs8);
-            return KeyFactory.getInstance(algorithm).generatePrivate(spec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e){
-            throw new IllegalStateException("Failed to create private key", e);
-        }
+  public static PrivateKey createPrivateKey(String string, String algorithm) {
+    try {
+      byte[] pkcs8 = Base64.getDecoder().decode(string);
+      PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(pkcs8);
+      return KeyFactory.getInstance(algorithm).generatePrivate(spec);
+    } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+      throw new IllegalStateException("Failed to create private key", e);
     }
+  }
 
-    public static PublicKey createPublicKey(String string, String algorithm){
-        try {
-            byte[] keyBytes = Base64.getDecoder().decode(string);
-            java.security.spec.X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-            return KeyFactory.getInstance(algorithm).generatePublic(spec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e){
-            throw new IllegalStateException("Failed to create public key", e);
-        }
+  public static PublicKey createPublicKey(String string, String algorithm) {
+    try {
+      byte[] keyBytes = Base64.getDecoder().decode(string);
+      java.security.spec.X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+      return KeyFactory.getInstance(algorithm).generatePublic(spec);
+    } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+      throw new IllegalStateException("Failed to create public key", e);
     }
-
+  }
 }
