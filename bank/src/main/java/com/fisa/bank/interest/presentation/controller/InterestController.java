@@ -1,0 +1,33 @@
+package com.fisa.bank.interest.presentation.controller;
+
+import com.fisa.bank.common.presentation.response.ApiResponse;
+import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
+import com.fisa.bank.common.presentation.response.body.SuccessBody;
+import com.fisa.bank.common.presentation.response.code.ResponseCode;
+import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
+import com.fisa.bank.interest.application.service.InterestService;
+import com.fisa.bank.interest.persistence.repository.InterestRateRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/interests")
+@RequiredArgsConstructor
+public class InterestController {
+
+    private final InterestService interestService;
+
+    @GetMapping("/{loanProductId}")
+    public ApiResponse<SuccessBody<List<InterestRateResponse>>> findAllInterest(@PathVariable Long loanProductId){
+
+        List<InterestRateResponse> allInterestRates = interestService.findAllById(loanProductId);
+
+        return ApiResponseGenerator.success(ResponseCode.GET, allInterestRates);
+    }
+
+}

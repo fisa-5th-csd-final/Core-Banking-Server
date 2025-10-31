@@ -1,4 +1,4 @@
-package com.fisa.bank.loan.persistence.entity.id;
+package com.fisa.bank.interest.persistence.id;
 
 import org.hibernate.type.descriptor.java.LongJavaType;
 import org.hibernate.type.descriptor.jdbc.BigIntJdbcType;

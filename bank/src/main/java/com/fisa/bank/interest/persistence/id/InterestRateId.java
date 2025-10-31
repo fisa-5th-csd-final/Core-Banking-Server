@@ -1,4 +1,4 @@
-package com.fisa.bank.loan.persistence.entity.id;
+package com.fisa.bank.interest.persistence.id;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
