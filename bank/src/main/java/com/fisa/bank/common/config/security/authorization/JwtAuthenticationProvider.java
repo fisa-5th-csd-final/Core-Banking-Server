@@ -1,10 +1,9 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.authorization;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;

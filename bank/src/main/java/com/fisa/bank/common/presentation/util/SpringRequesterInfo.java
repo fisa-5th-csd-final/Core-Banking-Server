@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.fisa.bank.common.application.util.RequesterInfo;
-import com.fisa.bank.common.config.security.auth.UserIdAuthentication;
+import com.fisa.bank.common.config.security.authorization.UserIdAuthentication;
 import com.fisa.bank.user.persistence.entity.id.UserId;
 
 @Component

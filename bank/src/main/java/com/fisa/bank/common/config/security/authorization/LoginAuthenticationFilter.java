@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.auth;
+package com.fisa.bank.common.config.security.authorization;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
