@@ -1,18 +1,14 @@
 package com.fisa.bank.loan.persistence.entity.id;
 
-import com.fisa.bank.common.persistence.id.BaseIdJavaType;
 import org.hibernate.type.descriptor.java.LongJavaType;
 import org.hibernate.type.descriptor.jdbc.BigIntJdbcType;
 
-public class InterestRateIdJavaType extends BaseIdJavaType<Long, InterestRateId>{
-    public static final InterestRateIdJavaType INSTANCE = new InterestRateIdJavaType();
+import com.fisa.bank.common.persistence.id.BaseIdJavaType;
 
-    public InterestRateIdJavaType(){
-        super(
-                InterestRateId.class,
-                InterestRateId::of,
-                LongJavaType.INSTANCE,
-                BigIntJdbcType.INSTANCE
-        );
-    }
+public class InterestRateIdJavaType extends BaseIdJavaType<Long, InterestRateId> {
+  public static final InterestRateIdJavaType INSTANCE = new InterestRateIdJavaType();
+
+  public InterestRateIdJavaType() {
+    super(InterestRateId.class, InterestRateId::of, LongJavaType.INSTANCE, BigIntJdbcType.INSTANCE);
+  }
 }
