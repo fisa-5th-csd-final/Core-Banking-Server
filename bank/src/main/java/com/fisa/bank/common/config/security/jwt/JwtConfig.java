@@ -52,7 +52,7 @@ public class JwtConfig {
     RSAKey rsaKey =
         new RSAKey.Builder(publicKey)
             .privateKey(privateKey)
-            .keyID(UUID.randomUUID().toString()) // KeyID 설정 -> Key 회전 가능
+            .keyID("core-bank") // KeyID 설정 -> Key 회전 가능
             .algorithm(jwsAlgorithm) // -> Jws 서명 알고리즘을 이걸로 사용하겠다는 설정
             .build();
     JWKSet jwkSet = new JWKSet(rsaKey);
