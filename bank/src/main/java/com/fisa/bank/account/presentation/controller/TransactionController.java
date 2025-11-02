@@ -34,18 +34,18 @@ public class TransactionController {
   private final TransactionService transactionService;
 
   // 출금 API
-  @PostMapping("/{accountId}/withdraw")
+  @PostMapping("/{accountNumber}/withdraw")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> withdraw(
-      @PathVariable Long accountId, @Valid @RequestBody AccountWithdrawRequest request) {
-    AccountTransactionResponse response = transactionService.withdraw(accountId, request);
+      @PathVariable String accountNumber, @Valid @RequestBody AccountWithdrawRequest request) {
+    AccountTransactionResponse response = transactionService.withdraw(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
   // 입금
-  @PostMapping("/{accountId}/deposit")
+  @PostMapping("/{accountNumber}/deposit")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
-      @PathVariable Long accountId, @Valid @RequestBody AccountDepositRequest request) {
-    AccountTransactionResponse response = transactionService.deposit(accountId, request);
+      @PathVariable String accountNumber, @Valid @RequestBody AccountDepositRequest request) {
+    AccountTransactionResponse response = transactionService.deposit(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -58,21 +58,21 @@ public class TransactionController {
   }
 
   // 카드결제
-  @PostMapping("{accountId}/pay")
+  @PostMapping("/{accountNumber}/pay")
   public ApiResponse<SuccessBody<CardPaymentResponse>> pay(
-      @PathVariable Long accountId, @Valid @RequestBody CardPaymentRequest request) {
-    CardPaymentResponse response = transactionService.payByCard(accountId, request);
+      @PathVariable String accountNumber, @Valid @RequestBody CardPaymentRequest request) {
+    CardPaymentResponse response = transactionService.payByCard(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
   // 거래내역 조회
-  @GetMapping("/{accountId}/transactions")
+  @GetMapping("/{accountNumber}/transactions")
   public ApiResponse<SuccessBody<AccountTransactionListResponse>> getTransactions(
-      @PathVariable Long accountId,
+      @PathVariable String accountNumber,
       @RequestParam LocalDate startDate,
       @RequestParam LocalDate endDate) {
     AccountTransactionListResponse response =
-        transactionService.getTransactions(accountId, startDate, endDate);
+        transactionService.getTransactions(accountNumber, startDate, endDate);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 }

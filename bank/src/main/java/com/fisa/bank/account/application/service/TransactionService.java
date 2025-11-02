@@ -20,6 +20,7 @@ import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.entity.AccountTransaction;
 import com.fisa.bank.account.persistence.entity.CardTransaction;
@@ -36,6 +37,7 @@ public class TransactionService {
   private final AccountRepository accountRepository;
   private final AccountTransactionRepository accountTransactionRepository;
   private final CardTransactionRepository cardTransactionRepository;
+  private final AccountReader accountReader;
 
   // 거래 시 거래 전, 거래 후 금액, 잔액 부족 등의 공통의 로직을 작성
   private AccountTransaction processTransaction(
@@ -71,11 +73,9 @@ public class TransactionService {
 
   // 출금
   @Transactional
-  public AccountTransactionResponse withdraw(Long accountId, AccountWithdrawRequest request) {
-    Account account =
-        accountRepository
-            .findById(AccountId.of(accountId))
-            .orElseThrow(AccountNotFoundException::new);
+  public AccountTransactionResponse withdraw(String accountNumber, AccountWithdrawRequest request) {
+    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
+    Account account = accountReader.getOwnedAccount(accountNumber);
 
     AccountTransaction trx =
         processTransaction(account, request.amount(), TransactionType.ATM_WITHDRAW, false, null);
@@ -85,11 +85,9 @@ public class TransactionService {
 
   // 입금
   @Transactional
-  public AccountTransactionResponse deposit(Long accountId, AccountDepositRequest request) {
-    Account account =
-        accountRepository
-            .findById(AccountId.of(accountId))
-            .orElseThrow(AccountNotFoundException::new);
+  public AccountTransactionResponse deposit(String accountNumber, AccountDepositRequest request) {
+    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
+    Account account = accountReader.getOwnedAccount(accountNumber);
 
     AccountTransaction trx =
         processTransaction(account, request.amount(), TransactionType.ATM_DEPOSIT, true, null);
@@ -100,15 +98,11 @@ public class TransactionService {
   // 송금
   @Transactional
   public TransferResponse transfer(TransferRequest request) {
-    Account from =
-        accountRepository
-            .findById(AccountId.of(request.fromAccountId()))
-            .orElseThrow(AccountNotFoundException::new);
+    // 토큰을 통해 현재 사용자가 송금하려는 계좌의 소유자인지 검증
+    Account from = accountReader.getOwnedAccount(request.fromAccountNumber());
 
-    Account to =
-        accountRepository
-            .findById(AccountId.of(request.toAccountId()))
-            .orElseThrow(AccountNotFoundException::new);
+    // 받는 계좌는 소유자 검증 없이 계좌번호로 조회
+    Account to = accountReader.getByAccountNumber(request.toAccountNumber());
 
     BigDecimal amount = request.amount();
 
@@ -127,11 +121,9 @@ public class TransactionService {
 
   // 카드 결제
   @Transactional
-  public CardPaymentResponse payByCard(Long accountId, CardPaymentRequest request) {
-    Account account =
-        accountRepository
-            .findById(AccountId.of(accountId))
-            .orElseThrow(AccountNotFoundException::new);
+  public CardPaymentResponse payByCard(String accountNumber, CardPaymentRequest request) {
+    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
+    Account account = accountReader.getOwnedAccount(accountNumber);
 
     // 계좌에도 로그 남기기위해 반영
     processTransaction(
@@ -157,9 +149,9 @@ public class TransactionService {
   }
 
   public AccountTransactionListResponse getTransactions(
-      Long accountId, LocalDate startDate, LocalDate endDate) {
-    AccountId id = AccountId.of(accountId);
-    Account account = accountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+      String accountNumber, LocalDate startDate, LocalDate endDate) {
+    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
+    Account account = accountReader.getOwnedAccount(accountNumber);
 
     // 거래내역 조회
     List<AccountTransactionResponse> transactions =
@@ -172,7 +164,7 @@ public class TransactionService {
 
     // 응답 DTO 생성
     return AccountTransactionListResponse.builder()
-        .accountId(id.getValue())
+        .accountId(account.getAccountId().getValue())
         .transactions(transactions)
         .build();
   }
