@@ -30,7 +30,7 @@ public class RegistrarInitializer implements ApplicationRunner {
                     .scope("client.read")
                     .build();
             clientRepository.save(client);
-            log.info("Registrar Client 생성 성공");
+            log.info("Registrar Client를 추가하였습니다.");
         } else {
             log.info("Registrar Client가 이미 존재합니다. ");
         }
