@@ -184,7 +184,7 @@ Content-Type: application/json
 
     <div class="card">
         <h2>4. 인가 코드 교환</h2>
-        <p>사용자가 성공적으로 로그인하면 서버는 등록된 리다이렉트 URI로 <code>?code=...&amp;state=...</code>를 붙여 리다이렉트합니다. 클라이언트는 <code>state</code>를 검증한 뒤 다음 요청을 수행합니다.</p>
+        <p>1.사용자가 성공적으로 로그인하면 Authorization <b>서버는 등록된 리다이렉트 URI</b>로 <code>?code=...&amp;state=...</code>를 붙여 리다이렉트합니다.<br>2. code 파라미터에 매핑된 value를 추출하여 액세스 토큰을 발급합니다.</p>
         <pre>POST /oauth2/token
 Authorization: Basic &lt;base64(client_id:client_secret)&gt;
 Content-Type: application/x-www-form-urlencoded
@@ -200,12 +200,15 @@ code_verifier=&lt;CODE_VERIFIER&gt;</pre>
         <h2>5. 토큰 검증</h2>
         <h3>ID Token</h3>
         <ul class="simple">
+            <li><strong>누가 로그인 했는지</strong> 확인하는 용도 입니다.</li>
             <li><code>id_token</code>의 서명을 <code>jwks_uri</code>에서 제공하는 JWK로 검증합니다.</li>
             <li>JWT 클레임 중 <code>iss</code>, <code>aud</code>, <code>exp</code>, <code>nonce</code>를 확인합니다.</li>
             <li>다중 테넌트 환경이라면 <code>azp</code>, <code>hd</code> 등 추가 클레임도 점검하세요.</li>
         </ul>
         <h3>Access Token</h3>
         <ul class="simple">
+            <li>로그인 한 사용자의 권한으로 <strong>API를 호출하는 용도</strong> 입니다.</li>
+            <li>Resource Server API 호출 권한을 증명하는 토큰입니다. 사용자 정보 화면을 띄우거나 결제 API를 호출할 때 헤더에 첨부합니다.</li>
             <li>토큰이 JWT라면 동일하게 서명과 만료 시간을 검증합니다.</li>
             <li>토큰이 Reference 토큰이라면 Resource Server가 <code>/oauth2/introspect</code>로 상태를 확인할 수 있도록 구성하세요.</li>
         </ul>
@@ -283,11 +286,11 @@ Authorization: Bearer &lt;access_token&gt;</pre>
     <div class="card">
         <h2>트러블슈팅</h2>
         <ul class="simple">
-            <li>로그인 페이지로 리다이렉트되지 않으면 <code>/oauth2/authorize</code>가 인증 필요 상태인지 서버 설정을 확인하세요.</li>
+            <li>로그인 페이지로 리다이렉트되지 않으면 <code>/oauth2/authorize</code>가 관리자에게 문의해주세요.</li>
             <li>리다이렉트 URI 불일치 오류는 공백·슬래시 유무까지 일치하는지 확인합니다.</li>
             <li>PKCE 오류는 <code>code_verifier</code>와 <code>code_challenge</code> 계산 방식이 동일(S256)인지 검증합니다.</li>
-            <li><code>invalid_client</code>가 발생하면 클라이언트 인증 방식(Basic, post, private_key_jwt 등)이 서버 설정과 일치하는지 확인하세요.</li>
-            <li>ID Token 검증 실패 시 <code>nonce</code> 또는 <code>aud</code> 검증 로직이 누락되었는지 점검합니다.</li>
+            <li><code>invalid_client</code>가 발생하면 클라이언트 인증 방식(Basic, post, private_key_jwt 등)이 클라이언트 등록 설정과 일치하는지 확인하세요.</li>
+            <li>ID Token 검증 실패 시 관리자에게 문의해주세요.</li>
         </ul>
     </div>
 
