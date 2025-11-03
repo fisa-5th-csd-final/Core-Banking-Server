@@ -74,8 +74,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
   }
 
   private Long getUserId(String loginId){
-      return userAuthRepository.findById(loginId)
+      return userAuthRepository.findUserIdByLoginId(loginId)
               .orElseThrow(() -> new UsernameNotFoundException("username %s not found".formatted(loginId)))
-              .getUser().getUserId().getValue();
+              .getValue();
   }
 }
