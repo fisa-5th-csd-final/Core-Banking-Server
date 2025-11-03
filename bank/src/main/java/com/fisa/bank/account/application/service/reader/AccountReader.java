@@ -19,20 +19,20 @@ public class AccountReader {
     private final AccountRepository accountRepository;
     private final UserService userService;
 
-    public Account getByAccountNumber(String accountNumber) {
+    public Account getAccountByAccountNumber(String accountNumber) {
         return accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(AccountNotFoundException::new);
     }
 
     // 계좌번호로 조회 (비관적 락)
-    public Account getByAccountNumberWithLock(String accountNumber) {
+    public Account getAccountByAccountNumberWithLock(String accountNumber) {
         return accountRepository.findByAccountNumberWithLock(accountNumber)
                 .orElseThrow(AccountNotFoundException::new);
     }
 
     // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환
     public Account getOwnedAccount(String accountNumber, Long userId) {
-        Account account = getByAccountNumber(accountNumber);
+        Account account = getAccountByAccountNumber(accountNumber);
         Long accountOwnerId = account.getUser().getUserId().getValue();
 
         if (!accountOwnerId.equals(userId)) {
@@ -43,7 +43,7 @@ public class AccountReader {
 
     // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환 (비관적 락)
     public Account getOwnedAccountWithLock(String accountNumber, Long userId) {
-        Account account = getByAccountNumberWithLock(accountNumber);
+        Account account = getAccountByAccountNumberWithLock(accountNumber);
         Long accountOwnerId = account.getUser().getUserId().getValue();
 
         if (!accountOwnerId.equals(userId)) {
@@ -55,11 +55,6 @@ public class AccountReader {
     // 사용자 가져오기
     public User getUserById(Long userId) {
         return userService.getUserById(UserId.of(userId));
-    }
-
-    // 두 계좌를 동시에 락으로 조회 (송금 시 데드락 방지용)
-    public List<Account> lockTwoAccountsByNumbers(List<String> accountNumbers) {
-        return accountRepository.lockTwoAccountsByNumbers(accountNumbers);
     }
 
     // 송금용 두 계좌 조회 (데드락 방지를 위해 정렬된 순서로 락 획득)

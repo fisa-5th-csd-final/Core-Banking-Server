@@ -15,7 +15,7 @@ import com.fisa.bank.account.application.dto.response.AccountTransactionListResp
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
 import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
-import com.fisa.bank.account.application.service.TransactionService;
+import com.fisa.bank.account.application.service.AccountTransactionService;
 import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
@@ -30,9 +30,9 @@ import com.fisa.bank.common.presentation.response.code.ResponseCode;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
-public class TransactionController {
+public class AccountTransactionController {
 
-  private final TransactionService transactionService;
+  private final AccountTransactionService accountTransactionService;
   private final RequesterInfo requesterInfo;
 
   // 출금 API
@@ -40,7 +40,7 @@ public class TransactionController {
   public ApiResponse<SuccessBody<AccountTransactionResponse>> withdraw(
       @PathVariable String accountNumber, @Valid @RequestBody AccountWithdrawRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    AccountTransactionResponse response = transactionService.withdraw(accountNumber, request, userId);
+    AccountTransactionResponse response = accountTransactionService.withdraw(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -49,7 +49,7 @@ public class TransactionController {
   public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
       @PathVariable String accountNumber, @Valid @RequestBody AccountDepositRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    AccountTransactionResponse response = transactionService.deposit(accountNumber, request, userId);
+    AccountTransactionResponse response = accountTransactionService.deposit(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -58,7 +58,7 @@ public class TransactionController {
   public ApiResponse<SuccessBody<TransferResponse>> transfer(
       @Valid @RequestBody TransferRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    TransferResponse response = transactionService.transfer(request, userId);
+    TransferResponse response = accountTransactionService.transfer(request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -67,7 +67,7 @@ public class TransactionController {
   public ApiResponse<SuccessBody<CardPaymentResponse>> pay(
       @PathVariable String accountNumber, @Valid @RequestBody CardPaymentRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    CardPaymentResponse response = transactionService.payByCard(accountNumber, request, userId);
+    CardPaymentResponse response = accountTransactionService.payByCard(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -79,7 +79,7 @@ public class TransactionController {
       @RequestParam LocalDate endDate) {
     Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionListResponse response =
-        transactionService.getTransactions(accountNumber, startDate, endDate, userId);
+        accountTransactionService.getTransactions(accountNumber, startDate, endDate, userId);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 }

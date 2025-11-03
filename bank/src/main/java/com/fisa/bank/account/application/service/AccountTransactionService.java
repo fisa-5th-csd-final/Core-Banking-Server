@@ -8,7 +8,6 @@ import com.fisa.bank.account.application.dto.response.AccountTransactionListResp
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
 import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
-import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.application.exception.InvalidTransferTargetException;
 import com.fisa.bank.account.application.service.reader.AccountReader;
@@ -30,7 +29,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionService {
+public class AccountTransactionService {
 
     private final AccountTransactionRepository accountTransactionRepository;
     private final CardTransactionRepository cardTransactionRepository;
