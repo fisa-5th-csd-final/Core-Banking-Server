@@ -27,7 +27,7 @@ public record TransferResponse(
     public static TransferResponse ofExternal(Account fromAccount, Account toAccount, BigDecimal amount) {
         return new TransferResponse(
                 fromAccount.getAccountNumber(),
-                toAccount.getAccountNumber(),  // 타행이므로 ID 없음
+                toAccount.getAccountNumber(),
                 amount,
                 fromAccount.getBalance(),
                 null,  // 타행이므로 잔액 알 수 없음
