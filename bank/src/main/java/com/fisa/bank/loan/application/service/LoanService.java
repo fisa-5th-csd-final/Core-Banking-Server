@@ -10,6 +10,7 @@ import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
 import com.fisa.bank.loan.application.dto.response.PagedResponse;
+import com.fisa.bank.loan.application.exception.DuplicateLoanException;
 import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.application.exception.PreferInterestNotFoundException;
 import com.fisa.bank.loan.application.model.EarlyRepayInterestRate;
@@ -109,8 +110,15 @@ public class LoanService {
     @Transactional
     public LoanApplyforResponse applyForLoan(LoanApplyForRequest request, Long loanProductId){
 
-        // TODO: 대출 원장성 테이블에 저장 LoanLedger
+        // 유저 정보 추출
+        UserId userId = springRequesterInfo.getUserId();
+        User user = userRepository.getReferenceById(userId);
+        if(loanLedgerRepository.existsByUser_UserIdAndLoanProduct_LoanProductId(userId, LoanProductId.of(loanProductId))){
+            throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
+        }
 
+
+        // 대출 원장성 테이블에 저장 LoanLedger
         // 미리 세팅해둘 데이터
             // 남은 상환액(원금) - 초기값은 원금과 동일
         BigDecimal remainPrincipal = request.getPrincipal();
@@ -152,9 +160,6 @@ public class LoanService {
         BigDecimal limitPreferInterest = interestRate.getLimitPreferInterest();
 
         // 우대 금리 - 유저의 신용등급과 고객등급으로
-        UserId userId = springRequesterInfo.getUserId();
-        User user = userRepository.getReferenceById(userId);
-
         CreditRating creditLevel = user.getCreditLevel(); // 신용 등급
         CustomerLevel customerLevel = user.getCustomerLevel(); // 고객 등급
 

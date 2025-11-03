@@ -1,6 +1,7 @@
 package com.fisa.bank.common.presentation.exception;
 
 import com.fisa.bank.interest.application.exception.InterestException;
+import com.fisa.bank.loan.application.exception.DuplicateLoanException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,11 @@ public class GlobalExceptionHandler {
   public ApiResponse<FailureBody> handle(InterestException e){
       log.error(e.getMessage(),e);
       return ApiResponseGenerator.fail(HttpStatus.NOT_FOUND, e.getErrorCode(), e.getMessage());
+  }
+
+  @ExceptionHandler(DuplicateLoanException.class)
+    public ApiResponse<FailureBody> handle(DuplicateLoanException e){
+      log.error(e.getMessage());
+      return ApiResponseGenerator.fail(HttpStatus.CONFLICT, e.getErrorCode(), e.getMessage());
   }
 }
