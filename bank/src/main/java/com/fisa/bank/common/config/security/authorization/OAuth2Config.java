@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -17,9 +18,11 @@ import org.springframework.security.oauth2.server.authorization.oidc.OidcClientR
 import org.springframework.security.oauth2.server.authorization.oidc.converter.OidcClientRegistrationRegisteredClientConverter;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2AccessTokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2RefreshTokenGenerator;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 
 @Configuration
@@ -32,10 +35,18 @@ public class OAuth2Config {
   public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbc) {
     return new JdbcRegisteredClientRepository(jdbc);
   }
+
+    @Bean
+    OAuth2TokenGenerator<Jwt> jwtGenerator(JwtEncoder jwtEncoder,
+                                           OAuth2TokenCustomizer<JwtEncodingContext> customizer) {
+        JwtGenerator gen = new JwtGenerator(jwtEncoder);
+        gen.setJwtCustomizer(customizer);
+        return gen;
+    }
+
   /** OAuth2Token 생성기 */
   @Bean
-  public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder) {
-    JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
+  public OAuth2TokenGenerator<?> tokenGenerator(OAuth2TokenGenerator<Jwt> jwtGenerator) {
     OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
     OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
     return new DelegatingOAuth2TokenGenerator(
