@@ -11,7 +11,7 @@ import java.util.List;
     원리금 균등 상환 - 월별 상환액 계산기
     P - 대출 원금
     r - 월 이자율(금리)
-    N - 총 상환 횟수(
+    N - 총 상환 횟수(개월)
  */
 public class EqualInstallmentCalculator {
 
