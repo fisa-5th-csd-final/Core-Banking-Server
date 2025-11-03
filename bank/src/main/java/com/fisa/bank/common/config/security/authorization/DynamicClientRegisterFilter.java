@@ -50,11 +50,6 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
             return;
         }
 
-        if("/dcr/guide.html".equals(path)){
-            request.getRequestDispatcher("/dcr/guide.html").forward(request, response);
-            return;
-        }
-
         // /dcr-config -> JSON 바로 반환
         if ("/dcr-config".equals(path)) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -72,16 +67,31 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
         // /dcr/index.html을 직접 치는 경우도 가능
         if ("/dcr/index.html".equals(path)) {
             ClassPathResource html = new ClassPathResource("static/dcr/index.html");
-            if (html.exists()) {
+            sendHtmlResource(html, response);
+            return;
+        }
+
+        if("/dcr/guide.html".equals(path)){
+            ClassPathResource html = new ClassPathResource("static/dcr/guide.html");
+            sendHtmlResource(html, response);
+            return;
+        }
+        // 그 외는 필터 체인 계속 진행
+        chain.doFilter(request, response);
+    }
+
+    private void sendHtmlResource(Object resource, HttpServletResponse response) throws IOException{
+        if(resource instanceof ClassPathResource){
+            if(((ClassPathResource) resource).exists()){
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType("text/html;charset=UTF-8");
-                try (InputStream in = html.getInputStream()) {
+                try (InputStream in = ((ClassPathResource)resource).getInputStream()) {
                     in.transferTo(response.getOutputStream());
                 }
                 return;
             }
         }
-        // 그 외는 필터 체인 계속 진행
-        chain.doFilter(request, response);
+
+        throw new IllegalArgumentException("Invalid Resource");
     }
 }
