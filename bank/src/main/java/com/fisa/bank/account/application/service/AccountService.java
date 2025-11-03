@@ -45,14 +45,14 @@ public class AccountService {
 
         Account saved = accountRepository.save(account);
 
-        return AccountResponse.of(saved, "계좌가 성공적으로 생성되었습니다.");
+        return AccountResponse.from(saved, "계좌가 성공적으로 생성되었습니다.");
     }
 
     // 계좌 상세 조회
     @Transactional(readOnly = true)
     public AccountDetailResponse getAccountDetail(String accountNumber) {
       Account account = accountReader.getOwnedAccount(accountNumber);
-      return AccountDetailResponse.of(account);
+      return AccountDetailResponse.from(account);
     }
 
     // 유저별 계좌 조회
@@ -61,7 +61,7 @@ public class AccountService {
         User user = accountReader.getUserById();
 
         return accountRepository.findAllByUser(user).stream()
-                .map(AccountListResponse::of)
+                .map(AccountListResponse::from)
                 .toList();
     }
 

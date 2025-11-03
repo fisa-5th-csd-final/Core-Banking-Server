@@ -78,7 +78,7 @@ public class TransactionService {
         AccountTransaction trx =
                 recordTransaction(account, request.amount(), TransactionType.ATM_WITHDRAW, false, null);
 
-        return AccountTransactionResponse.of(trx);
+        return AccountTransactionResponse.from(trx);
     }
 
     // 입금
@@ -90,7 +90,7 @@ public class TransactionService {
         AccountTransaction trx =
                 recordTransaction(account, request.amount(), TransactionType.ATM_DEPOSIT, true, null);
 
-        return AccountTransactionResponse.of(trx);
+        return AccountTransactionResponse.from(trx);
     }
 
     // 송금
@@ -137,7 +137,7 @@ public class TransactionService {
 
         CardTransaction saved = cardTransactionRepository.save(cardTrx);
 
-        return CardPaymentResponse.of(saved);
+        return CardPaymentResponse.from(saved);
     }
 
     public AccountTransactionListResponse getTransactions(
@@ -151,13 +151,10 @@ public class TransactionService {
                         .findByAccountAndDateGreaterThanEqualAndDateBefore(
                                 account, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay())
                         .stream()
-                        .map(AccountTransactionResponse::of)
+                        .map(AccountTransactionResponse::from)
                         .toList();
 
         // 응답 DTO 생성
-        return AccountTransactionListResponse.builder()
-                .accountId(account.getAccountId().getValue())
-                .transactions(transactions)
-                .build();
+        return new AccountTransactionListResponse(account.getAccountNumber(), transactions);
     }
 }

@@ -7,7 +7,7 @@ import com.fisa.bank.account.persistence.entity.Account;
 
 public record AccountListResponse(
     Long accountId, String accountNumber, BigDecimal balance, LocalDateTime createdAt) {
-  public static AccountListResponse of(Account account) {
+  public static AccountListResponse from(Account account) {
     return new AccountListResponse(
         account.getAccountId().getValue(),
         account.getAccountNumber(),
