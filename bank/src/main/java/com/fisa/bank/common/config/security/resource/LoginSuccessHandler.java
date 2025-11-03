@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 /** 로그인 성공 핸들러 스프링 시큐리티에 의해, 사용자 인증이 성공하면 Authentication 객체를 Jwt 토큰으로 인코딩하여 ResponseBody에 담는다. */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final UserJwtGenerator jwtGenerator;
@@ -56,10 +58,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.flushBuffer();
         return;
       }
+      log.warn("UserDetails : {}", user);
       throw new IllegalStateException("UserDetails should be not null");
     }
 
     // UserIdAuthentication 이 아니면 예외
+      log.warn("Authentication : {}", authentication);
     throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
   }
 

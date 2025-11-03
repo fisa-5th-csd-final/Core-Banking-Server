@@ -3,6 +3,7 @@ package com.fisa.bank.common.config.security.authorization;
 import com.fisa.bank.user.persistence.entity.id.UserId;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +20,7 @@ import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
     private final UserAuthRepository userAuthRepository;
@@ -27,6 +29,7 @@ public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
     public void customize(JwtEncodingContext context) {
         var principal = context.getPrincipal(); // 인증된 사용자(SecurityContext의 Authentication)
 
+        // 사용자가 /login 페이지에서 form login 으로 인증을 수행했다면, UsernamePassword 인증 객체가 들어오는 게 맞다.
         if(principal instanceof UsernamePasswordAuthenticationToken){
             UserDetails user = (UserDetails) principal.getPrincipal();
 
@@ -49,6 +52,7 @@ public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
             return;
         }
 
+        log.warn("Accepted Authentication {}", principal);
         throw new AuthenticationServiceException("Principal should be UsernamePasswordAuthenticationToken");
     }
 
