@@ -95,8 +95,8 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers("/api/loans/**").permitAll()
-                        .requestMatchers("/api/interests/**").permitAll());
-        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/api/interests/**").permitAll()
+                        .anyRequest().permitAll());
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
         return http.build();
