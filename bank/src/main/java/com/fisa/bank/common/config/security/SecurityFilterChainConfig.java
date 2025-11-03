@@ -1,5 +1,8 @@
 package com.fisa.bank.common.config.security;
 
+import com.fisa.bank.common.config.security.resource.AccessTokenEntryPoint;
+import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +24,15 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityFilterChainConfig {
+
+    private final AccessTokenEntryPoint accessTokenEntryPoint;
 
   @Bean
   @Order(1)
@@ -78,7 +85,7 @@ public class SecurityFilterChainConfig {
     @Bean
     @Order(2)
     // [일반 사용자용] 인증이 필요하지 않은 엔드포인트
-    public SecurityFilterChain unAuthenticated(HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception {
+    public SecurityFilterChain unAuthenticated(HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter) throws Exception {
         commonConfiguration(http);
 
         RequestMatcher requestMatcher = new OrRequestMatcher(
@@ -99,7 +106,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers("/api/loans/**").permitAll()
                         .requestMatchers("/api/interests/**").permitAll()
                         .anyRequest().permitAll());
-        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
+        http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
         return http.build();
@@ -111,29 +118,44 @@ public class SecurityFilterChainConfig {
     public SecurityFilterChain authenticated(HttpSecurity http, @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception{
         commonConfiguration(http);
 
-        http.securityMatcher("/api/**");
+        http.securityMatchers(matcher ->
+                matcher.requestMatchers("/api/**"));
         http.authorizeHttpRequests( auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/loans/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
                 .anyRequest().authenticated());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling(ex->ex.authenticationEntryPoint(accessTokenEntryPoint));
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
         return http.build();
     }
 
     @Bean
     @Order(4)
-    public SecurityFilterChain login(HttpSecurity http) throws Exception{
+    public SecurityFilterChain loginFilterChain(HttpSecurity http) throws Exception{
 
         http.securityMatcher("/login", "/default-ui.css", "/error/**");
         http.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.GET, "/login").permitAll()
+                request.requestMatchers(HttpMethod.GET, "/login").permitAll() // login
                         .requestMatchers(HttpMethod.GET, "/error/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/default-ui.css").permitAll());
+                        .requestMatchers(HttpMethod.GET, "/default-ui.css").permitAll()); // login 페이지 css
 
-        http.formLogin(Customizer.withDefaults());
+        http.formLogin(Customizer.withDefaults()); // form Login 활성화
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
         return http.build();
+    }
+
+    @Bean
+    @Order(5)
+    public SecurityFilterChain unknownFilterChain(HttpSecurity httpSecurity, UnknownEndPointFilter unknownEndPointFilter) throws Exception {
+        httpSecurity.securityMatcher("/**");
+
+        commonConfiguration(httpSecurity);
+        httpSecurity.logout(AbstractHttpConfigurer::disable);
+        //서버가 처리할 수 있는 엔드포인트인지 확인하는 필터
+        httpSecurity.addFilterBefore(unknownEndPointFilter, DisableEncodeUrlFilter.class);
+        return httpSecurity.build();
     }
 
     // FilterChain 공통 설정
