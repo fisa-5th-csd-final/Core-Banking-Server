@@ -4,59 +4,71 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.oidc.OidcClientRegistration;
+import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcClientRegistrationAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
-import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 public class SecurityFilterChainConfig {
 
-    @Bean
-    @Order(1)
-    // Authorization Server 필터 체인 설정
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                      OAuth2TokenGenerator<?> tokenGenerator,
-                                                                      JwtDecoder jwtDecoder) throws Exception {
-        OAuth2AuthorizationServerConfigurer authorizationServer = OAuth2AuthorizationServerConfigurer.authorizationServer();
+  @Bean
+  @Order(1)
+  // Authorization Server 필터 체인 설정
+  public SecurityFilterChain authorizationServerSecurityFilterChain(
+          HttpSecurity http, OAuth2TokenGenerator<?> tokenGenerator, JwtDecoder jwtDecoder,
+          @Qualifier("OidcClientRegistrationConverter")Converter<OidcClientRegistration, RegisteredClient> converter)
+      throws Exception {
+    OAuth2AuthorizationServerConfigurer authorizationServer =
+        OAuth2AuthorizationServerConfigurer.authorizationServer();
 
-        commonConfiguration(http); // 공통 설정
-        // SAS 엔드포인트만 매칭
+//    commonConfiguration(http); // 공통 설정
+      http.formLogin(Customizer.withDefaults());
+      http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+    // SAS 엔드포인트만 매칭
 
         http.securityMatcher(authorizationServer.getEndpointsMatcher())
             .authorizeHttpRequests(auth -> auth
             .anyRequest().permitAll());
 
-        // SAS 기능 활성화(OIDC 포함)
-        http.with(authorizationServer, as ->
-                            as.tokenGenerator(tokenGenerator)
-                                .oidc(
-                                        oidc -> oidc
-                                            .clientRegistrationEndpoint(Customizer.withDefaults())
-                                            .userInfoEndpoint(Customizer.withDefaults())
-                                ))
-                // 인증 안 된 HTML 요청은 /login으로
-            .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
-                        new LoginUrlAuthenticationEntryPoint("/login"),
-                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-                ));
+    // SAS 기능 활성화(OIDC 포함)
+    http.with(
+            authorizationServer,
+            as ->
+                as.tokenGenerator(tokenGenerator)
+                    .oidc(
+                        oidc ->
+                            oidc.clientRegistrationEndpoint(c -> c.authenticationProviders(providers -> {
+                                        for (var p : providers) {
+                                            if (p instanceof OidcClientRegistrationAuthenticationProvider provider) {
+                                                provider.setRegisteredClientConverter(converter);
+                                            }
+                                        }
+                                    }))
+                                .userInfoEndpoint(Customizer.withDefaults()))
+            )
+        // 인증 안 된 HTML 요청은 /login으로
+        .exceptionHandling(
+            ex ->
+                ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+        );
 
-        http.oauth2ResourceServer(oauth2->
-                    oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)
-            ));
+      http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();
     }
@@ -96,12 +108,28 @@ public class SecurityFilterChainConfig {
     public SecurityFilterChain authenticated(HttpSecurity http, @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception{
         commonConfiguration(http);
 
-        http.securityMatcher("/**");
+        http.securityMatcher("/api/**");
         http.authorizeHttpRequests( auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/loans/**").authenticated()
                 .anyRequest().authenticated());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+
+    @Bean
+    @Order(4)
+    public SecurityFilterChain login(HttpSecurity http) throws Exception{
+
+        http.securityMatcher("/login", "/default-ui.css", "/error/**");
+        http.authorizeHttpRequests(request ->
+                request.requestMatchers(HttpMethod.GET, "/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/error/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/default-ui.css").permitAll());
+
+        http.formLogin(Customizer.withDefaults());
+        http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
         return http.build();
     }
 
