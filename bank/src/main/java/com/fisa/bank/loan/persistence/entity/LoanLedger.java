@@ -92,4 +92,7 @@ public class LoanLedger {
   // 연체 일수
   @Column(nullable = false)
   private int overdueCount;
+
+  @Column(nullable = false)
+  private int term;
 }

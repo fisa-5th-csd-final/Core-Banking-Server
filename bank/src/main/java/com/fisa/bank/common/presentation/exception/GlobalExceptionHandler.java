@@ -2,6 +2,7 @@ package com.fisa.bank.common.presentation.exception;
 
 import com.fisa.bank.interest.application.exception.InterestException;
 import com.fisa.bank.loan.application.exception.DuplicateLoanException;
+import com.fisa.bank.loan.application.exception.InsufficientRepaymentException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -59,4 +60,10 @@ public class GlobalExceptionHandler {
       log.error(e.getMessage());
       return ApiResponseGenerator.fail(HttpStatus.CONFLICT, e.getErrorCode(), e.getMessage());
   }
+
+    @ExceptionHandler(InsufficientRepaymentException.class)
+    public ApiResponse<FailureBody> handle(InsufficientRepaymentException e){
+        log.error(e.getMessage());
+        return ApiResponseGenerator.fail(HttpStatus.UNPROCESSABLE_ENTITY, e.getErrorCode(), e.getMessage());
+    }
 }

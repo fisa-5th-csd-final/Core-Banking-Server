@@ -5,6 +5,7 @@ import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
+import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 
 @RestController
@@ -67,6 +70,12 @@ public class LoanController {
         return ApiResponseGenerator.success(ResponseCode.CREATE, loanApplyforResponse);
     }
 
+    // 대출 상환
+    @PostMapping("/{loanLedgerId}/repayment")
+    public void repayMonthlyLoan(@PathVariable Long loanLedgerId, @RequestBody LoanMonthlyRepayRequest request){
+        System.out.println("대출상환");
+        loanService.repayMonthlyLoan(loanLedgerId, request);
+    }
 
 
 }
