@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -133,9 +132,6 @@ public class LoanService {
         else if (loanType == LoanType.MORTGAGE && (term < 1 || term > 50)) {
             throw new IllegalArgumentException("MORTGAGE 대출의 상환 기간은 1~50년이어야 합니다.");
         }
-        else{
-
-        }
 
         // 마지막 상환, 바로 다음 상환일 계산
         LocalDateTime startDate = LocalDateTime.now(); // 가입 시점 기준
@@ -178,10 +174,7 @@ public class LoanService {
             // 우대 금리 vs 상한 우대 금리
         BigDecimal finalPreferInterest = limitPreferInterest.compareTo(preferInterest.getPreferInterest()) < 0 ? limitPreferInterest : preferInterest.getPreferInterest();
 
-        BigDecimal completedInterest = BigDecimal.ZERO
-                .add(baseInterest)
-                .add(addInterest)
-                .subtract(finalPreferInterest);
+        BigDecimal completedInterest = baseInterest.add(addInterest).subtract(finalPreferInterest);
 
         // 대출 원장 테이블 데이터 만들기
         LoanLedger loanLedger = LoanLedger.builder()
@@ -205,7 +198,7 @@ public class LoanService {
                 .name(savedLoanLedger.getLoanProduct().getName())
 //                .completedInterest(savedLoanLedger.getCompletedInterest())
 //                .principal(savedLoanLedger.getPrincipal())
-//                .remainPricipal(savedLoanLedger.getRemainPrincipal())
+//                .remainPrincipal(savedLoanLedger.getRemainPrincipal())
 //                .nextRepaymentDate(savedLoanLedger.getNextRepaymentDate())
 //                .nextRepaymentDate(savedLoanLedger.getNextRepaymentDate())
 //                .loanEndDate(savedLoanLedger.getLoanEndDate())

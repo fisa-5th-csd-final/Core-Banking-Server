@@ -2,15 +2,10 @@ package com.fisa.bank.loan.application.dto.request;
 
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.RepaymentType;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 public class LoanApplyForRequest {
