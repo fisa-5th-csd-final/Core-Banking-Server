@@ -1,10 +1,7 @@
 package com.fisa.bank.loan.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import org.hibernate.type.SqlTypes;
 import com.fisa.bank.loan.persistence.entity.id.LoanTransactionId;
 import com.fisa.bank.loan.persistence.entity.id.LoanTransactionIdJavaType;
 import com.fisa.bank.loan.persistence.enums.TransactionType;
+import org.springframework.stereotype.Service;
 
 /*
    대출 이력성 테이블
@@ -24,6 +22,8 @@ import com.fisa.bank.loan.persistence.enums.TransactionType;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
+@Builder
+@Setter
 public class LoanTransaction {
 
   // 거래 id
@@ -33,7 +33,7 @@ public class LoanTransaction {
   @JdbcTypeCode(SqlTypes.BIGINT)
   private LoanTransactionId trxLId;
 
-  // LoanLedger 1 : N TranscationLoan
+  // LoanLedger 1 : N TransactionLoan
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "loanLedgerId", nullable = false)
   private LoanLedger loanLedger;
@@ -52,11 +52,9 @@ public class LoanTransaction {
   private BigDecimal amount;
 
   // 이자 납입액
-  @Column(nullable = false)
   private BigDecimal repaymentInterestAmount;
 
   // 원금 납입액
-  @Column(nullable = false)
   private BigDecimal repaymentPrincipalAmount;
 
   // 거래 후 남은 상환액(원금)

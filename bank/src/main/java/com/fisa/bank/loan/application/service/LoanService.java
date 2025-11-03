@@ -14,16 +14,15 @@ import com.fisa.bank.loan.application.exception.DuplicateLoanException;
 import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
 import com.fisa.bank.loan.application.exception.PreferInterestNotFoundException;
 import com.fisa.bank.loan.application.model.EarlyRepayInterestRate;
-import com.fisa.bank.loan.persistence.entity.LoanLedger;
-import com.fisa.bank.loan.persistence.entity.LoanProduct;
-import com.fisa.bank.loan.persistence.entity.PreferInterest;
-import com.fisa.bank.loan.persistence.entity.PreferInterestCompositeKey;
+import com.fisa.bank.loan.persistence.entity.*;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
+import com.fisa.bank.loan.persistence.enums.TransactionType;
 import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
+import com.fisa.bank.loan.persistence.repository.LoanTransactionRepository;
 import com.fisa.bank.loan.persistence.repository.PreferInterestRepository;
 import com.fisa.bank.user.persistence.entity.CreditRating;
 import com.fisa.bank.user.persistence.entity.CustomerLevel;
@@ -38,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +48,7 @@ public class LoanService {
     private final UserRepository userRepository;
     private final SpringRequesterInfo springRequesterInfo;
     private final LoanLedgerRepository loanLedgerRepository;
+    private final LoanTransactionRepository loanTransactionRepository;
 
     @Transactional
     public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO){
@@ -116,7 +117,6 @@ public class LoanService {
         if(loanLedgerRepository.existsByUser_UserIdAndLoanProduct_LoanProductId(userId, LoanProductId.of(loanProductId))){
             throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
         }
-
 
         // 대출 원장성 테이블에 저장 LoanLedger
         // 미리 세팅해둘 데이터
@@ -196,7 +196,20 @@ public class LoanService {
                 .interestType(interestType)
                 .earlyRepayInterestRate(earlyRepayInterestRate)
                 .build();
+
+        // 대출 이력성 테이블에 저장 LoanTransaction
+        LoanTransaction loanTransaction = LoanTransaction.builder()
+                .date(startDate)
+                .remainPrincipal(remainPrincipal)
+                .amount(remainPrincipal)
+                .transactionType(TransactionType.LOAN)
+                .build();
+
+        loanTransaction.setLoanLedger(loanLedger);
+        loanLedger.setLoanTransactionList(List.of(loanTransaction));
+
         LoanLedger savedLoanLedger = loanLedgerRepository.save(loanLedger);
+        LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
 
         LoanApplyforResponse loanApplyForResponse = LoanApplyforResponse.builder()
 //                .loanProductId(savedLoanLedger.getLoanProduct().getLoanProductId().getValue())
@@ -210,7 +223,7 @@ public class LoanService {
 //                .repaymentStatus(savedLoanLedger.getRepaymentStatus())
 //                .earlyRepayInterestRate(savedLoanLedger.getEarlyRepayInterestRate())
                 .build();
-        // TODO: 대출 거래 테이블에 저장 LoanTransaction
+
         return loanApplyForResponse;
     }
 

@@ -1,12 +1,7 @@
 package com.fisa.bank.loan.application.dto.response;
 
-import com.fisa.bank.loan.persistence.enums.LoanType;
-import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Builder

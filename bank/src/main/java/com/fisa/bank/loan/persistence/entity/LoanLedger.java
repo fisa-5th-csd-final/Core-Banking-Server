@@ -27,6 +27,7 @@ import com.fisa.bank.user.persistence.entity.User;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
+@Setter
 public class LoanLedger {
 
   @Id
@@ -37,7 +38,7 @@ public class LoanLedger {
 
   // LoanLedger 1 : N LoanTransaction
   @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<LoanTransaction> loanTransactionList = new ArrayList<>();
+  private List<LoanTransaction> loanTransactionList;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "loanProductId", nullable = false)
