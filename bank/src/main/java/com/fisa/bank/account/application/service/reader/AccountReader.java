@@ -3,19 +3,13 @@ package com.fisa.bank.account.application.service.reader;
 import com.fisa.bank.account.application.exception.AccessDeniedException;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.persistence.entity.Account;
-import com.fisa.bank.account.persistence.entity.id.AccountId;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.common.application.util.RequesterInfo;
-import com.fisa.bank.user.application.exception.UserNotFoundException;
 import com.fisa.bank.user.application.service.UserService;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.id.UserId;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.RequestInfo;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor

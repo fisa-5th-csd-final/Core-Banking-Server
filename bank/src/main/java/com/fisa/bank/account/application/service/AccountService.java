@@ -1,21 +1,14 @@
 package com.fisa.bank.account.application.service;
 
-import com.fisa.bank.account.application.dto.request.AccountCreateRequest;
 import com.fisa.bank.account.application.dto.response.AccountDetailResponse;
 import com.fisa.bank.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.account.application.dto.response.AccountResponse;
-import com.fisa.bank.account.application.exception.AccessDeniedException;
 import com.fisa.bank.account.application.exception.AccountNotDeletableException;
-import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.account.persistence.entity.Account;
-import com.fisa.bank.account.persistence.entity.id.AccountId;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.user.application.exception.UserNotFoundException;
 import com.fisa.bank.user.persistence.entity.User;
-import com.fisa.bank.user.persistence.entity.id.UserId;
-import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
