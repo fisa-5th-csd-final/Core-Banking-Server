@@ -36,7 +36,6 @@ public class AccountReader {
         if (!accountOwnerId.equals(userId)) {
             throw new AccessDeniedException();
         }
-        System.out.println(account);
         return account;
     }
 
@@ -48,7 +47,6 @@ public class AccountReader {
         if (!accountOwnerId.equals(userId)) {
             throw new AccessDeniedException();
         }
-        System.out.println(account);
         return account;
     }
 
