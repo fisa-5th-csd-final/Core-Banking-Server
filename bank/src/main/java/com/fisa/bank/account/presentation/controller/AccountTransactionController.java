@@ -15,7 +15,8 @@ import com.fisa.bank.account.application.dto.response.AccountTransactionListResp
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
 import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
-import com.fisa.bank.account.application.service.TransactionService;
+import com.fisa.bank.account.application.service.AccountTransactionService;
+import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
@@ -29,23 +30,26 @@ import com.fisa.bank.common.presentation.response.code.ResponseCode;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
-public class TransactionController {
+public class AccountTransactionController {
 
-  private final TransactionService transactionService;
+  private final AccountTransactionService accountTransactionService;
+  private final RequesterInfo requesterInfo;
 
   // 출금 API
-  @PostMapping("/{accountId}/withdraw")
+  @PostMapping("/{accountNumber}/withdraw")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> withdraw(
-      @PathVariable Long accountId, @Valid @RequestBody AccountWithdrawRequest request) {
-    AccountTransactionResponse response = transactionService.withdraw(accountId, request);
+      @PathVariable String accountNumber, @Valid @RequestBody AccountWithdrawRequest request) {
+    Long userId = requesterInfo.getUserId().getValue();
+    AccountTransactionResponse response = accountTransactionService.withdraw(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
   // 입금
-  @PostMapping("/{accountId}/deposit")
+  @PostMapping("/{accountNumber}/deposit")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
-      @PathVariable Long accountId, @Valid @RequestBody AccountDepositRequest request) {
-    AccountTransactionResponse response = transactionService.deposit(accountId, request);
+      @PathVariable String accountNumber, @Valid @RequestBody AccountDepositRequest request) {
+    Long userId = requesterInfo.getUserId().getValue();
+    AccountTransactionResponse response = accountTransactionService.deposit(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -53,26 +57,29 @@ public class TransactionController {
   @PostMapping("/transfer")
   public ApiResponse<SuccessBody<TransferResponse>> transfer(
       @Valid @RequestBody TransferRequest request) {
-    TransferResponse response = transactionService.transfer(request);
+    Long userId = requesterInfo.getUserId().getValue();
+    TransferResponse response = accountTransactionService.transfer(request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
   // 카드결제
-  @PostMapping("{accountId}/pay")
+  @PostMapping("/{accountNumber}/pay")
   public ApiResponse<SuccessBody<CardPaymentResponse>> pay(
-      @PathVariable Long accountId, @Valid @RequestBody CardPaymentRequest request) {
-    CardPaymentResponse response = transactionService.payByCard(accountId, request);
+      @PathVariable String accountNumber, @Valid @RequestBody CardPaymentRequest request) {
+    Long userId = requesterInfo.getUserId().getValue();
+    CardPaymentResponse response = accountTransactionService.payByCard(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
   // 거래내역 조회
-  @GetMapping("/{accountId}/transactions")
+  @GetMapping("/{accountNumber}/transactions")
   public ApiResponse<SuccessBody<AccountTransactionListResponse>> getTransactions(
-      @PathVariable Long accountId,
+      @PathVariable String accountNumber,
       @RequestParam LocalDate startDate,
       @RequestParam LocalDate endDate) {
+    Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionListResponse response =
-        transactionService.getTransactions(accountId, startDate, endDate);
+        accountTransactionService.getTransactions(accountNumber, startDate, endDate, userId);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 }

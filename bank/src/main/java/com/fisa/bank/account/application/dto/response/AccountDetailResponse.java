@@ -12,7 +12,7 @@ public record AccountDetailResponse(
     String bankCode,
     BigDecimal balance,
     LocalDateTime createdAt) {
-  public static AccountDetailResponse of(Account account) {
+  public static AccountDetailResponse from(Account account) {
     return new AccountDetailResponse(
         account.getAccountId().getValue(),
         account.getAccountNumber(),

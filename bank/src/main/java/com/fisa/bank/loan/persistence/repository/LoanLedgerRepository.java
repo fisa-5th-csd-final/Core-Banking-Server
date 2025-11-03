@@ -8,5 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LoanLedgerRepository extends JpaRepository<LoanLedger, LoanLedgerId> {
     boolean existsByUser_UserIdAndLoanProduct_LoanProductId(UserId userId, LoanProductId loanProductId);
-//    findAllByLoanProduct_LoanProduct_LoanProductId
 }
