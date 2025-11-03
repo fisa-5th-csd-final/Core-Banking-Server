@@ -17,7 +17,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 public class SecurityFilterChainConfig {
@@ -67,46 +70,51 @@ public class SecurityFilterChainConfig {
       throws Exception {
     commonConfiguration(http);
 
-    http.securityMatcher("/api/users", "/api/login", "/api/loans/**", "/api/interests/**");
-    http.authorizeHttpRequests(
-        auth ->
-            auth.requestMatchers(HttpMethod.POST, "/api/users")
-                .permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/login")
-                .permitAll()
-                .requestMatchers("/api/loans/**")
-                .permitAll()
-                .requestMatchers("/api/interests/**")
-                .permitAll());
-    http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+        RequestMatcher requestMatcher = new OrRequestMatcher(
+                PathPatternRequestMatcher.withDefaults().matcher("/api/users"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/login"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/loans"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/interests/**"),
+                PathPatternRequestMatcher.withDefaults().matcher("/api/loans/products/**"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/loans"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*")
+        );
 
-    return http.build();
-  }
+        http.securityMatcher(requestMatcher);
+        http.authorizeHttpRequests(
+                auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
+                        .requestMatchers("/api/loans/**").permitAll()
+                        .requestMatchers("/api/interests/**").permitAll());
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
-  @Bean
-  @Order(3)
-  // [일반 사용자용] 인증이 필요한 엔드포인트 시큐리티 필터체인
-  public SecurityFilterChain authenticated(
-      HttpSecurity http,
-      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
-      throws Exception {
-    commonConfiguration(http);
+        return http.build();
+    }
 
-    http.securityMatcher("/**");
-    http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
-    http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
-    return http.build();
-  }
+    @Bean
+    @Order(3)
+    // [일반 사용자용] 인증이 필요한 엔드포인트 시큐리티 필터체인
+    public SecurityFilterChain authenticated(HttpSecurity http, @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception{
+        commonConfiguration(http);
 
-  // FilterChain 공통 설정
-  private void commonConfiguration(HttpSecurity http) throws Exception {
-    http.csrf(AbstractHttpConfigurer::disable);
-    http.httpBasic(AbstractHttpConfigurer::disable);
-    http.logout(AbstractHttpConfigurer::disable);
-    http.formLogin(AbstractHttpConfigurer::disable);
-    http.sessionManagement(
-        sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
-  }
+        http.securityMatcher("/**");
+        http.authorizeHttpRequests( auth -> auth
+                .requestMatchers(HttpMethod.POST, "/api/loans/**").authenticated()
+                .anyRequest().authenticated());
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+
+    // FilterChain 공통 설정
+    private void commonConfiguration(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.httpBasic(AbstractHttpConfigurer::disable);
+        http.logout(AbstractHttpConfigurer::disable);
+        http.formLogin(AbstractHttpConfigurer::disable);
+        http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
+    }
+
 }

@@ -1,23 +1,22 @@
 package com.fisa.bank.loan.application.dto.response;
 
+import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
+import com.fisa.bank.loan.persistence.enums.LoanType;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
-import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
-import com.fisa.bank.loan.persistence.enums.LoanType;
-
 @Getter
 @Builder
 public class LoanProductCreateResponse {
-  private final LoanProductId loanProductId;
+    private final Long loanProductId;
 
-  private final String name;
+    private final String name;
 
-  private final LoanType type;
+    private final LoanType type;
 
-  private final BigDecimal addInterest;
+    private final BigDecimal addInterest;
 
-  private final BigDecimal limitPreferInterest;
+    private final BigDecimal limitPreferInterest;
 }
