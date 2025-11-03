@@ -2,7 +2,7 @@ package com.fisa.bank.common.config.security.resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.common.config.security.jwt.JwtGenerator;
+import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-  private final JwtGenerator jwtGenerator;
+  private final UserJwtGenerator jwtGenerator;
   private final ObjectMapper objectMapper;
   private final UserAuthRepository userAuthRepository;
 

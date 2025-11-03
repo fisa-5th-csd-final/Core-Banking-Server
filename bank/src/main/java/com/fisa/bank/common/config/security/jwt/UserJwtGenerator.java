@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtGenerator {
+public class UserJwtGenerator {
 
   private static final ZoneId KST = ZoneId.of("Asia/Seoul");
   private static final JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
@@ -23,7 +23,7 @@ public class JwtGenerator {
   private final JwtProperties jwtProperties;
   private final JwtEncoder jwtEncoder;
 
-  public JwtGenerator(JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
+  public UserJwtGenerator(JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
     this.jwtEncoder = jwtEncoder;
     this.jwtProperties = jwtProperties;
   }
