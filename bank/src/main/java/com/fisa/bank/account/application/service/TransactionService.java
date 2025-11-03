@@ -8,7 +8,9 @@ import com.fisa.bank.account.application.dto.response.AccountTransactionListResp
 import com.fisa.bank.account.application.dto.response.AccountTransactionResponse;
 import com.fisa.bank.account.application.dto.response.CardPaymentResponse;
 import com.fisa.bank.account.application.dto.response.TransferResponse;
+import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.account.application.exception.InvalidTransferTargetException;
 import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.entity.AccountTransaction;
@@ -96,22 +98,30 @@ public class TransactionService {
     // 송금
     @Transactional
     public TransferResponse transfer(TransferRequest request, Long userId) {
-        // 계좌번호 순서대로 락 획득
-        Account fromAccount = accountReader.getOwnedAccountWithLock(request.fromAccountNumber(), userId);
-
+        String fromNo = request.fromAccountNumber();
+        String toNo = request.toAccountNumber();
         BigDecimal amount = request.amount();
 
+        // 자기 자신으로 송금 방지
+        if (ourBankCode.equals(request.toBankCode()) && fromNo.equals(toNo)) {
+            throw new InvalidTransferTargetException();
+        }
+
         if (ourBankCode.equals(request.toBankCode())) {
-            // 같은 은행 내 송금
-            Account toAccount = accountReader.getByAccountNumberWithLock(request.toAccountNumber());
-            recordTransaction(fromAccount, amount, TransactionType.TRANSFER_SEND, false, toAccount.getAccountNumber());
-            recordTransaction(toAccount, amount, TransactionType.TRANSFER_RECEIVE, true, fromAccount.getAccountNumber());
-            return TransferResponse.of(fromAccount, toAccount, amount);
+            // 같은 은행: 두 계좌 모두 조회 및 락 획득
+            AccountReader.TransferAccountsPair accounts = accountReader.lockTransferAccounts(fromNo, toNo, userId);
+
+            // 거래 처리
+            recordTransaction(accounts.from(), amount, TransactionType.TRANSFER_SEND, false, accounts.to().getAccountNumber());
+            recordTransaction(accounts.to(), amount, TransactionType.TRANSFER_RECEIVE, true, accounts.from().getAccountNumber());
+
+            return TransferResponse.of(accounts.from(), accounts.to(), amount);
+
         } else {
-            // 타행 송금
-            Account toAccount = accountReader.getByAccountNumber(request.toAccountNumber());
-            recordTransaction(fromAccount, amount, TransactionType.EXTERNAL_TRANSFER_SEND, false, fromAccount.getAccountNumber());
-            return TransferResponse.ofExternal(fromAccount, toAccount, amount);
+            // 타행: 보내는 쪽만 락
+            Account from = accountReader.getOwnedAccountWithLock(fromNo, userId);
+            recordTransaction(from, amount, TransactionType.EXTERNAL_TRANSFER_SEND, false, toNo);
+            return TransferResponse.ofExternal(from, toNo, amount);
         }
     }
 

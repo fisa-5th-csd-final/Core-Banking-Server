@@ -10,6 +10,8 @@ import com.fisa.bank.user.persistence.entity.id.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class AccountReader {
@@ -53,5 +55,38 @@ public class AccountReader {
     // 사용자 가져오기
     public User getUserById(Long userId) {
         return userService.getUserById(UserId.of(userId));
+    }
+
+    // 두 계좌를 동시에 락으로 조회 (송금 시 데드락 방지용)
+    public List<Account> lockTwoAccountsByNumbers(List<String> accountNumbers) {
+        return accountRepository.lockTwoAccountsByNumbers(accountNumbers);
+    }
+
+    // 송금용 두 계좌 조회 (데드락 방지를 위해 정렬된 순서로 락 획득)
+    public TransferAccountsPair lockTransferAccounts(String fromAccountNumber, String toAccountNumber, Long userId) {
+        List<String> ordered = List.of(fromAccountNumber, toAccountNumber).stream().sorted().toList();
+
+        List<Account> locked = accountRepository.lockTwoAccountsByNumbers(ordered);
+
+        Account from = locked.stream()
+                .filter(a -> a.getAccountNumber().equals(fromAccountNumber))
+                .findFirst()
+                .orElseThrow(() -> new AccountNotFoundException("송금하는 계좌를 찾을 수 없습니다"));
+
+        Account to = locked.stream()
+                .filter(a -> a.getAccountNumber().equals(toAccountNumber))
+                .findFirst()
+                .orElseThrow(() -> new AccountNotFoundException("수취 계좌를 찾을 수 없습니다."));
+
+        Long accountOwnerId = from.getUser().getUserId().getValue();
+        if (!accountOwnerId.equals(userId)) {
+            throw new AccessDeniedException();
+        }
+
+        return new TransferAccountsPair(from, to);
+    }
+
+    // 송금용 계좌 쌍을 담는 record
+    public record TransferAccountsPair(Account from, Account to) {
     }
 }

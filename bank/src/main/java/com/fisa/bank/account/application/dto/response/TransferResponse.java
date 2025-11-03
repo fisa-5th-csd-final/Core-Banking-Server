@@ -24,10 +24,10 @@ public record TransferResponse(
     }
 
     // 타행 송금용 팩토리 메서드
-    public static TransferResponse ofExternal(Account fromAccount, Account toAccount, BigDecimal amount) {
+    public static TransferResponse ofExternal(Account fromAccount, String toAccountNumber, BigDecimal amount) {
         return new TransferResponse(
                 fromAccount.getAccountNumber(),
-                toAccount.getAccountNumber(),
+                toAccountNumber,
                 amount,
                 fromAccount.getBalance(),
                 null,  // 타행이므로 잔액 알 수 없음
