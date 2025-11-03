@@ -12,6 +12,8 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.stereotype.Component;
 
+import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
+
 @Component
 @RequiredArgsConstructor
 public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
@@ -33,8 +35,8 @@ public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 
             if (context.getTokenType().getValue().equals("access_token")) {
                 // Access Token 커스텀
-                context.getClaims().claim("roles", authorities);
-                context.getClaims().claim("user_id", userId.getValue());
+                context.getClaims().claim(CLAIM_ROLE, authorities);
+                context.getClaims().claim(CLAIM_USER_ID, userId.getValue());
                 // aud, jti, nbf 등도 여기서 세밀 제어 가능
             }
 

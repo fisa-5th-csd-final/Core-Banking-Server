@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.stereotype.Component;
 
+import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
+
 /** UserIdAuthentication의 인증을 수행하는 Provider */
 @Component("AppAuthenticationProvider")
 public class JwtAuthenticationProvider implements AuthenticationProvider {
@@ -36,9 +38,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     try {
       Jwt jwt = jwtDecoder.decode(token);
-      Long userId = jwt.getClaim("userId");
+      Long userId = jwt.getClaim(CLAIM_USER_ID);
       List<String> roles =
-          jwt.getClaim("role") == null ? Collections.emptyList() : jwt.getClaim("role");
+          jwt.getClaim(CLAIM_ROLE) == null ? Collections.emptyList() : jwt.getClaim(CLAIM_ROLE);
       Collection<? extends GrantedAuthority> authorities =
           roles.stream().map(SimpleGrantedAuthority::new).toList();
 
