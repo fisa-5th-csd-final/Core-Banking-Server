@@ -1,5 +1,6 @@
 package com.fisa.bank.common.presentation.exception;
 
+import com.fisa.bank.interest.application.exception.InterestException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -44,5 +45,11 @@ public class GlobalExceptionHandler {
   public ApiResponse<FailureBody> handle(RuntimeException e) {
     log.error(e.getMessage(), e);
     return ApiResponseGenerator.fail(HttpStatus.INTERNAL_SERVER_ERROR, "500", e.getMessage());
+  }
+
+  @ExceptionHandler(InterestException.class)
+  public ApiResponse<FailureBody> handle(InterestException e){
+      log.error(e.getMessage(),e);
+      return ApiResponseGenerator.fail(HttpStatus.NOT_FOUND, e.getErrorCode(), e.getMessage());
   }
 }

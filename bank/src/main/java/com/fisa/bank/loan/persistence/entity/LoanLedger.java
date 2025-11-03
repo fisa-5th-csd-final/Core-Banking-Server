@@ -1,9 +1,7 @@
 package com.fisa.bank.loan.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +25,8 @@ import com.fisa.bank.user.persistence.entity.User;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
 public class LoanLedger {
 
   @Id
@@ -83,7 +83,6 @@ public class LoanLedger {
   @Column(nullable = false)
   private LocalDateTime nextRepaymentDate;
 
-  @Column(nullable = false)
   private LocalDateTime lastRepaymentDate;
 
   @Column(nullable = false)

@@ -1,6 +1,7 @@
 package com.fisa.bank.common.config.security.authorization;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,7 +28,7 @@ public class OAuth2Config {
   // 인메모리, JDBC 선택 가능
   @Bean
   public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbc) {
-      return new JdbcRegisteredClientRepository(jdbc);
+    return new JdbcRegisteredClientRepository(jdbc);
   }
 
   @Bean("OAuth2ClientAuthenticationProvider")
