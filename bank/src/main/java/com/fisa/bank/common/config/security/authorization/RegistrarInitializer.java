@@ -1,7 +1,6 @@
 package com.fisa.bank.common.config.security.authorization;
 
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -38,8 +37,6 @@ public class RegistrarInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println(clientId);
-        System.out.println(secret);
         if (clientRepository.findByClientId(clientId) == null) {
             RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
                     .clientId(clientId)
