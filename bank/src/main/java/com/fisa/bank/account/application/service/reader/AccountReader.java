@@ -4,7 +4,6 @@ import com.fisa.bank.account.application.exception.AccessDeniedException;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.user.application.service.UserService;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.id.UserId;
@@ -17,7 +16,6 @@ public class AccountReader {
 
     private final AccountRepository accountRepository;
     private final UserService userService;
-    private final RequesterInfo requesterInfo;
 
     public Account getByAccountNumber(String accountNumber) {
         return accountRepository.findByAccountNumber(accountNumber)
@@ -31,12 +29,11 @@ public class AccountReader {
     }
 
     // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환
-    public Account getOwnedAccount(String accountNumber) {
+    public Account getOwnedAccount(String accountNumber, Long userId) {
         Account account = getByAccountNumber(accountNumber);
         Long accountOwnerId = account.getUser().getUserId().getValue();
-        Long currentUserId = requesterInfo.getUserId().getValue();
 
-        if (!accountOwnerId.equals(currentUserId)) {
+        if (!accountOwnerId.equals(userId)) {
             throw new AccessDeniedException();
         }
         System.out.println(account);
@@ -44,12 +41,11 @@ public class AccountReader {
     }
 
     // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환 (비관적 락)
-    public Account getOwnedAccountWithLock(String accountNumber) {
+    public Account getOwnedAccountWithLock(String accountNumber, Long userId) {
         Account account = getByAccountNumberWithLock(accountNumber);
         Long accountOwnerId = account.getUser().getUserId().getValue();
-        Long currentUserId = requesterInfo.getUserId().getValue();
 
-        if (!accountOwnerId.equals(currentUserId)) {
+        if (!accountOwnerId.equals(userId)) {
             throw new AccessDeniedException();
         }
         System.out.println(account);
@@ -57,8 +53,7 @@ public class AccountReader {
     }
 
     // 사용자 가져오기
-    public User getUserById() {
-        Long currentUserId = requesterInfo.getUserId().getValue();
-        return userService.getUserById(UserId.of(currentUserId));
+    public User getUserById(Long userId) {
+        return userService.getUserById(UserId.of(userId));
     }
 }

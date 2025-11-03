@@ -71,9 +71,9 @@ public class TransactionService {
 
     // 출금
     @Transactional
-    public AccountTransactionResponse withdraw(String accountNumber, AccountWithdrawRequest request) {
+    public AccountTransactionResponse withdraw(String accountNumber, AccountWithdrawRequest request, Long userId) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccountWithLock(accountNumber);
+        Account account = accountReader.getOwnedAccountWithLock(accountNumber, userId);
 
         AccountTransaction trx =
                 recordTransaction(account, request.amount(), TransactionType.ATM_WITHDRAW, false, null);
@@ -83,9 +83,9 @@ public class TransactionService {
 
     // 입금
     @Transactional
-    public AccountTransactionResponse deposit(String accountNumber, AccountDepositRequest request) {
+    public AccountTransactionResponse deposit(String accountNumber, AccountDepositRequest request, Long userId) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccountWithLock(accountNumber);
+        Account account = accountReader.getOwnedAccountWithLock(accountNumber, userId);
 
         AccountTransaction trx =
                 recordTransaction(account, request.amount(), TransactionType.ATM_DEPOSIT, true, null);
@@ -95,9 +95,9 @@ public class TransactionService {
 
     // 송금
     @Transactional
-    public TransferResponse transfer(TransferRequest request) {
+    public TransferResponse transfer(TransferRequest request, Long userId) {
         // 계좌번호 순서대로 락 획득
-        Account fromAccount = accountReader.getOwnedAccountWithLock(request.fromAccountNumber());
+        Account fromAccount = accountReader.getOwnedAccountWithLock(request.fromAccountNumber(), userId);
 
         BigDecimal amount = request.amount();
 
@@ -118,9 +118,9 @@ public class TransactionService {
 
     // 카드 결제
     @Transactional
-    public CardPaymentResponse payByCard(String accountNumber, CardPaymentRequest request) {
+    public CardPaymentResponse payByCard(String accountNumber, CardPaymentRequest request, Long userId) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccountWithLock(accountNumber);
+        Account account = accountReader.getOwnedAccountWithLock(accountNumber, userId);
 
         // 계좌에도 로그 남기기위해 반영
         recordTransaction(
@@ -146,9 +146,9 @@ public class TransactionService {
     }
 
     public AccountTransactionListResponse getTransactions(
-            String accountNumber, LocalDate startDate, LocalDate endDate) {
+            String accountNumber, LocalDate startDate, LocalDate endDate, Long userId) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccount(accountNumber);
+        Account account = accountReader.getOwnedAccount(accountNumber, userId);
 
         // 거래내역 조회
         List<AccountTransactionResponse> transactions =

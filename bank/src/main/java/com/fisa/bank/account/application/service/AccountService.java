@@ -29,8 +29,8 @@ public class AccountService {
 
     // 계좌 생성 서비스
     @Transactional
-    public AccountResponse createAccount() {
-        User user = accountReader.getUserById();
+    public AccountResponse createAccount(Long userId) {
+        User user = accountReader.getUserById(userId);
         String accountNumber = AccountNumberGenerator.generate();
         Account account = Account.create(
                 accountNumber,
@@ -45,15 +45,15 @@ public class AccountService {
 
     // 계좌 상세 조회
     @Transactional(readOnly = true)
-    public AccountDetailResponse getAccountDetail(String accountNumber) {
-      Account account = accountReader.getOwnedAccount(accountNumber);
+    public AccountDetailResponse getAccountDetail(String accountNumber, Long userId) {
+      Account account = accountReader.getOwnedAccount(accountNumber, userId);
       return AccountDetailResponse.from(account);
     }
 
     // 유저별 계좌 조회
     @Transactional(readOnly = true)
-    public List<AccountListResponse> getAccountsByUserId() {
-        User user = accountReader.getUserById();
+    public List<AccountListResponse> getAccountsByUserId(Long userId) {
+        User user = accountReader.getUserById(userId);
 
         return accountRepository.findAllByUser(user).stream()
                 .map(AccountListResponse::from)
@@ -62,8 +62,8 @@ public class AccountService {
 
     // 계좌 삭제
     @Transactional
-    public void deleteAccount(String accountNumber) {
-        Account account = accountReader.getOwnedAccount(accountNumber);
+    public void deleteAccount(String accountNumber, Long userId) {
+        Account account = accountReader.getOwnedAccount(accountNumber, userId);
 
         // 잔액이 있는 경우 예외 처리
         if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {
