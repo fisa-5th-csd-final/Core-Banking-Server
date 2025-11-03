@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
 
+/**
+ * OAuth2 Client에게 AccessToken을 발급할 때, Jwt에 사용자의 UserId 클레임을 삽입하는 역할을 수행
+ */
 @Component
 @RequiredArgsConstructor
 public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
@@ -35,15 +38,18 @@ public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 
             if (context.getTokenType().getValue().equals("access_token")) {
                 // Access Token 커스텀
+                // aud, jti, nbf 등도 여기서 세밀 제어 가능
                 context.getClaims().claim(CLAIM_ROLE, authorities);
                 context.getClaims().claim(CLAIM_USER_ID, userId.getValue());
-                // aud, jti, nbf 등도 여기서 세밀 제어 가능
             }
 
             if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
                 // ID Token 커스텀 (OIDC 표준 + 도메인 확장)
             }
+            return;
         }
+
+        throw new AuthenticationServiceException("Principal should be UsernamePasswordAuthenticationToken");
     }
 
 }
