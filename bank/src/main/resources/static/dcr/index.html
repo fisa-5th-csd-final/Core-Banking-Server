@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OAuth 2.0 / OIDC 클라이언트 동적 등록</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
+            line-height: 1.5;
+            background: #0b1020;
+            color: #e6e9ef;
+        }
+        .container { max-width: 980px; margin: 40px auto; padding: 0 16px; }
+        h1 { font-size: 1.6rem; margin: 0 0 16px; }
+        p.lead { margin: 0 0 24px; color: #a9b1c6; }
+        .card {
+            background: #131a33; border: 1px solid #1f2a4d; border-radius: 16px; padding: 24px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.24); margin-bottom: 20px;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        @media (max-width: 840px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-row { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+        label { font-size: .92rem; color: #c3cbe1; }
+        input[type="text"], input[type="url"], input[type="number"], textarea, select {
+            width: 100%; padding: 12px 14px; border: 1px solid #2a355f; background: #0e1530;
+            color: #e6e9ef; border-radius: 10px; outline: none;
+        }
+        textarea { resize: vertical; min-height: 84px; }
+        .hint { font-size: .85rem; color: #99a4c6; }
+        .checklist {
+            display: flex; flex-direction: column; gap: 8px; padding: 12px;
+            border: 1px dashed #2a355f; border-radius: 10px; background: #0e1530;
+        }
+        .checklist label { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+        .row-span-2 { grid-column: span 2; }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        button { border: 0; padding: 12px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: #5b8cff; color: #0b1020; }
+        .btn-secondary { background: #243057; color: #e6e9ef; }
+        pre {
+            margin: 0; padding: 16px; background: #0e1530; border: 1px solid #2a355f;
+            border-radius: 10px; overflow: auto; font-size: .92rem;
+        }
+        .footer { text-align: center; color: #93a0c2; font-size: .88rem; margin-top: 24px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>OAuth 2.0 / OIDC 클라이언트 동적 등록 (DCR)</h1>
+    <p class="lead">registrar client/secret으로 먼저 토큰을 받은 뒤, Bearer로 /connect/register에 등록 요청을 보냅니다.</p>
+
+    <div class="card">
+        <form id="dcr-form">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label for="issuer">Registration Endpoint</label>
+                    <input type="url" id="issuer" placeholder="http://localhost:8080/connect/register" required />
+                    <div class="hint">인증 서버의 DCR 엔드포인트</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="clientName">client_name</label>
+                    <input type="text" id="clientName" placeholder="My Server App" value="My Server App" />
+                </div>
+
+                <div class="form-row">
+                    <label for="tokenAuth">token_endpoint_auth_method</label>
+                    <select id="tokenAuth">
+                        <option value="client_secret_basic" selected>client_secret_basic</option>
+                        <option value="client_secret_post">client_secret_post</option>
+                        <option value="none">none (public client)</option>
+                    </select>
+                </div>
+
+                <div class="form-row row-span-2">
+                    <label for="redirectUris">redirect_uris (줄바꿈으로 여러 개)</label>
+                    <textarea id="redirectUris" placeholder="http://localhost:8081/login/oauth2/code/my-client">http://localhost:8081/login/oauth2/code/my-client</textarea>
+                </div>
+
+                <div class="form-row">
+                    <label>grant_types</label>
+                    <div class="checklist" id="grantTypes">
+                        <label><input type="checkbox" value="authorization_code" checked /> authorization_code</label>
+                        <label><input type="checkbox" value="refresh_token" checked /> refresh_token</label>
+                        <label><input type="checkbox" value="client_credentials" /> client_credentials</label>
+                        <label><input type="checkbox" value="urn:ietf:params:oauth:grant-type:device_code" /> device_code</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>response_types</label>
+                    <div class="checklist" id="responseTypes">
+                        <label><input type="checkbox" value="code" checked /> code</label>
+                        <label><input type="checkbox" value="token" /> token (implicit)</label>
+                        <label><input type="checkbox" value="id_token" /> id_token (implicit/hybrid)</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="scope">scope (공백 구분)</label>
+                    <input type="text" id="scope" value="openid profile email" />
+                </div>
+
+                <div class="form-row">
+                    <label for="requireProofKey">
+                        <input type="checkbox" id="requireProofKey" />
+                        require_proof_key (PKCE 강제)
+                    </label>
+                    <div class="hint">서버 정책상 PKCE가 강제일 수 있습니다.</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="logoUri">logo_uri (선택)</label>
+                    <input type="url" id="logoUri" placeholder="https://example.com/logo.png" />
+                </div>
+
+                <div class="form-row">
+                    <label for="contacts">contacts (쉼표로 구분, 선택)</label>
+                    <input type="text" id="contacts" placeholder="owner@example.com,ops@example.com" />
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn-secondary" id="btn-preview">JSON 미리보기</button>
+                <button type="submit" class="btn-primary">등록 요청 보내기</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2 style="margin-top:0">요청 / 응답</h2>
+        <div class="form-row" style="margin-bottom:12px">
+            <label>요청 바디 (미리보기)</label>
+            <pre id="requestPreview">{}</pre>
+        </div>
+        <div class="form-row">
+            <label>응답</label>
+            <pre id="responseBox">아직 응답이 없습니다.</pre>
+        </div>
+    </div>
+
+    <div class="footer">© Your Bank — Dynamic Client Registration</div>
+</div>
+
+<script>
+    const $ = (sel) => document.querySelector(sel);
+
+    // 전역 설정: 서버에서 /dcr-config로 주입
+    let REG_ENDPOINT = 'http://localhost:8080/connect/register';
+    let REG_CLIENT_ID = 'registrar-client';
+    let REG_CLIENT_SECRET = 'secret';
+
+    async function loadDcrConfig() {
+        try {
+            const res = await fetch('/dcr-config', { headers: { 'Accept': 'application/json' }});
+            if (res.ok) {
+                const cfg = await res.json();
+                if (cfg.registrationEndpoint) REG_ENDPOINT = cfg.registrationEndpoint;
+                if (cfg.registrarClientId) REG_CLIENT_ID = cfg.registrarClientId;
+                if (cfg.registrarClientSecret) REG_CLIENT_SECRET = cfg.registrarClientSecret;
+            }
+        } catch (_) { /* noop: 기본값 사용 */ }
+
+        // 폼에 초기값 반영
+        const issuer = $("#issuer");
+        if (issuer && !issuer.value.trim()) issuer.value = REG_ENDPOINT;
+    }
+
+    function getCheckedValues(containerId) {
+        return [...document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)]
+            .map(el => el.value);
+    }
+
+    function buildPayload() {
+        const redirectUris = $("#redirectUris").value
+            .split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+        const contacts = $("#contacts").value
+            .split(",").map(s => s.trim()).filter(Boolean);
+
+        const payload = {
+            client_name: $("#clientName").value.trim(),
+            redirect_uris: redirectUris,
+            grant_types: getCheckedValues("grantTypes"),
+            response_types: getCheckedValues("responseTypes"),
+            token_endpoint_auth_method: $("#tokenAuth").value,
+            scope: $("#scope").value.trim(),
+            require_proof_key: $("#requireProofKey").checked
+        };
+        const logo = $("#logoUri").value.trim();
+        if (logo) payload.logo_uri = logo;
+        if (contacts.length) payload.contacts = contacts;
+        return payload;
+    }
+
+    // 1) registrar로 client_credentials 토큰 발급
+    async function fetchRegistrarAccessToken(registrationEndpoint, clientId, clientSecret) {
+        // 등록 endpoint의 origin 기준으로 토큰 엔드포인트 구성
+        // 예) http://localhost:8080/connect/register -> http://localhost:8080/oauth2/token
+        const base = new URL(registrationEndpoint).origin;
+        const tokenUrl = base + '/oauth2/token';
+
+        const form = new URLSearchParams();
+        form.set('grant_type', 'client_credentials');
+        // 최소 client.create 필요. 상황에 따라 client.read 등 추가
+        form.set('scope', 'client.create');
+
+        const auth = 'Basic ' + btoa(`${clientId}:${clientSecret}`);
+
+        const res = await fetch(tokenUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': auth,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: form.toString()
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`토큰 발급 실패 (HTTP ${res.status})\n${text}`);
+        }
+        const json = await res.json();
+        if (!json.access_token) {
+            throw new Error('토큰 발급 응답에 access_token 없음');
+        }
+        return json.access_token;
+    }
+
+    // 2) Bearer로 /connect/register 요청
+    async function callDynamicClientRegistration(registrationEndpoint, accessToken, payload) {
+        const res = await fetch(registrationEndpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        const text = await res.text();
+        let pretty;
+        try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch { pretty = text; }
+        return { status: res.status, body: pretty };
+    }
+
+    $("#btn-preview").addEventListener("click", () => {
+        $("#requestPreview").textContent = JSON.stringify(buildPayload(), null, 2);
+    });
+
+    $("#dcr-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        $("#responseBox").textContent = "요청 중...";
+
+        const endpoint = $("#issuer").value.trim() || REG_ENDPOINT;
+        const payload = buildPayload();
+        $("#requestPreview").textContent = JSON.stringify(payload, null, 2);
+
+        try {
+            // 1단계: registrar로 토큰 발급
+            const accessToken = await fetchRegistrarAccessToken(endpoint, REG_CLIENT_ID, REG_CLIENT_SECRET);
+
+            // 2단계: Bearer로 등록 호출
+            const { status, body } = await callDynamicClientRegistration(endpoint, accessToken, payload);
+            $("#responseBox").textContent = `HTTP ${status}\n\n${body}`;
+        } catch (err) {
+            $("#responseBox").textContent = `에러: ${err?.message || err}`;
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadDcrConfig);
+</script>
+</body>
+</html>

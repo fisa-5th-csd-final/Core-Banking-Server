@@ -1,8 +1,10 @@
 package com.fisa.bank.common.config.security.authorization;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -85,5 +87,14 @@ public class OAuth2Config {
   OAuth2AuthorizationConsentService authorizationConsentService(
       JdbcTemplate jdbc, RegisteredClientRepository repo) {
     return new JdbcOAuth2AuthorizationConsentService(jdbc, repo);
+  }
+
+  // 서블릿 필터에만 등록하기 위함
+  @Bean
+    public FilterRegistrationBean<DynamicClientRegisterFilter> dcrFilterRegistrationBean(DynamicClientRegisterFilter filter){
+      FilterRegistrationBean<DynamicClientRegisterFilter> registrationBean = new FilterRegistrationBean<>(filter);
+
+      registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+      return registrationBean;
   }
 }
