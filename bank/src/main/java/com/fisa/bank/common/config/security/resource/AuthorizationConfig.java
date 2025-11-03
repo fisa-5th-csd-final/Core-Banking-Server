@@ -93,4 +93,13 @@ public class AuthorizationConfig {
     registrationBean.setEnabled(false); // 서블릿 필터에서 제거
     return registrationBean;
   }
+
+    @Bean
+    public FilterRegistrationBean<UnknownEndPointFilter> loginFilterRegistrationBean(
+            UnknownEndPointFilter unknownEndPointFilter) {
+        FilterRegistrationBean<UnknownEndPointFilter> registrationBean =
+                new FilterRegistrationBean<>(unknownEndPointFilter);
+        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+        return registrationBean;
+    }
 }
