@@ -73,7 +73,7 @@ public class TransactionService {
     @Transactional
     public AccountTransactionResponse withdraw(String accountNumber, AccountWithdrawRequest request) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccount(accountNumber);
+        Account account = accountReader.getOwnedAccountWithLock(accountNumber);
 
         AccountTransaction trx =
                 recordTransaction(account, request.amount(), TransactionType.ATM_WITHDRAW, false, null);
@@ -85,7 +85,7 @@ public class TransactionService {
     @Transactional
     public AccountTransactionResponse deposit(String accountNumber, AccountDepositRequest request) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccount(accountNumber);
+        Account account = accountReader.getOwnedAccountWithLock(accountNumber);
 
         AccountTransaction trx =
                 recordTransaction(account, request.amount(), TransactionType.ATM_DEPOSIT, true, null);
@@ -96,15 +96,20 @@ public class TransactionService {
     // 송금
     @Transactional
     public TransferResponse transfer(TransferRequest request) {
-        Account fromAccount = accountReader.getOwnedAccount(request.fromAccountNumber());
-        Account toAccount = accountReader.getByAccountNumber(request.toAccountNumber());
+        // 계좌번호 순서대로 락 획득
+        Account fromAccount = accountReader.getOwnedAccountWithLock(request.fromAccountNumber());
+
         BigDecimal amount = request.amount();
-        System.out.println(ourBankCode);
+
         if (ourBankCode.equals(request.toBankCode())) {
+            // 같은 은행 내 송금
+            Account toAccount = accountReader.getByAccountNumberWithLock(request.toAccountNumber());
             recordTransaction(fromAccount, amount, TransactionType.TRANSFER_SEND, false, toAccount.getAccountNumber());
             recordTransaction(toAccount, amount, TransactionType.TRANSFER_RECEIVE, true, fromAccount.getAccountNumber());
             return TransferResponse.of(fromAccount, toAccount, amount);
         } else {
+            // 타행 송금
+            Account toAccount = accountReader.getByAccountNumber(request.toAccountNumber());
             recordTransaction(fromAccount, amount, TransactionType.EXTERNAL_TRANSFER_SEND, false, fromAccount.getAccountNumber());
             return TransferResponse.ofExternal(fromAccount, toAccount, amount);
         }
@@ -115,7 +120,7 @@ public class TransactionService {
     @Transactional
     public CardPaymentResponse payByCard(String accountNumber, CardPaymentRequest request) {
         // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-        Account account = accountReader.getOwnedAccount(accountNumber);
+        Account account = accountReader.getOwnedAccountWithLock(accountNumber);
 
         // 계좌에도 로그 남기기위해 반영
         recordTransaction(

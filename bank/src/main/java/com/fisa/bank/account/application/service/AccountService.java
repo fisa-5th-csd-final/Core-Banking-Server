@@ -17,6 +17,7 @@ import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.id.UserId;
 import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,8 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountReader accountReader;
 
-    private static final String DEFAULT_BANK_CODE = "020";
+    @Value("${bank.code}")
+    private String ourBankCode;
 
     // 계좌 생성 서비스
     @Transactional
@@ -40,7 +42,7 @@ public class AccountService {
         Account account = Account.create(
                 accountNumber,
                 user,
-                DEFAULT_BANK_CODE
+                ourBankCode
         );
 
         Account saved = accountRepository.save(account);

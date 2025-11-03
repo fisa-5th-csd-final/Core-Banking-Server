@@ -30,9 +30,28 @@ public class AccountReader {
                 .orElseThrow(AccountNotFoundException::new);
     }
 
+    // 계좌번호로 조회 (비관적 락)
+    public Account getByAccountNumberWithLock(String accountNumber) {
+        return accountRepository.findByAccountNumberWithLock(accountNumber)
+                .orElseThrow(AccountNotFoundException::new);
+    }
+
     // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환
     public Account getOwnedAccount(String accountNumber) {
         Account account = getByAccountNumber(accountNumber);
+        Long accountOwnerId = account.getUser().getUserId().getValue();
+        Long currentUserId = requesterInfo.getUserId().getValue();
+
+        if (!accountOwnerId.equals(currentUserId)) {
+            throw new AccessDeniedException();
+        }
+        System.out.println(account);
+        return account;
+    }
+
+    // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환 (비관적 락)
+    public Account getOwnedAccountWithLock(String accountNumber) {
+        Account account = getByAccountNumberWithLock(accountNumber);
         Long accountOwnerId = account.getUser().getUserId().getValue();
         Long currentUserId = requesterInfo.getUserId().getValue();
 
