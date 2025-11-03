@@ -5,6 +5,7 @@ public enum TransactionType {
   ATM_WITHDRAW, // ATM 출금
   TRANSFER_SEND, // 송금 (보내는 쪽)
   TRANSFER_RECEIVE, // 송금 (받는 쪽)
+  EXTERNAL_TRANSFER_SEND, // 타행 송금 (보내는 쪽)
   CARD_PAYMENT, // 카드 결제
   CARD_REFUND // 카드 환불
 }

@@ -6,3 +6,6 @@ spring:
     include:
       - db
       - auth
+
+bank:
+  code: "020"  # 우리 은행 코드
