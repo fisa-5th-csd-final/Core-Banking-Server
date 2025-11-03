@@ -13,6 +13,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * 클라이언트를 동적으로 등록하기 위한 엔드포인트를 관리하는 서블릿 필터
+ * 해당 필터는 Spring Security Filter Chain에 등록하지 않는다.
+ */
 @Component
 public class DynamicClientRegisterFilter extends OncePerRequestFilter {
 
@@ -43,6 +47,11 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
         // /dcr -> /dcr/index.html로 내부 forward
         if ("/dcr".equals(path) || "/dcr/".equals(path)) {
             request.getRequestDispatcher("/dcr/index.html").forward(request, response);
+            return;
+        }
+
+        if("/dcr/guide.html".equals(path)){
+            request.getRequestDispatcher("/dcr/guide.html").forward(request, response);
             return;
         }
 

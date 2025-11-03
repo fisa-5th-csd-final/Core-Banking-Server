@@ -36,6 +36,13 @@
         }
         .checklist label { display: flex; align-items: center; gap: 10px; font-weight: 500; }
         .row-span-2 { grid-column: span 2; }
+        .header-actions { display: flex; justify-content: flex-end; margin: 0 0 24px; }
+        .header-actions a {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; border-radius: 10px; background: #243057; color: #e6e9ef;
+            font-weight: 600; text-decoration: none; transition: background .2s ease;
+        }
+        .header-actions a:hover { background: #2f3d6e; }
         .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
         button { border: 0; padding: 12px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .btn-primary { background: #5b8cff; color: #0b1020; }
@@ -51,6 +58,9 @@
 <div class="container">
     <h1>OAuth 2.0 / OIDC 클라이언트 동적 등록 (DCR)</h1>
     <p class="lead">registrar client/secret으로 먼저 토큰을 받은 뒤, Bearer로 /connect/register에 등록 요청을 보냅니다.</p>
+    <div class="header-actions">
+        <a href="/dcr/guide.html">OAuth 2.0 / OIDC 가이드</a>
+    </div>
 
     <div class="card">
         <form id="dcr-form">
