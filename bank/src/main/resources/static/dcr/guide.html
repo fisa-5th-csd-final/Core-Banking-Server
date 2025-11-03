@@ -13,7 +13,7 @@
             background: #0b1020;
             color: #e6e9ef;
         }
-        .container { max-width: 1080px; margin: 40px auto; padding: 0 16px; }
+        .container { max-width: 1280px; margin: 40px auto; padding: 0 16px; }
         h1 { font-size: 1.9rem; margin: 0 0 16px; }
         h2 { font-size: 1.4rem; margin: 0 0 14px; }
         h3 { font-size: 1.08rem; margin: 14px 0 8px; }
@@ -129,6 +129,7 @@ Content-Type: application/json
                 <th>파라미터</th>
                 <th>설명</th>
                 <th>예시</th>
+                <th>필수 여부</th>
             </tr>
             </thead>
             <tbody>
@@ -136,36 +137,43 @@ Content-Type: application/json
                 <td><code>response_type</code></td>
                 <td>대부분 <code>code</code> (Authorization Code Grant)</td>
                 <td><code>code</code></td>
+                <td><code>필수</code></td>
             </tr>
             <tr>
                 <td><code>client_id</code></td>
                 <td>등록된 클라이언트 식별자</td>
                 <td><code>my-oidc-client</code></td>
+                <td><code>필수</code></td>
             </tr>
             <tr>
                 <td><code>redirect_uri</code></td>
                 <td>등록된 URI와 정확히 일치해야 함</td>
                 <td><code>https://client.example.com/login/oauth2/code/main</code></td>
+                <td><code>필수</code></td>
             </tr>
             <tr>
                 <td><code>scope</code></td>
                 <td><code>openid</code> 포함, profile/email 등 필요 범위 추가</td>
                 <td><code>openid profile email</code></td>
+                <td><code>필수</code></td>
             </tr>
             <tr>
                 <td><code>state</code></td>
                 <td>CSRF 방지 토큰, 응답 비교 필수</td>
-                <td><code>b64nonce123</code></td>
+                <td>OAuth2.0 스펙 상 CSRF 토큰을 삽입해야 하는 게 옳지만<br> 테스트의 편의성을 위해서 적용하지 않았습니다.<br>빈 값으로 보내도 됩니다.</td>
+                <td><code>선택</code></td>
             </tr>
             <tr>
                 <td><code>nonce</code></td>
-                <td>ID Token 재생 공격 방지용 난수, 응답 검증 필수</td>
+                <td>ID Token 재생 공격 방지용 난수, <br><code>OPTIONAL</code></td>
                 <td><code>random-nonce-xyz</code></td>
+                <td><code>선택</code></td>
             </tr>
             <tr>
                 <td><code>code_challenge</code>, <code>code_challenge_method</code></td>
                 <td>PKCE 사용 시 필수. <code>code_challenge_method=S256</code> 권장</td>
                 <td><code>code_challenge=...</code></td>
+                <td><code>PKCE 사용 시 필수</code></td>
             </tr>
             </tbody>
         </table>
