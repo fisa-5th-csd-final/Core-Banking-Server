@@ -45,6 +45,7 @@ public class SecurityFilterChainConfig {
 
         http.securityMatcher(authorizationServer.getEndpointsMatcher())
             .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/oauth2/authorize").authenticated()
             .anyRequest().permitAll());
 
     // SAS 기능 활성화(OIDC 포함)
