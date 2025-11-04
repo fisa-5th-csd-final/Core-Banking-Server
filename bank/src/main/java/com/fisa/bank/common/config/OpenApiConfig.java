@@ -24,7 +24,7 @@ public class OpenApiConfig {
                     .name(jwt)
                     .type(SecurityScheme.Type.HTTP)
                     .scheme("bearer")
-                    .bearerFormat("JWT"));
+                    .bearerFormat(jwt));
 
     return new OpenAPI()
         .info(apiInfo())
