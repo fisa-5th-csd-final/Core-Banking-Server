@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>클라이언트 개발자를 위한 OAuth 2.0 / OIDC 가이드</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
+            line-height: 1.6;
+            background: #0b1020;
+            color: #e6e9ef;
+        }
+        .container { max-width: 1280px; margin: 40px auto; padding: 0 16px; }
+        h1 { font-size: 1.9rem; margin: 0 0 16px; }
+        h2 { font-size: 1.4rem; margin: 0 0 14px; }
+        h3 { font-size: 1.08rem; margin: 14px 0 8px; }
+        p.lead { margin: 0 0 24px; color: #a9b1c6; }
+        .card {
+            background: #131a33; border: 1px solid #1f2a4d; border-radius: 16px; padding: 24px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.24); margin-bottom: 24px;
+        }
+        .card:last-of-type { margin-bottom: 32px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 999px; background: #243057; color: #e6e9ef; font-size: .82rem;
+        }
+        .step-list { counter-reset: step; margin: 0; padding-left: 20px; color: #c3cbe1; }
+        .step-list li { margin-bottom: 10px; }
+        .step-list li::marker { font-weight: 600; color: #5b8cff; }
+        ul.simple { margin: 0; padding-left: 18px; color: #c3cbe1; }
+        ul.simple li + li { margin-top: 6px; }
+        table {
+            width: 100%; border-collapse: collapse; margin-top: 8px; background: #0e1530;
+        }
+        th, td {
+            border: 1px solid #2a355f; padding: 10px 12px; text-align: left;
+        }
+        th { background: #19224b; color: #e6e9ef; font-weight: 600; }
+        td { color: #c3cbe1; vertical-align: top; }
+        code, pre {
+            font-family: ui-monospace, SFMono-Regular, SFMono, Menlo, Consolas, Liberation Mono, monospace;
+            background: #0e1530;
+            border: 1px solid #2a355f;
+            border-radius: 8px;
+        }
+        code { padding: 2px 6px; font-size: .92rem; }
+        pre { margin: 14px 0; padding: 16px; overflow: auto; font-size: .9rem; }
+        .tip {
+            margin-top: 16px; padding: 16px; border-radius: 12px;
+            background: rgba(91, 140, 255, .08); border: 1px solid rgba(91, 140, 255, .3);
+            color: #d6ddff; font-size: .92rem;
+        }
+        .nav-actions {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 12px;
+        }
+        .nav-actions a {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; border-radius: 10px; background: #243057; color: #e6e9ef;
+            font-weight: 600; text-decoration: none; transition: background .2s ease;
+        }
+        .nav-actions a:hover { background: #2f3d6e; }
+        .footer { text-align: center; color: #93a0c2; font-size: .88rem; margin-top: 32px; }
+        @media (max-width: 720px) {
+            .nav-actions { flex-direction: column; align-items: flex-start; }
+            .nav-actions a { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav-actions">
+        <div>
+            <h1>클라이언트 개발자를 위한 OAuth 2.0 / OIDC 여정</h1>
+            <p class="lead">이 문서는 RP(Client) 애플리케이션이 Authorization Server와 연동해 로그인, 토큰 교환, 사용자 프로필 조회를 완료하기 위해 따라야 할 단계를 정리했습니다.</p>
+        </div>
+        <a href="/dcr/index.html">동적 등록 도구 열기</a>
+    </div>
+
+    <div class="card">
+        <h2>0. 사전 체크리스트</h2>
+        <ul class="simple">
+            <li>서버 메타데이터 엔드포인트 <code>/.well-known/openid-configuration</code>에 접근 가능한지 확인합니다.</li>
+            <li>동적 또는 정적 방식으로 클라이언트 등록 권한(또는 registrar 계정)을 확보합니다.</li>
+            <li>HTTPS, 리다이렉트 URI, CORS 등 프런트엔드 환경 설정이 실제 배포 환경과 일치하는지 점검합니다.</li>
+            <li>PKCE, state, nonce 등 필수 파라미터를 생성할 유틸리티가 준비되어 있는지 확인합니다.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>1. OIDC 메타데이터 조회</h2>
+        <p>Authorization Server의 OIDC Discovery 문서를 먼저 읽어 클라이언트 애플리케이션이 사용할 엔드포인트와 지원 기능을 파악합니다.</p>
+        <pre>GET /.well-known/openid-configuration</pre>
+        <div class="tip">
+            응답에서 <code>authorization_endpoint</code>, <code>token_endpoint</code>, <code>jwks_uri</code>, <code>scopes_supported</code>, <code>response_types_supported</code> 등을 캐싱해 두면 이후 요청을 구성할 때 반복 호출을 줄일 수 있습니다.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. 클라이언트 등록</h2>
+        <h3>동적 등록 (DCR)</h3>
+        <p>클라이언트가 직접 등록을 수행할 수 있다면 <code>/connect/register</code>로 JSON 요청을 보냅니다. 이때 registrar 토큰이 필요하며, 도구가 필요하면 상단 버튼으로 이동하세요.</p>
+        <pre>POST /connect/register
+Authorization: Bearer &lt;registrar_access_token&gt;
+Content-Type: application/json
+
+{
+  "client_name": "My OIDC Client",
+  "redirect_uris": ["https://client.example.com/login/oauth2/code/main"],
+  "grant_types": ["authorization_code", "refresh_token"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "client_secret_basic",
+  "scope": "openid profile email",
+  "require_proof_key": true
+}</pre>
+        <div class="tip">
+            정적 등록이라면 동일한 속성을 서버 담당자에게 전달하고, 발급받은 <code>client_id</code>, <code>client_secret</code>을 안전하게 저장하세요.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>3. 로그인 요청 만들기</h2>
+        <p>사용자를 인증하기 위해 Authorization Server의 <code>/oauth2/authorize</code>로 리다이렉트합니다. 필수 파라미터는 다음과 같습니다.</p>
+        <table>
+            <thead>
+            <tr>
+                <th>파라미터</th>
+                <th>설명</th>
+                <th>예시</th>
+                <th>필수 여부</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>response_type</code></td>
+                <td>대부분 <code>code</code> (Authorization Code Grant)</td>
+                <td><code>code</code></td>
+                <td><code>필수</code></td>
+            </tr>
+            <tr>
+                <td><code>client_id</code></td>
+                <td>등록된 클라이언트 식별자</td>
+                <td><code>my-oidc-client</code></td>
+                <td><code>필수</code></td>
+            </tr>
+            <tr>
+                <td><code>redirect_uri</code></td>
+                <td>등록된 URI와 정확히 일치해야 함</td>
+                <td><code>https://client.example.com/login/oauth2/code/main</code></td>
+                <td><code>필수</code></td>
+            </tr>
+            <tr>
+                <td><code>scope</code></td>
+                <td><code>openid</code> 포함, profile/email 등 필요 범위 추가</td>
+                <td><code>openid profile email</code></td>
+                <td><code>필수</code></td>
+            </tr>
+            <tr>
+                <td><code>state</code></td>
+                <td>CSRF 방지 토큰, 응답 비교 필수</td>
+                <td>OAuth2.0 스펙 상 CSRF 토큰을 삽입해야 하는 게 옳지만<br> 테스트의 편의성을 위해서 적용하지 않았습니다.<br>빈 값으로 보내도 됩니다.</td>
+                <td><code>선택</code></td>
+            </tr>
+            <tr>
+                <td><code>nonce</code></td>
+                <td>ID Token 재생 공격 방지용 난수, <br><code>OPTIONAL</code></td>
+                <td><code>random-nonce-xyz</code></td>
+                <td><code>선택</code></td>
+            </tr>
+            <tr>
+                <td><code>code_challenge</code>, <code>code_challenge_method</code></td>
+                <td>PKCE 사용 시 필수. <code>code_challenge_method=S256</code> 권장</td>
+                <td><code>code_challenge=...</code></td>
+                <td><code>선택</code></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="tip">
+            SPA나 모바일 앱은 <code>code_verifier</code>와 <code>code_challenge</code>를 사용자 세션 저장소에 보관하고, 콜백 처리 시 교환해야 합니다.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. 인가 코드 교환</h2>
+        <p>1.사용자가 성공적으로 로그인하면 Authorization <b>서버는 등록된 리다이렉트 URI</b>로 <code>?code=...&amp;state=...</code>를 붙여 리다이렉트합니다.<br>2. code 파라미터에 매핑된 value를 추출하여 액세스 토큰을 발급합니다.</p>
+        <pre>POST /oauth2/token
+Authorization: Basic &lt;base64(client_id:client_secret)&gt;
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&
+code=&lt;AUTHORIZATION_CODE&gt;&
+redirect_uri=https://client.example.com/login/oauth2/code/main&
+code_verifier=&lt;CODE_VERIFIER&gt;</pre>
+        <p>응답에는 <code>access_token</code>, <code>refresh_token</code> (옵션), <code>id_token</code>, <code>token_type</code>, <code>expires_in</code>이 포함됩니다. 보안을 위해 <code>refresh_token</code>은 서버 측에만 저장하세요.</p>
+    </div>
+
+    <div class="card">
+        <h2>5. 토큰 검증</h2>
+        <h3>ID Token</h3>
+        <ul class="simple">
+            <li><strong>누가 로그인 했는지</strong> 확인하는 용도 입니다.</li>
+            <li><code>id_token</code>의 서명을 <code>jwks_uri</code>에서 제공하는 JWK로 검증합니다.</li>
+            <li>JWT 클레임 중 <code>iss</code>, <code>aud</code>, <code>exp</code>, <code>nonce</code>를 확인합니다.</li>
+            <li>다중 테넌트 환경이라면 <code>azp</code>, <code>hd</code> 등 추가 클레임도 점검하세요.</li>
+        </ul>
+        <h3>Access Token</h3>
+        <ul class="simple">
+            <li>로그인 한 사용자의 권한으로 <strong>API를 호출하는 용도</strong> 입니다.</li>
+            <li>Resource Server API 호출 권한을 증명하는 토큰입니다. 사용자 정보 화면을 띄우거나 결제 API를 호출할 때 헤더에 첨부합니다.</li>
+            <li>토큰이 JWT라면 동일하게 서명과 만료 시간을 검증합니다.</li>
+            <li>토큰이 Reference 토큰이라면 Resource Server가 <code>/oauth2/introspect</code>로 상태를 확인할 수 있도록 구성하세요.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>6. API 호출</h2>
+        <p>Access Token을 Authorization 헤더에 담아 Resource Server API를 호출합니다.</p>
+        <pre>GET /api/profile
+Authorization: Bearer &lt;access_token&gt;</pre>
+        <div class="tip">
+            토큰 만료 시 <code>refresh_token</code>으로 새로운 Access Token을 발급받거나, 만료 임박 시 Silent Refresh 전략을 사용하세요.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>7. 세션 및 로그아웃 관리</h2>
+        <ul class="simple">
+            <li>클라이언트 자체 세션을 생성할 경우 <code>id_token</code>의 <code>sub</code> 값을 사용자 키로 삼습니다.</li>
+            <li>서버 로그아웃을 연동하려면 RP-Initiated Logout URL(<code>end_session_endpoint</code>)을 호출하고, <code>id_token_hint</code>와 <code>post_logout_redirect_uri</code>를 전달하세요.</li>
+            <li>Refresh Token을 더 이상 사용하지 않을 경우 <code>/oauth2/revoke</code>로 취소 요청을 보낼 수 있습니다.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>주요 엔드포인트 요약</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>엔드포인트</th>
+                <th>용도</th>
+                <th>인증</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>/.well-known/openid-configuration</code></td>
+                <td>Discovery 문서</td>
+                <td><span class="badge">permitAll</span></td>
+            </tr>
+            <tr>
+                <td><code>/oauth2/authorize</code></td>
+                <td>사용자 인증 및 동의</td>
+                <td><span class="badge">authenticated</span></td>
+            </tr>
+            <tr>
+                <td><code>/oauth2/token</code></td>
+                <td>인가 코드 &lt;-&gt; 토큰 교환</td>
+                <td><span class="badge">client 인증</span></td>
+            </tr>
+            <tr>
+                <td><code>/oauth2/jwks</code></td>
+                <td>서명 검증용 키 세트</td>
+                <td><span class="badge">permitAll</span></td>
+            </tr>
+            <tr>
+                <td><code>/oauth2/introspect</code></td>
+                <td>Access Token 유효성 확인</td>
+                <td><span class="badge">client 인증</span></td>
+            </tr>
+            <tr>
+                <td><code>/oauth2/revoke</code></td>
+                <td>토큰 폐기</td>
+                <td><span class="badge">client 인증</span></td>
+            </tr>
+            <tr>
+                <td><code>/connect/register</code></td>
+                <td>동적 클라이언트 등록</td>
+                <td><span class="badge">registrar Bearer</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>트러블슈팅</h2>
+        <ul class="simple">
+            <li>로그인 페이지로 리다이렉트되지 않으면 <code>/oauth2/authorize</code>가 관리자에게 문의해주세요.</li>
+            <li>리다이렉트 URI 불일치 오류는 공백·슬래시 유무까지 일치하는지 확인합니다.</li>
+            <li>PKCE 오류는 <code>code_verifier</code>와 <code>code_challenge</code> 계산 방식이 동일(S256)인지 검증합니다.</li>
+            <li><code>invalid_client</code>가 발생하면 클라이언트 인증 방식(Basic, post, private_key_jwt 등)이 클라이언트 등록 설정과 일치하는지 확인하세요.</li>
+            <li>ID Token 검증 실패 시 관리자에게 문의해주세요.</li>
+        </ul>
+    </div>
+
+    <div class="nav-actions">
+        <a href="/dcr/index.html">동적 등록 도구로 돌아가기</a>
+        <a href="/dcr/guide.html">맨 위로 이동</a>
+    </div>
+
+    <div class="footer">© Your Bank — OAuth 2.0 &amp; OIDC Client Guide</div>
+</div>
+</body>
+</html>

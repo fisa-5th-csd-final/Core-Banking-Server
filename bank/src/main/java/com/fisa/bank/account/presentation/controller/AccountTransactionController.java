@@ -43,7 +43,8 @@ public class AccountTransactionController {
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
       @Valid @RequestBody AccountWithdrawRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    AccountTransactionResponse response = accountTransactionService.withdraw(accountNumber, request, userId);
+    AccountTransactionResponse response =
+        accountTransactionService.withdraw(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -53,7 +54,8 @@ public class AccountTransactionController {
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
       @Valid @RequestBody AccountDepositRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    AccountTransactionResponse response = accountTransactionService.deposit(accountNumber, request, userId);
+    AccountTransactionResponse response =
+        accountTransactionService.deposit(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -72,7 +74,8 @@ public class AccountTransactionController {
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
       @Valid @RequestBody CardPaymentRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
-    CardPaymentResponse response = accountTransactionService.payByCard(accountNumber, request, userId);
+    CardPaymentResponse response =
+        accountTransactionService.payByCard(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 

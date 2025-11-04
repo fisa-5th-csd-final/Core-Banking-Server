@@ -8,9 +8,9 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 
 @Getter
 public class InterestRateResponse {
-  private BigDecimal baseInterest;
-  private BigDecimal addInterest;
-  private BigDecimal limitPreferInterest;
+  private final BigDecimal baseInterest;
+  private final BigDecimal addInterest;
+  private final BigDecimal limitPreferInterest;
 
   public InterestRateResponse(
       BigDecimal baseInterest, BigDecimal addInterest, BigDecimal limitPreferInterest) {
