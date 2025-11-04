@@ -99,7 +99,13 @@ public class SecurityFilterChainConfig {
         matcher ->
             matcher
                 .requestMatchers(
-                    "/api/users", "/api/loans", "/api/interests/**", "/api/loans/products/**", "/swagger-ui/**","/v3/api-docs/**","/swagger-resources/**")
+                    "/api/users",
+                    "/api/loans",
+                    "/api/interests/**",
+                    "/api/loans/products/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**")
                 .requestMatchers(HttpMethod.GET, "/api/loans/*")
                 .requestMatchers(HttpMethod.POST, "/api/loans"));
 
@@ -129,7 +135,6 @@ public class SecurityFilterChainConfig {
       @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
       throws Exception {
     commonConfiguration(http);
-
 
     http.securityMatchers(matcher -> matcher.requestMatchers("/api/**"));
     http.authorizeHttpRequests(
