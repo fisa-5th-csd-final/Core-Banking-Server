@@ -319,4 +319,16 @@ public class LoanService {
         allLoanLedgers.stream().map((loanLedger) -> LoanLedgerResponse.from(loanLedger)).toList();
     return loanLedgerResponses;
   }
+
+  @Transactional
+  public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
+    // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
+    // TODO: 월 상환액, 상환 계좌 추가해야 됨.
+    LoanLedger loanLedger =
+        loanLedgerRepository
+            .findById(LoanLedgerId.of(loanLedgerId))
+            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+
+    return LoanLedgerDetailResponse.from(loanLedger);
+  }
 }

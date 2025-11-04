@@ -89,4 +89,13 @@ public class LoanController {
 
     return ApiResponseGenerator.success(ResponseCode.GET, myLoanLedger);
   }
+
+  @GetMapping("/ledger/{loanLedgerId}")
+  public ApiResponse<SuccessBody<LoanLedgerDetailResponse>> getLoanLedgerDetail(
+      @PathVariable Long loanLedgerId) {
+
+    LoanLedgerDetailResponse loanLedgerDetail = loanService.getLoanLedgerDetail(loanLedgerId);
+
+    return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
+  }
 }
