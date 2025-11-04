@@ -1,18 +1,16 @@
 package com.fisa.bank.common.config.security.resource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
-import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +20,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 
 /** 로그인 성공 핸들러 스프링 시큐리티에 의해, 사용자 인증이 성공하면 Authentication 객체를 Jwt 토큰으로 인코딩하여 ResponseBody에 담는다. */
 @Component
@@ -63,7 +66,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     // UserIdAuthentication 이 아니면 예외
-      log.warn("Authentication : {}", authentication);
+    log.warn("Authentication : {}", authentication);
     throw new IllegalStateException("Authentication is not UsernamePasswordAuthentication");
   }
 
@@ -77,9 +80,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
   }
 
-  private Long getUserId(String loginId){
-      return userAuthRepository.findUserIdByLoginId(loginId)
-              .orElseThrow(() -> new UsernameNotFoundException("username %s not found".formatted(loginId)))
-              .getValue();
+  private Long getUserId(String loginId) {
+    return userAuthRepository
+        .findUserIdByLoginId(loginId)
+        .orElseThrow(
+            () -> new UsernameNotFoundException("username %s not found".formatted(loginId)))
+        .getValue();
   }
 }

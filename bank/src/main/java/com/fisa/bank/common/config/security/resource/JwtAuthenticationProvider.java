@@ -1,5 +1,7 @@
 package com.fisa.bank.common.config.security.resource;
 
+import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,8 +21,6 @@ import org.springframework.security.oauth2.jwt.JwtEncodingException;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.stereotype.Component;
-
-import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
 
 /** UserIdAuthentication의 인증을 수행하는 Provider */
 @Component("AppAuthenticationProvider")

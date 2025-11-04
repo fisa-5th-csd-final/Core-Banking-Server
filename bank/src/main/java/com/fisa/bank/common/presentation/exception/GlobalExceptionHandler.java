@@ -1,6 +1,5 @@
 package com.fisa.bank.common.presentation.exception;
 
-import com.fisa.bank.interest.application.exception.InterestException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.FailureBody;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
 import com.fisa.bank.common.presentation.response.code.BusinessErrorCode;
+import com.fisa.bank.interest.application.exception.InterestException;
 
 // 애플리케이션 전역 Exception 핸들러
 // BusinessException을 제외하고, 다른 종류의 예외들도 추가할 수 있다.
@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(InterestException.class)
-  public ApiResponse<FailureBody> handle(InterestException e){
-      log.error(e.getMessage(),e);
-      return ApiResponseGenerator.fail(HttpStatus.NOT_FOUND, e.getErrorCode(), e.getMessage());
+  public ApiResponse<FailureBody> handle(InterestException e) {
+    log.error(e.getMessage(), e);
+    return ApiResponseGenerator.fail(HttpStatus.NOT_FOUND, e.getErrorCode(), e.getMessage());
   }
 }

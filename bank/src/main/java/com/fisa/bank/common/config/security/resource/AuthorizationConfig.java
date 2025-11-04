@@ -94,12 +94,12 @@ public class AuthorizationConfig {
     return registrationBean;
   }
 
-    @Bean
-    public FilterRegistrationBean<UnknownEndPointFilter> unknownFilterRegistrationBean(
-            UnknownEndPointFilter unknownEndPointFilter) {
-        FilterRegistrationBean<UnknownEndPointFilter> registrationBean =
-                new FilterRegistrationBean<>(unknownEndPointFilter);
-        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
-        return registrationBean;
-    }
+  @Bean
+  public FilterRegistrationBean<UnknownEndPointFilter> unknownFilterRegistrationBean(
+      UnknownEndPointFilter unknownEndPointFilter) {
+    FilterRegistrationBean<UnknownEndPointFilter> registrationBean =
+        new FilterRegistrationBean<>(unknownEndPointFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
 }

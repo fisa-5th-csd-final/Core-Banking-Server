@@ -1,6 +1,7 @@
 package com.fisa.bank.common.config.security.authorization;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,13 +39,13 @@ public class OAuth2Config {
     return new JdbcRegisteredClientRepository(jdbc);
   }
 
-    @Bean
-    OAuth2TokenGenerator<Jwt> jwtGenerator(JwtEncoder jwtEncoder,
-                                           OAuth2TokenCustomizer<JwtEncodingContext> customizer) {
-        JwtGenerator gen = new JwtGenerator(jwtEncoder);
-        gen.setJwtCustomizer(customizer);
-        return gen;
-    }
+  @Bean
+  OAuth2TokenGenerator<Jwt> jwtGenerator(
+      JwtEncoder jwtEncoder, OAuth2TokenCustomizer<JwtEncodingContext> customizer) {
+    JwtGenerator gen = new JwtGenerator(jwtEncoder);
+    gen.setJwtCustomizer(customizer);
+    return gen;
+  }
 
   /** OAuth2Token 생성기 */
   @Bean
@@ -57,23 +58,24 @@ public class OAuth2Config {
 
   /** require_proof_key false 설정 */
   @Bean("OidcClientRegistrationConverter")
-  public Converter<OidcClientRegistration, RegisteredClient> clientConverter(){
-      OidcClientRegistrationRegisteredClientConverter delegate = new OidcClientRegistrationRegisteredClientConverter();
+  public Converter<OidcClientRegistration, RegisteredClient> clientConverter() {
+    OidcClientRegistrationRegisteredClientConverter delegate =
+        new OidcClientRegistrationRegisteredClientConverter();
 
-      return (source) -> {
-          RegisteredClient base = delegate.convert(source);
-          // 클라이언트가 보낸 require_proof_key(불리언)를 그대로 존중
-          Object raw = source.getClaims().get("require_proof_key");
+    return (source) -> {
+      RegisteredClient base = delegate.convert(source);
+      // 클라이언트가 보낸 require_proof_key(불리언)를 그대로 존중
+      Object raw = source.getClaims().get("require_proof_key");
 
-          boolean reqPkce = (raw instanceof Boolean b) ? b : false; // 값이 없으면 기본 false(서버 앱에 유리)
+      boolean reqPkce = (raw instanceof Boolean b) ? b : false; // 값이 없으면 기본 false(서버 앱에 유리)
 
-          ClientSettings newSettings = ClientSettings
-                  .withSettings(base.getClientSettings().getSettings())
-                  .requireProofKey(reqPkce)
-                  .build();
+      ClientSettings newSettings =
+          ClientSettings.withSettings(base.getClientSettings().getSettings())
+              .requireProofKey(reqPkce)
+              .build();
 
-          return RegisteredClient.from(base).clientSettings(newSettings).build();
-      };
+      return RegisteredClient.from(base).clientSettings(newSettings).build();
+    };
   }
 
   // 인증/인가 동의 저장소
@@ -91,10 +93,12 @@ public class OAuth2Config {
 
   // 서블릿 필터에만 등록하기 위함
   @Bean
-    public FilterRegistrationBean<DynamicClientRegisterFilter> dcrFilterRegistrationBean(DynamicClientRegisterFilter filter){
-      FilterRegistrationBean<DynamicClientRegisterFilter> registrationBean = new FilterRegistrationBean<>(filter);
+  public FilterRegistrationBean<DynamicClientRegisterFilter> dcrFilterRegistrationBean(
+      DynamicClientRegisterFilter filter) {
+    FilterRegistrationBean<DynamicClientRegisterFilter> registrationBean =
+        new FilterRegistrationBean<>(filter);
 
-      registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-      return registrationBean;
+    registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    return registrationBean;
   }
 }

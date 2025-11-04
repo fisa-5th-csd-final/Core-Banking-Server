@@ -3,8 +3,10 @@ package com.fisa.bank.common.config.security.authorization;
 import static com.fisa.bank.common.config.security.authorization.OAuth2Const.SCOPE_CLIENT_CREATE;
 import static com.fisa.bank.common.config.security.authorization.OAuth2Const.SCOPE_CLIENT_READ;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -19,40 +21,40 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RegistrarInitializer implements ApplicationRunner {
 
-    private final RegisteredClientRepository clientRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final RegisteredClientRepository clientRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    // RegistrarClient 정보
-    private final String clientId;
-    private final String secret;
+  // RegistrarClient 정보
+  private final String clientId;
+  private final String secret;
 
-    public RegistrarInitializer(
-            RegisteredClientRepository clientRepository,
-            PasswordEncoder passwordEncoder,
-            @Value("${oauth2.registrar-client.id}") String clientId,
-            @Value("${oauth2.registrar-client.secret}") String secret
-    ){
-        this.clientId = clientId;
-        this.secret = secret;
-        this.clientRepository = clientRepository;
-        this.passwordEncoder = passwordEncoder;
+  public RegistrarInitializer(
+      RegisteredClientRepository clientRepository,
+      PasswordEncoder passwordEncoder,
+      @Value("${oauth2.registrar-client.id}") String clientId,
+      @Value("${oauth2.registrar-client.secret}") String secret) {
+    this.clientId = clientId;
+    this.secret = secret;
+    this.clientRepository = clientRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
+
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    if (clientRepository.findByClientId(clientId) == null) {
+      RegisteredClient client =
+          RegisteredClient.withId(UUID.randomUUID().toString())
+              .clientId(clientId)
+              .clientSecret(passwordEncoder.encode(secret))
+              .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+              .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+              .scope(SCOPE_CLIENT_CREATE)
+              .scope(SCOPE_CLIENT_READ)
+              .build();
+      clientRepository.save(client);
+      log.info("Registrar Client를 추가하였습니다.");
+    } else {
+      log.info("Registrar Client가 이미 존재합니다. ");
     }
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        if (clientRepository.findByClientId(clientId) == null) {
-            RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
-                    .clientId(clientId)
-                    .clientSecret(passwordEncoder.encode(secret))
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                    .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                    .scope(SCOPE_CLIENT_CREATE)
-                    .scope(SCOPE_CLIENT_READ)
-                    .build();
-            clientRepository.save(client);
-            log.info("Registrar Client를 추가하였습니다.");
-        } else {
-            log.info("Registrar Client가 이미 존재합니다. ");
-        }
-    }
+  }
 }

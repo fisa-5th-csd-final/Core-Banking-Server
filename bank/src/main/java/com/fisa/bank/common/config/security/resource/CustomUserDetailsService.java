@@ -1,6 +1,5 @@
 package com.fisa.bank.common.config.security.resource;
 
-import com.fisa.bank.user.persistence.entity.id.UserId;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
