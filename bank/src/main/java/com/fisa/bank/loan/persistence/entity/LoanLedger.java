@@ -12,6 +12,7 @@ import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerIdJavaType;
 import com.fisa.bank.loan.persistence.enums.InterestType;
@@ -87,6 +88,9 @@ public class LoanLedger {
 
   @Column(nullable = false)
   private LocalDateTime loanEndDate;
+
+  @OneToOne(fetch = FetchType.EAGER, mappedBy = "account_id")
+  private Account account;
 
   // 연체 일수
   @Column(nullable = false)

@@ -81,4 +81,11 @@ public class LoanController {
     System.out.println("대출상환");
     loanService.repayMonthlyLoan(loanLedgerId, request);
   }
+
+  @DeleteMapping("/{loanLedgerId}")
+  public ApiResponse<SuccessBody<Void>> deleteLoanLedger(
+      @PathVariable("loanLedgerId") Long loanLedgerId) {
+    loanService.cancelLoan(loanLedgerId);
+    return ApiResponseGenerator.success(ResponseCode.DELETE);
+  }
 }

@@ -10,6 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fisa.bank.account.application.exception.AccountNotFoundException;
+import com.fisa.bank.account.persistence.entity.Account;
+import com.fisa.bank.account.persistence.repository.AccountRepository;
+import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.common.presentation.util.SpringRequesterInfo;
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.service.InterestService;
@@ -48,6 +52,8 @@ public class LoanService {
   private final SpringRequesterInfo springRequesterInfo;
   private final LoanLedgerRepository loanLedgerRepository;
   private final LoanTransactionRepository loanTransactionRepository;
+  private final RequesterInfo requesterInfo;
+  private final AccountRepository accountRepository;
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -119,6 +125,10 @@ public class LoanService {
     // 유저 정보 추출
     UserId userId = springRequesterInfo.getUserId();
     User user = userRepository.getReferenceById(userId);
+    Account account =
+        accountRepository
+            .findByAccountNumber(request.getAccountNumber())
+            .orElseThrow(AccountNotFoundException::new);
     if (loanLedgerRepository.existsByUser_UserIdAndLoanProduct_LoanProductId(
         userId, LoanProductId.of(loanProductId))) {
       throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
@@ -211,6 +221,7 @@ public class LoanService {
             .interestType(interestType)
             .earlyRepayInterestRate(earlyRepayInterestRate)
             .term(request.getTerm())
+            .account(account)
             .build();
 
     // 대출 이력성 테이블에 저장 LoanTransaction
