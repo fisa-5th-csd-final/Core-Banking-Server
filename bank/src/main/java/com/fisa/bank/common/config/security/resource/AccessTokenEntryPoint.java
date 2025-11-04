@@ -17,7 +17,7 @@ public class AccessTokenEntryPoint implements AuthenticationEntryPoint {
             throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-        response.getWriter().write("{\"message\": \"인증이 필요합니다\", \"error\": \"U200\"}");
+        response.getWriter().write("{\"message\": \"인증이 필요합니다\", \"error\": \"U001\"}");
         response.getWriter().flush();
     }
 }
