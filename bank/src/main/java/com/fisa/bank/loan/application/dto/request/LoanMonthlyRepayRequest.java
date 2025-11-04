@@ -7,6 +7,5 @@ import java.math.BigDecimal;
 
 @Getter
 public class LoanMonthlyRepayRequest {
-    @NotNull
-    private BigDecimal amount;
+  @NotNull private BigDecimal amount;
 }

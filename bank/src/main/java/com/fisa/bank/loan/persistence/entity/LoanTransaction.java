@@ -60,6 +60,6 @@ public class LoanTransaction {
   private BigDecimal remainPrincipal;
 
   public void setLoanLedger(LoanLedger loanLedger) {
-      this.loanLedger = loanLedger;
+    this.loanLedger = loanLedger;
   }
 }

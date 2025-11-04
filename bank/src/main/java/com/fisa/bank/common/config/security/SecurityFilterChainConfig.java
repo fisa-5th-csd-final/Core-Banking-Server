@@ -70,51 +70,61 @@ public class SecurityFilterChainConfig {
       throws Exception {
     commonConfiguration(http);
 
-        RequestMatcher requestMatcher = new OrRequestMatcher(
-                PathPatternRequestMatcher.withDefaults().matcher("/api/users"),
-                PathPatternRequestMatcher.withDefaults().matcher("/api/login"),
-                PathPatternRequestMatcher.withDefaults().matcher("/api/loans"),
-                PathPatternRequestMatcher.withDefaults().matcher("/api/interests/**"),
-                PathPatternRequestMatcher.withDefaults().matcher("/api/loans/products/**"),
-                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/loans"),
-                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*")
-        );
+    RequestMatcher requestMatcher =
+        new OrRequestMatcher(
+            PathPatternRequestMatcher.withDefaults().matcher("/api/users"),
+            PathPatternRequestMatcher.withDefaults().matcher("/api/login"),
+            PathPatternRequestMatcher.withDefaults().matcher("/api/loans"),
+            PathPatternRequestMatcher.withDefaults().matcher("/api/interests/**"),
+            PathPatternRequestMatcher.withDefaults().matcher("/api/loans/products/**"),
+            PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/loans"),
+            PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*"));
 
-        http.securityMatcher(requestMatcher);
-        http.authorizeHttpRequests(
-                auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
-                        .requestMatchers("/api/loans/**").permitAll()
-                        .requestMatchers("/api/interests/**").permitAll());
-        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+    http.securityMatcher(requestMatcher);
+    http.authorizeHttpRequests(
+        auth ->
+            auth.requestMatchers(HttpMethod.POST, "/api/users")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/login")
+                .permitAll()
+                .requestMatchers("/api/loans/**")
+                .permitAll()
+                .requestMatchers("/api/interests/**")
+                .permitAll());
+    http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    @Order(3)
-    // [일반 사용자용] 인증이 필요한 엔드포인트 시큐리티 필터체인
-    public SecurityFilterChain authenticated(HttpSecurity http, @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) throws Exception{
-        commonConfiguration(http);
+  @Bean
+  @Order(3)
+  // [일반 사용자용] 인증이 필요한 엔드포인트 시큐리티 필터체인
+  public SecurityFilterChain authenticated(
+      HttpSecurity http,
+      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
+      throws Exception {
+    commonConfiguration(http);
 
-        http.securityMatcher("/**");
-        http.authorizeHttpRequests( auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/loans/**").authenticated()
-                .anyRequest().authenticated());
-        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
+    http.securityMatcher("/**");
+    http.authorizeHttpRequests(
+        auth ->
+            auth.requestMatchers(HttpMethod.POST, "/api/loans/**")
+                .authenticated()
+                .anyRequest()
+                .authenticated());
+    http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
 
-    // FilterChain 공통 설정
-    private void commonConfiguration(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.httpBasic(AbstractHttpConfigurer::disable);
-        http.logout(AbstractHttpConfigurer::disable);
-        http.formLogin(AbstractHttpConfigurer::disable);
-        http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
-    }
-
+  // FilterChain 공통 설정
+  private void commonConfiguration(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable);
+    http.httpBasic(AbstractHttpConfigurer::disable);
+    http.logout(AbstractHttpConfigurer::disable);
+    http.formLogin(AbstractHttpConfigurer::disable);
+    http.sessionManagement(
+        sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
+  }
 }

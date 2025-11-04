@@ -95,8 +95,8 @@ public class LoanLedger {
   @Column(nullable = false)
   private int term;
 
-  public void addLoanTransactionList(LoanTransaction loanTransaction){
-      loanTransactionList.add(loanTransaction);
-      loanTransaction.setLoanLedger(this);
+  public void addLoanTransactionList(LoanTransaction loanTransaction) {
+    loanTransactionList.add(loanTransaction);
+    loanTransaction.setLoanLedger(this);
   }
 }
