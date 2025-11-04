@@ -95,7 +95,7 @@ public class AuthorizationConfig {
   }
 
     @Bean
-    public FilterRegistrationBean<UnknownEndPointFilter> loginFilterRegistrationBean(
+    public FilterRegistrationBean<UnknownEndPointFilter> unknownFilterRegistrationBean(
             UnknownEndPointFilter unknownEndPointFilter) {
         FilterRegistrationBean<UnknownEndPointFilter> registrationBean =
                 new FilterRegistrationBean<>(unknownEndPointFilter);
