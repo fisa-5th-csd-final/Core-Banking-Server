@@ -1,5 +1,9 @@
 package com.fisa.bank.common.config.security.jwt;
 
+import static com.fisa.bank.common.config.security.jwt.JwtConst.CLAIM_ISSUER;
+import static com.fisa.bank.common.config.security.jwt.JwtConst.CLAIM_ROLE;
+import static com.fisa.bank.common.config.security.jwt.JwtConst.CLAIM_USER_ID;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -15,7 +19,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtGenerator {
+public class UserJwtGenerator {
 
   private static final ZoneId KST = ZoneId.of("Asia/Seoul");
   private static final JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
@@ -23,7 +27,7 @@ public class JwtGenerator {
   private final JwtProperties jwtProperties;
   private final JwtEncoder jwtEncoder;
 
-  public JwtGenerator(JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
+  public UserJwtGenerator(JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
     this.jwtEncoder = jwtEncoder;
     this.jwtProperties = jwtProperties;
   }
@@ -32,9 +36,9 @@ public class JwtGenerator {
     ZonedDateTime now = LocalDateTime.now().atZone(KST);
     JwtClaimsSet claimsSet =
         JwtClaimsSet.builder()
-            .claim("userId", userId)
-            .claim("role", authorities)
-            .issuer("core-bank")
+            .claim(CLAIM_USER_ID, userId)
+            .claim(CLAIM_ROLE, authorities)
+            .issuer(CLAIM_ISSUER)
             .issuedAt(now.toInstant())
             .expiresAt(now.toInstant().plus(jwtProperties.getAccessTokenExpiration()))
             .build();
@@ -46,8 +50,8 @@ public class JwtGenerator {
     ZonedDateTime now = LocalDateTime.now().atZone(KST);
     JwtClaimsSet claimsSet =
         JwtClaimsSet.builder()
-            .claim("userId", userId)
-            .issuer("core-bank")
+            .claim(CLAIM_USER_ID, userId)
+            .issuer(CLAIM_ISSUER)
             .issuedAt(now.toInstant())
             .expiresAt(now.toInstant().plus(jwtProperties.getRefreshTokenExpiration()))
             .build();

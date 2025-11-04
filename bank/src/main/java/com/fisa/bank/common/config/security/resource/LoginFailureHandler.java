@@ -39,7 +39,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
   private String createFailureBody() {
     try {
       return objectMapper.writeValueAsString(
-          Map.of("error", "unauthorized", "message", "인증 정보가 올바르지 않습니다."));
+          Map.of("error", "U000", "message", "인증 정보가 올바르지 않습니다."));
     } catch (JsonProcessingException e) {
       throw new IllegalStateException("Exception occur in json processing");
     }

@@ -1,5 +1,7 @@
 package com.fisa.bank.common.config.security.resource;
 
+import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,9 +38,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     try {
       Jwt jwt = jwtDecoder.decode(token);
-      Long userId = jwt.getClaim("userId");
+      Long userId = jwt.getClaim(CLAIM_USER_ID);
       List<String> roles =
-          jwt.getClaim("role") == null ? Collections.emptyList() : jwt.getClaim("role");
+          jwt.getClaim(CLAIM_ROLE) == null ? Collections.emptyList() : jwt.getClaim(CLAIM_ROLE);
       Collection<? extends GrantedAuthority> authorities =
           roles.stream().map(SimpleGrantedAuthority::new).toList();
 
