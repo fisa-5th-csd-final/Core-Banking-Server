@@ -1,5 +1,8 @@
 package com.fisa.bank.common.config.security.authorization;
 
+import static com.fisa.bank.common.config.security.authorization.OAuth2Const.SCOPE_CLIENT_CREATE;
+import static com.fisa.bank.common.config.security.authorization.OAuth2Const.SCOPE_CLIENT_READ;
+
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,8 +46,8 @@ public class RegistrarInitializer implements ApplicationRunner {
                     .clientSecret(passwordEncoder.encode(secret))
                     .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                     .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                    .scope("client.create")
-                    .scope("client.read")
+                    .scope(SCOPE_CLIENT_CREATE)
+                    .scope(SCOPE_CLIENT_READ)
                     .build();
             clientRepository.save(client);
             log.info("Registrar Client를 추가하였습니다.");
