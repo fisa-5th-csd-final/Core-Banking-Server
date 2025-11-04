@@ -100,13 +100,13 @@ public class SecurityFilterChainConfig {
                 matcher
                     .requestMatchers(
                         HttpMethod.GET,
-                        "/api/loans",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/swagger-resources/**",
                         "/api/loans/products/**",
                         "/api/interests/**")
-                    .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users"))
+                    .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
+                    .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId}"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
