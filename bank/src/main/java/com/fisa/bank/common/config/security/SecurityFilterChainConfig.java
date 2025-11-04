@@ -100,6 +100,8 @@ public class SecurityFilterChainConfig {
                 matcher
                     .requestMatchers(
                         HttpMethod.GET,
+                        "/api/loans/products",
+                        "/api/loans/{loanProductId}",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/swagger-resources/**",
