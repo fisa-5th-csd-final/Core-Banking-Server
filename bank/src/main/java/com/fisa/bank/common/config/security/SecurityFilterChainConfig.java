@@ -22,10 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.fisa.bank.common.config.security.resource.AccessTokenEntryPoint;
 import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
@@ -98,17 +95,14 @@ public class SecurityFilterChainConfig {
       throws Exception {
     commonConfiguration(http);
 
-    RequestMatcher requestMatcher =
-        new OrRequestMatcher(
-            PathPatternRequestMatcher.withDefaults().matcher("/api/users"),
-            PathPatternRequestMatcher.withDefaults().matcher("/api/login"),
-            PathPatternRequestMatcher.withDefaults().matcher("/api/loans"),
-            PathPatternRequestMatcher.withDefaults().matcher("/api/interests/**"),
-            PathPatternRequestMatcher.withDefaults().matcher("/api/loans/products/**"),
-            PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/loans"),
-            PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*"));
+    http.securityMatchers(
+        matcher ->
+            matcher
+                .requestMatchers(
+                    "/api/users", "/api/loans", "/api/interests/**", "/api/loans/products/**")
+                .requestMatchers(HttpMethod.GET, "/api/loans/*")
+                .requestMatchers(HttpMethod.POST, "/api/loans"));
 
-    http.securityMatcher(requestMatcher);
     http.authorizeHttpRequests(
         auth ->
             auth.requestMatchers(HttpMethod.POST, "/api/users")
@@ -151,11 +145,13 @@ public class SecurityFilterChainConfig {
     return http.build();
   }
 
+  /** 시큐리티 기본 로그인 및 에러 리다이렉트 필터체인 */
   @Bean
   @Order(4)
   public SecurityFilterChain loginFilterChain(HttpSecurity http) throws Exception {
 
-    http.securityMatcher("/login", "/default-ui.css", "/error/**");
+    http.securityMatchers(
+        matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"));
     http.authorizeHttpRequests(
         request ->
             request

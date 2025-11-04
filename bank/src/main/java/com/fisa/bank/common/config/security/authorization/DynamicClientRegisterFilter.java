@@ -79,17 +79,17 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
     chain.doFilter(request, response);
   }
 
-    private void sendHtmlResource(Object resource, HttpServletResponse response) throws IOException{
-        if(resource instanceof ClassPathResource classPathResource){
-            if(classPathResource.exists()){
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentType("text/html;charset=UTF-8");
-                try (InputStream in = classPathResource.getInputStream()) {
-                    in.transferTo(response.getOutputStream());
-                }
-                return;
-            }
+  private void sendHtmlResource(Object resource, HttpServletResponse response) throws IOException {
+    if (resource instanceof ClassPathResource classPathResource) {
+      if (classPathResource.exists()) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("text/html;charset=UTF-8");
+        try (InputStream in = classPathResource.getInputStream()) {
+          in.transferTo(response.getOutputStream());
         }
-        throw new IllegalArgumentException("Invalid Resource");
+        return;
+      }
     }
+    throw new IllegalArgumentException("Invalid Resource");
+  }
 }

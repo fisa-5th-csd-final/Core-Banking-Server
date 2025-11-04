@@ -1,19 +1,20 @@
 package com.fisa.bank.common.config.security.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 시큐리티는 존재하지 않는 엔드포인트 api에 대해서 403을 보내지만, 404를 보내도록 하려고 했다. 이를 위해 시큐리티에 명시되지 않은 엔드포인트는 모두 허용하여 요청을
@@ -49,7 +50,7 @@ public class UnknownEndPointFilter extends OncePerRequestFilter {
 
   private void response404(HttpServletResponse response) throws IOException {
     // 엔드포인트가 존재하지 않으면 404 반환
-      Map<String, String> body = Map.of("message", "존재하지 않는 엔드포인트입니다.");
+    Map<String, String> body = Map.of("message", "존재하지 않는 엔드포인트입니다.");
     response.setContentType("application/json; charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     response.getWriter().write(om.writeValueAsString(body));
@@ -58,7 +59,7 @@ public class UnknownEndPointFilter extends OncePerRequestFilter {
   }
 
   private void response405(HttpServletResponse response) throws IOException {
-      Map<String, String> body = Map.of("message", "이 엔드포인트는 해당 메소드를 지원하지 않습니다.");
+    Map<String, String> body = Map.of("message", "이 엔드포인트는 해당 메소드를 지원하지 않습니다.");
     response.setContentType("application/json; charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     response.getWriter().write(om.writeValueAsString(body));
