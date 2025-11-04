@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFilter;
@@ -37,11 +38,15 @@ public class JwtAuthenticationFilter extends AuthenticationFilter {
       Authentication authentication = authenticationConverter.convert(request);
 
       if (Objects.nonNull(authentication)) {
-        // 인증 진행
-        authentication = authenticationManager.authenticate(authentication);
-
-        // 컨텍스트 저장
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+          // 인증 진행
+          authentication = authenticationManager.authenticate(authentication);
+          // 컨텍스트 저장
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (AuthenticationException e) {
+          authentication.setAuthenticated(false);
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
       }
     }
     filterChain.doFilter(request, response);

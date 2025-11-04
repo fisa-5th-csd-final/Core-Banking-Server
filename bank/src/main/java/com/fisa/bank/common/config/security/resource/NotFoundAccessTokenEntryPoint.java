@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 // JwtAuthentication이 없을경우 실행됨 (유효한 access token이 없음)
 @Component
-public class AccessTokenEntryPoint implements AuthenticationEntryPoint {
+public class NotFoundAccessTokenEntryPoint implements AuthenticationEntryPoint {
 
   @Override
   public void commence(
