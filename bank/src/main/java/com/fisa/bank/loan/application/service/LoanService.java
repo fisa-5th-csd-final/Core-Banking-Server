@@ -24,6 +24,7 @@ import com.fisa.bank.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
+import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.persistence.entity.*;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
@@ -282,5 +283,17 @@ public class LoanService {
     }
 
     // TODO: 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
+    // 원장 테이블 업데이트
+    // 남은 원금
+    // 다음 상환일
+    // 마지막 거래 일시
+    loanLedger.updateLoanLedger(
+        UpdateLoanLedgerParam.builder()
+            .remainPrincipal(
+                loanLedger.getPrincipal().subtract(monthlyRepayment.getMonthlyPayment()))
+            .lastRepaymentDate(loanLedger.getNextRepaymentDate())
+            .nextRepaymentDate(loanLedger.getNextRepaymentDate().plusMonths(1))
+            .build());
+    // 거래 테이블에도 저장
   }
 }
