@@ -27,7 +27,7 @@ public class EqualInstallmentCalculatorTest {
                 "회차", "상환일", "남은 원금", "이자", "원금 상환", "월 상환액"
         );
         for (int month = 1; month <= term; month++) {
-            int remainingTerm = term - (month - 1);
+//            int remainingTerm = term - (month - 1);
 
             // 월별 상환액 계산
             MonthlyRepayment repayment = EqualInstallmentCalculator.calculateEqualInstallment(

@@ -13,7 +13,6 @@ import org.hibernate.type.SqlTypes;
 import com.fisa.bank.loan.persistence.entity.id.LoanTransactionId;
 import com.fisa.bank.loan.persistence.entity.id.LoanTransactionIdJavaType;
 import com.fisa.bank.loan.persistence.enums.TransactionType;
-import org.springframework.stereotype.Service;
 
 /*
    대출 이력성 테이블
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Builder
-@Setter
 public class LoanTransaction {
 
   // 거래 id
@@ -60,4 +58,8 @@ public class LoanTransaction {
   // 거래 후 남은 상환액(원금)
   @Column(nullable = false)
   private BigDecimal remainPrincipal;
+
+  public void setLoanLedger(LoanLedger loanLedger) {
+      this.loanLedger = loanLedger;
+  }
 }

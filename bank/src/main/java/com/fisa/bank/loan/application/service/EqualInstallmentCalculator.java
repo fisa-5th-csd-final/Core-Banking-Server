@@ -5,7 +5,6 @@ import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /*
     원리금 균등 상환 - 월별 상환액 계산기
@@ -17,7 +16,7 @@ public class EqualInstallmentCalculator {
 
     /**
      * 원리금 균등 상환 계산
-     * @param remainPrincipal 대출금
+     * @param remainPrincipal 남은 원금
      * @param completedInterest 연이율 (예: 0.05 = 5%)
      * @param term 상환 기간(개월)
      * @return 월별 상환액

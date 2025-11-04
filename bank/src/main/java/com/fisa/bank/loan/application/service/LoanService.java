@@ -30,14 +30,10 @@ import com.fisa.bank.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -147,7 +143,7 @@ public class LoanService {
         // 마지막 상환일 = 시작일 + term 년
         LocalDateTime loanEndDate = startDate.plusYears(term);
 
-        // 첫 번째 상환일 = 시작일 + 1년 (상환 주기 1년 가정)
+        // 첫 번째 상환일 = 시작일 + 1개월 (상환 주기 1년 가정)
         LocalDateTime nextRepaymentDate = startDate.plusMonths(1);
 
         InterestRate interestRate = loanProduct.getInterestRateList().get(0);
@@ -206,8 +202,8 @@ public class LoanService {
                 .transactionType(TransactionType.LOAN)
                 .build();
 
-        loanTransaction.setLoanLedger(loanLedger);
-        loanLedger.setLoanTransactionList(List.of(loanTransaction));
+//        loanTransaction.setLoanLedger(loanLedger);
+        loanLedger.addLoanTransactionList(loanTransaction);
 
         LoanLedger savedLoanLedger = loanLedgerRepository.save(loanLedger);
         LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);

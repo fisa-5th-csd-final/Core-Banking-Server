@@ -20,8 +20,7 @@ public class LoanTransactionResponse {
     private BigDecimal repaymentInterestAmount;
     private BigDecimal repaymentPrincipalAmount;
 
-    // 거래 유형이 대출일 경우 from 메소드
-    public LoanTransactionResponse fromLoan(LoanTransaction entity){
+    public static LoanTransactionResponse from(LoanTransaction entity){
         return new LoanTransactionResponse(
                 entity.getTrxLId().getValue(),
                 entity.getDate(),

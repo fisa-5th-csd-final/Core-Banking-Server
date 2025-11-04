@@ -27,7 +27,6 @@ import com.fisa.bank.user.persistence.entity.User;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-@Setter
 public class LoanLedger {
 
   @Id
@@ -37,8 +36,8 @@ public class LoanLedger {
   private LoanLedgerId loanLedgerId;
 
   // LoanLedger 1 : N LoanTransaction
-  @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<LoanTransaction> loanTransactionList;
+  @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "loanProductId", nullable = false)
@@ -95,4 +94,9 @@ public class LoanLedger {
 
   @Column(nullable = false)
   private int term;
+
+  public void addLoanTransactionList(LoanTransaction loanTransaction){
+      loanTransactionList.add(loanTransaction);
+      loanTransaction.setLoanLedger(this);
+  }
 }

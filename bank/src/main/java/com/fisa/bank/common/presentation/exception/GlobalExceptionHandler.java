@@ -57,13 +57,13 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(DuplicateLoanException.class)
     public ApiResponse<FailureBody> handle(DuplicateLoanException e){
-      log.error(e.getMessage());
+      log.error(e.getMessage(), e);
       return ApiResponseGenerator.fail(HttpStatus.CONFLICT, e.getErrorCode(), e.getMessage());
   }
 
     @ExceptionHandler(InsufficientRepaymentException.class)
     public ApiResponse<FailureBody> handle(InsufficientRepaymentException e){
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return ApiResponseGenerator.fail(HttpStatus.UNPROCESSABLE_ENTITY, e.getErrorCode(), e.getMessage());
     }
 }
