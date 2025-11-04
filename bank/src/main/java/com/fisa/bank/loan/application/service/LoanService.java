@@ -279,8 +279,6 @@ public class LoanService {
 
     // 납입 금액 vs 이번 달 상환금 -> 상환가능한지 체크
     // 이번 달 상환 금액보다 request.getAmount가 더 작다면 예외 발생시키기
-    System.out.println(monthlyRepayment.getMonthlyPayment());
-    System.out.println(request.getAmount());
     if (request.getAmount().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
       throw new InsufficientRepaymentException(
           request.getAmount(), monthlyRepayment.getMonthlyPayment());
@@ -290,14 +288,26 @@ public class LoanService {
     // 원장 테이블 업데이트
     // 남은 원금
     // 다음 상환일
-    // 마지막 거래 일시
+    // 마지막 상환 날짜와 다음 상환 날짜 업데이트
+    LocalDateTime lastRepaymentDate = loanLedger.getNextRepaymentDate();
+    LocalDateTime nextRepaymentDate = lastRepaymentDate.plusMonths(1);
     loanLedger.updateLoanLedger(
         UpdateLoanLedgerParam.builder()
-            .remainPrincipal(
-                loanLedger.getPrincipal().subtract(monthlyRepayment.getMonthlyPayment()))
-            .lastRepaymentDate(loanLedger.getNextRepaymentDate())
-            .nextRepaymentDate(loanLedger.getNextRepaymentDate().plusMonths(1))
+            .remainPrincipal(monthlyRepayment.getRemainPrincipal())
+            .lastRepaymentDate(lastRepaymentDate)
+            .nextRepaymentDate(nextRepaymentDate)
             .build());
     // 거래 테이블에도 저장
+    LoanTransaction loanTransaction =
+        LoanTransaction.builder()
+            .loanLedger(loanLedger)
+            .date(LocalDateTime.now())
+            .transactionType(TransactionType.REPAYMENT)
+            .amount(monthlyRepayment.getMonthlyPayment())
+            .repaymentInterestAmount(monthlyRepayment.getInterestPayment())
+            .repaymentPrincipalAmount(monthlyRepayment.getPrincipalPayment())
+            .remainPrincipal(monthlyRepayment.getRemainPrincipal())
+            .build();
+    LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
   }
 }

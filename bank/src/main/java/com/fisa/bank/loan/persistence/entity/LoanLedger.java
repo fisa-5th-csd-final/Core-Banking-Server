@@ -105,6 +105,6 @@ public class LoanLedger {
   public void updateLoanLedger(UpdateLoanLedgerParam updateLoanLedgerParam) {
     this.remainPrincipal = updateLoanLedgerParam.getRemainPrincipal();
     this.nextRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
-    this.lastRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
+    this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
   }
 }

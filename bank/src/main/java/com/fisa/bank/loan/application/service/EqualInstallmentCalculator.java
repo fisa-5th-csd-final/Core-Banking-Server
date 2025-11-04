@@ -52,6 +52,11 @@ public class EqualInstallmentCalculator {
       principalPayment = remainPrincipal.setScale(0, RoundingMode.UP);
       monthlyPayment = principalPayment.add(interestPayment);
     }
-    return new MonthlyRepayment(term, principalPayment, interestPayment, monthlyPayment);
+    return new MonthlyRepayment(
+        term,
+        principalPayment,
+        interestPayment,
+        monthlyPayment,
+        remainPrincipal.subtract(principalPayment));
   }
 }
