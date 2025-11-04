@@ -15,24 +15,22 @@ import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.service.InterestService;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
+import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
 import com.fisa.bank.loan.application.dto.response.PagedResponse;
-import com.fisa.bank.loan.application.exception.LoanProductNotFoundException;
-import com.fisa.bank.loan.application.exception.PreferInterestNotFoundException;
+import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayInterestRate;
-import com.fisa.bank.loan.persistence.entity.LoanLedger;
-import com.fisa.bank.loan.persistence.entity.LoanProduct;
-import com.fisa.bank.loan.persistence.entity.PreferInterest;
-import com.fisa.bank.loan.persistence.entity.PreferInterestCompositeKey;
+import com.fisa.bank.loan.application.model.MonthlyRepayment;
+import com.fisa.bank.loan.persistence.entity.*;
+import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
-import com.fisa.bank.loan.persistence.enums.InterestType;
-import com.fisa.bank.loan.persistence.enums.LoanType;
-import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
+import com.fisa.bank.loan.persistence.enums.*;
 import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
+import com.fisa.bank.loan.persistence.repository.LoanTransactionRepository;
 import com.fisa.bank.loan.persistence.repository.PreferInterestRepository;
 import com.fisa.bank.user.persistence.entity.CreditRating;
 import com.fisa.bank.user.persistence.entity.CustomerLevel;
@@ -49,6 +47,8 @@ public class LoanService {
   private final UserRepository userRepository;
   private final SpringRequesterInfo springRequesterInfo;
   private final LoanLedgerRepository loanLedgerRepository;
+  private final LoanTransactionRepository loanTransactionRepository;
+
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -117,8 +117,15 @@ public class LoanService {
   @Transactional
   public LoanApplyforResponse applyForLoan(LoanApplyForRequest request, Long loanProductId) {
 
-    // TODO: 대출 원장성 테이블에 저장 LoanLedger
+    // 유저 정보 추출
+    UserId userId = springRequesterInfo.getUserId();
+    User user = userRepository.getReferenceById(userId);
+    if (loanLedgerRepository.existsByUser_UserIdAndLoanProduct_LoanProductId(
+        userId, LoanProductId.of(loanProductId))) {
+      throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
+    }
 
+    // 대출 원장성 테이블에 저장 LoanLedger
     // 미리 세팅해둘 데이터
     // 남은 상환액(원금) - 초기값은 원금과 동일
     BigDecimal remainPrincipal = request.getPrincipal();
@@ -148,8 +155,8 @@ public class LoanService {
     // 마지막 상환일 = 시작일 + term 년
     LocalDateTime loanEndDate = startDate.plusYears(term);
 
-    // 첫 번째 상환일 = 시작일 + 1년 (상환 주기 1년 가정)
-    LocalDateTime nextRepaymentDate = startDate.plusYears(1);
+    // 첫 번째 상환일 = 시작일 + 1개월 (상환 주기 1년 가정)
+    LocalDateTime nextRepaymentDate = startDate.plusMonths(1);
 
     InterestRate interestRate = loanProduct.getInterestRateList().get(0);
 
@@ -161,9 +168,6 @@ public class LoanService {
     BigDecimal limitPreferInterest = interestRate.getLimitPreferInterest();
 
     // 우대 금리 - 유저의 신용등급과 고객등급으로
-    UserId userId = springRequesterInfo.getUserId();
-    User user = userRepository.getReferenceById(userId);
-
     CreditRating creditLevel = user.getCreditLevel(); // 신용 등급
     CustomerLevel customerLevel = user.getCustomerLevel(); // 고객 등급
 
@@ -207,8 +211,23 @@ public class LoanService {
             .overdueCount(0)
             .interestType(interestType)
             .earlyRepayInterestRate(earlyRepayInterestRate)
+            .term(request.getTerm())
             .build();
+
+    // 대출 이력성 테이블에 저장 LoanTransaction
+    LoanTransaction loanTransaction =
+        LoanTransaction.builder()
+            .date(startDate)
+            .remainPrincipal(remainPrincipal)
+            .amount(remainPrincipal)
+            .transactionType(TransactionType.LOAN)
+            .build();
+
+    //        loanTransaction.setLoanLedger(loanLedger);
+    loanLedger.addLoanTransactionList(loanTransaction);
+
     LoanLedger savedLoanLedger = loanLedgerRepository.save(loanLedger);
+    LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
 
     LoanApplyforResponse loanApplyForResponse =
         LoanApplyforResponse.builder()
@@ -224,7 +243,45 @@ public class LoanService {
             //                .repaymentStatus(savedLoanLedger.getRepaymentStatus())
             //                .earlyRepayInterestRate(savedLoanLedger.getEarlyRepayInterestRate())
             .build();
-    // TODO: 대출 거래 테이블에 저장 LoanTransaction
+
     return loanApplyForResponse;
+  }
+
+  public void repayMonthlyLoan(Long loanLedgerId, LoanMonthlyRepayRequest request) {
+
+    LoanLedger loanLedger =
+        loanLedgerRepository
+            .findById(LoanLedgerId.of(loanLedgerId))
+            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+
+    // TODO: 상환 방법에 따른 월 상환액 계산
+    MonthlyRepayment monthlyRepayment = new MonthlyRepayment();
+    // 이번 달 상환 금액 -> 상환 타입별로 달라짐.
+    // 1. 원리금 균등
+    if (loanLedger.getRepaymentType() == RepaymentType.EQUAL_INSTALLMENT) {
+      monthlyRepayment =
+          EqualInstallmentCalculator.calculateEqualInstallment(
+              loanLedger.getPrincipal(),
+              loanLedger.getRemainPrincipal(),
+              loanLedger.getCompletedInterest(),
+              loanLedger.getTerm() * 12, // 연 -> 개월로 변경
+              loanLedger.getNextRepaymentDate(),
+              loanLedger.getLoanEndDate());
+    }
+
+    // 2. 원금 균등
+
+    // 3. 만기 일시 - 만기일
+
+    // 납입 금액 vs 이번 달 상환금 -> 상환가능한지 체크
+    // 이번 달 상환 금액보다 request.getAmount가 더 작다면 예외 발생시키기
+    System.out.println(monthlyRepayment.getMonthlyPayment());
+    System.out.println(request.getAmount());
+    if (request.getAmount().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
+      throw new InsufficientRepaymentException(
+          request.getAmount(), monthlyRepayment.getMonthlyPayment());
+    }
+
+    // TODO: 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
   }
 }

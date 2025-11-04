@@ -36,7 +36,7 @@ public class LoanLedger {
   private LoanLedgerId loanLedgerId;
 
   // LoanLedger 1 : N LoanTransaction
-  @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -91,4 +91,12 @@ public class LoanLedger {
   // 연체 일수
   @Column(nullable = false)
   private int overdueCount;
+
+  @Column(nullable = false)
+  private int term;
+
+  public void addLoanTransactionList(LoanTransaction loanTransaction) {
+    loanTransactionList.add(loanTransaction);
+    loanTransaction.setLoanLedger(this);
+  }
 }

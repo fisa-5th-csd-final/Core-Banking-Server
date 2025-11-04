@@ -6,5 +6,4 @@ import java.util.List;
 public record AccountTransactionListResponse(
     String accountNumber, // 계좌 ID
     List<AccountTransactionResponse> transactions // 거래내역 리스트
-) {
-}
+    ) {}

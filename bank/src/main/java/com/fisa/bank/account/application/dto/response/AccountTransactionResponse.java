@@ -12,7 +12,7 @@ public record AccountTransactionResponse(
     String type, // 거래 유형 (DEPOSIT, WITHDRAWAL 등)
     BigDecimal amount, // 거래 금액
     BigDecimal balanceAfter // 거래 후 잔액
-) {
+    ) {
 
   public static AccountTransactionResponse from(AccountTransaction transaction) {
     return new AccountTransactionResponse(
