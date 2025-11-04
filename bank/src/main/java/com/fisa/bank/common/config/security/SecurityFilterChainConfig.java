@@ -107,7 +107,7 @@ public class SecurityFilterChainConfig {
                     "/v3/api-docs/**",
                     "/swagger-resources/**")
                 .requestMatchers(HttpMethod.GET, "/api/loans/*")
-                .requestMatchers(HttpMethod.POST, "/api/loans"));
+                .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login"));
 
     http.authorizeHttpRequests(
         auth ->

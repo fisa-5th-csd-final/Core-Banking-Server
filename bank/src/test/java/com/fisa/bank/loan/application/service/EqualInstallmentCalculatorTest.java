@@ -14,7 +14,7 @@ public class EqualInstallmentCalculatorTest {
     // 대출 조건
     BigDecimal principal = BigDecimal.valueOf(1_000_000); // 원금
     BigDecimal completedInterest = BigDecimal.valueOf(0.05); // 연이율 5%
-    int term = 12; // 6개월
+    int term = 12; // 12개월
 
     LocalDateTime nextRepaymentDate = LocalDateTime.of(2025, 12, 3, 17, 9, 30); // 첫 상환일
     LocalDateTime loanEndDate = LocalDateTime.of(2026, 11, 3, 17, 9, 30); // 마지막 상환일

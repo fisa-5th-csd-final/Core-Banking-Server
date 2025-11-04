@@ -3,6 +3,7 @@ package com.fisa.bank.loan.application.service;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
@@ -247,6 +248,7 @@ public class LoanService {
     return loanApplyForResponse;
   }
 
+  @Transactional
   public void repayMonthlyLoan(Long loanLedgerId, LoanMonthlyRepayRequest request) {
 
     LoanLedger loanLedger =
@@ -263,7 +265,9 @@ public class LoanService {
           EqualInstallmentCalculator.calculateEqualInstallment(
               loanLedger.getPrincipal(),
               loanLedger.getRemainPrincipal(),
-              loanLedger.getCompletedInterest(),
+              loanLedger
+                  .getCompletedInterest()
+                  .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
               loanLedger.getTerm() * 12, // 연 -> 개월로 변경
               loanLedger.getNextRepaymentDate(),
               loanLedger.getLoanEndDate());

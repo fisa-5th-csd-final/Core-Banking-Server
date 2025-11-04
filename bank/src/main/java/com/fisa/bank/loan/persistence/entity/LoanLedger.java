@@ -38,6 +38,7 @@ public class LoanLedger {
 
   // LoanLedger 1 : N LoanTransaction
   @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @Builder.Default
   private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
