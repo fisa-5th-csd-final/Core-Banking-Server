@@ -49,7 +49,6 @@ public class LoanService {
   private final LoanLedgerRepository loanLedgerRepository;
   private final LoanTransactionRepository loanTransactionRepository;
 
-
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
 

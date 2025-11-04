@@ -1,5 +1,15 @@
 package com.fisa.bank.account.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+
+import org.springframework.web.bind.annotation.*;
+
 import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.request.CardPaymentRequest;
@@ -14,14 +24,6 @@ import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 /**
  * TransactionController
@@ -83,8 +85,10 @@ public class AccountTransactionController {
   @GetMapping("/{accountNumber}/transactions")
   public ApiResponse<SuccessBody<AccountTransactionListResponse>> getTransactions(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
-      @Parameter(description = "조회 시작일 (YYYY-MM-DD)", required = true) @RequestParam LocalDate startDate,
-      @Parameter(description = "조회 종료일 (YYYY-MM-DD)", required = true) @RequestParam LocalDate endDate) {
+      @Parameter(description = "조회 시작일 (YYYY-MM-DD)", required = true) @RequestParam
+          LocalDate startDate,
+      @Parameter(description = "조회 종료일 (YYYY-MM-DD)", required = true) @RequestParam
+          LocalDate endDate) {
     Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionListResponse response =
         accountTransactionService.getTransactions(accountNumber, startDate, endDate, userId);
