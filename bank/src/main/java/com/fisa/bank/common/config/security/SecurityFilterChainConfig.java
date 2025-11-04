@@ -24,14 +24,14 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
-import com.fisa.bank.common.config.security.resource.NotFoundAccessTokenEntryPoint;
+import com.fisa.bank.common.config.security.resource.RequiredAuthenticationEntryPoint;
 import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityFilterChainConfig {
 
-  private final NotFoundAccessTokenEntryPoint accessTokenEntryPoint;
+  private final RequiredAuthenticationEntryPoint requiredAuthenticationEntryPoint;
 
   @Bean
   @Order(1)
@@ -133,7 +133,7 @@ public class SecurityFilterChainConfig {
         .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    http.exceptionHandling(ex -> ex.authenticationEntryPoint(accessTokenEntryPoint));
+    http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
     return http.build();
   }
