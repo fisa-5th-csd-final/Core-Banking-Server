@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +19,7 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
-import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
-import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
-import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
-import com.fisa.bank.loan.application.dto.response.PagedResponse;
+import com.fisa.bank.loan.application.dto.response.*;
 import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
@@ -309,5 +307,16 @@ public class LoanService {
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
             .build();
     LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
+  }
+
+  @Transactional
+  public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
+    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
+
+    System.out.println("allLoanLedgers = " + allLoanLedgers);
+
+    List<LoanLedgerResponse> loanLedgerResponses =
+        allLoanLedgers.stream().map((loanLedger) -> LoanLedgerResponse.from(loanLedger)).toList();
+    return loanLedgerResponses;
   }
 }
