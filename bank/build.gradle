@@ -44,7 +44,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.13'
 	// Flyway
 	implementation 'org.flywaydb:flyway-core'
 	implementation "org.flywaydb:flyway-mysql"

@@ -24,14 +24,14 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
-import com.fisa.bank.common.config.security.resource.AccessTokenEntryPoint;
+import com.fisa.bank.common.config.security.resource.RequiredAuthenticationEntryPoint;
 import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityFilterChainConfig {
 
-  private final AccessTokenEntryPoint accessTokenEntryPoint;
+  private final RequiredAuthenticationEntryPoint requiredAuthenticationEntryPoint;
 
   @Bean
   @Order(1)
@@ -96,31 +96,21 @@ public class SecurityFilterChainConfig {
     commonConfiguration(http);
 
     http.securityMatchers(
-        matcher ->
-            matcher
-                .requestMatchers(
-                    "/api/users",
-                    "/api/loans",
-                    "/api/interests/**",
-                    "/api/loans/products/**",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/swagger-resources/**")
-                .requestMatchers(HttpMethod.GET, "/api/loans/*")
-                .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login"));
+            matcher ->
+                matcher
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/loans/products",
+                        "/api/loans/{loanProductId}",
+                        "/api/interests/{loanProductId}",
+                        "/swagger-ui/index.html", // TODO: Swagger 전용 필터체인으로 분리
+                        "/v3/api-docs", // TODO: Swagger 전용 필터체인으로 분리
+                        "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
+                        )
+                    .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
+                    .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId}"))
+        .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
-    http.authorizeHttpRequests(
-        auth ->
-            auth.requestMatchers(HttpMethod.POST, "/api/users")
-                .permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/login")
-                .permitAll()
-                .requestMatchers("/api/loans/**")
-                .permitAll()
-                .requestMatchers("/api/interests/**")
-                .permitAll()
-                .anyRequest()
-                .permitAll());
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
@@ -134,19 +124,32 @@ public class SecurityFilterChainConfig {
       HttpSecurity http,
       @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
       throws Exception {
+
     commonConfiguration(http);
 
-    http.securityMatchers(matcher -> matcher.requestMatchers("/api/**"));
-    http.authorizeHttpRequests(
-        auth ->
-            auth.requestMatchers(HttpMethod.POST, "/api/loans/**")
-                .authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/users/me")
-                .authenticated()
-                .anyRequest()
-                .authenticated());
+    http.securityMatchers(
+            matcher ->
+                matcher
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/loans/{loanProductId}",
+                        "/api/loans/{loanLedgerId}/repayment",
+                        "/api/accounts",
+                        "/api/accounts/{accountNumber}/deposit",
+                        "/api/accounts/{accountNumber}/pay",
+                        "/api/accounts/{accountNumber}/withdraw",
+                        "/api/accounts/transfer")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/users/me",
+                        "/api/accounts/{accountNumber}",
+                        "/api/accounts",
+                        "/api/accounts/{accountNumber}/transactions")
+                    .requestMatchers(HttpMethod.DELETE, "/api/accounts/{accountNumber}"))
+        .authorizeHttpRequests(request -> request.anyRequest().authenticated());
+
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    http.exceptionHandling(ex -> ex.authenticationEntryPoint(accessTokenEntryPoint));
+    http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
     return http.build();
   }
@@ -157,16 +160,8 @@ public class SecurityFilterChainConfig {
   public SecurityFilterChain loginFilterChain(HttpSecurity http) throws Exception {
 
     http.securityMatchers(
-        matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"));
-    http.authorizeHttpRequests(
-        request ->
-            request
-                .requestMatchers(HttpMethod.GET, "/login")
-                .permitAll() // login
-                .requestMatchers(HttpMethod.GET, "/error/**")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/default-ui.css")
-                .permitAll()); // login 페이지 css
+            matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
+        .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.formLogin(Customizer.withDefaults()); // form Login 활성화
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
