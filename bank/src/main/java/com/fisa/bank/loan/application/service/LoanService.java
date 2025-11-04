@@ -49,6 +49,7 @@ public class LoanService {
   private final LoanLedgerRepository loanLedgerRepository;
   private final LoanTransactionRepository loanTransactionRepository;
 
+
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
 
@@ -282,6 +283,5 @@ public class LoanService {
     }
 
     // TODO: 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
-
   }
 }

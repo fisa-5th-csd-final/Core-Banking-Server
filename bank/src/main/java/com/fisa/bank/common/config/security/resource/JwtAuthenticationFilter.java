@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 
+/** 사용자가 Authorization에 보낸 토큰을 추출해서 Authentication 객체로 변환하는 역할 */
 public class JwtAuthenticationFilter extends AuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
@@ -33,11 +35,14 @@ public class JwtAuthenticationFilter extends AuthenticationFilter {
     if (super.getRequestMatcher().matches(request)) {
       // Authentication 변환
       Authentication authentication = authenticationConverter.convert(request);
-      // 인증 진행
-      authentication = authenticationManager.authenticate(authentication);
 
-      // 컨텍스트 저장
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      if (Objects.nonNull(authentication)) {
+        // 인증 진행
+        authentication = authenticationManager.authenticate(authentication);
+
+        // 컨텍스트 저장
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      }
     }
     filterChain.doFilter(request, response);
   }

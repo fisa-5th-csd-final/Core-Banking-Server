@@ -13,3 +13,8 @@ jwt:
 jwk:
   private-key-path: ${JWK_PRIVATE_KEY_PATH}
   public-key-path: ${JWK_PUBLIC_KEY_PATH}
+
+oauth2:
+  registrar-client:
+    id: ${REGISTRAR_CLIENT_ID}
+    secret: ${REGISTRAR_CLIENT_SECRET}
