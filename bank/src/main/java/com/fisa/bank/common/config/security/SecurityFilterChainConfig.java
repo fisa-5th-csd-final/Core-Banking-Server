@@ -96,31 +96,19 @@ public class SecurityFilterChainConfig {
     commonConfiguration(http);
 
     http.securityMatchers(
-        matcher ->
-            matcher
-                .requestMatchers(
-                    "/api/users",
-                    "/api/loans",
-                    "/api/interests/**",
-                    "/api/loans/products/**",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/swagger-resources/**")
-                .requestMatchers(HttpMethod.GET, "/api/loans/*")
-                .requestMatchers(HttpMethod.POST, "/api/loans"));
+            matcher ->
+                matcher
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/loans",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/api/loans/products/**",
+                        "/api/interests/**")
+                    .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users"))
+        .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
-    http.authorizeHttpRequests(
-        auth ->
-            auth.requestMatchers(HttpMethod.POST, "/api/users")
-                .permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/login")
-                .permitAll()
-                .requestMatchers("/api/loans/**")
-                .permitAll()
-                .requestMatchers("/api/interests/**")
-                .permitAll()
-                .anyRequest()
-                .permitAll());
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
@@ -134,17 +122,16 @@ public class SecurityFilterChainConfig {
       HttpSecurity http,
       @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
       throws Exception {
+
     commonConfiguration(http);
 
-    http.securityMatchers(matcher -> matcher.requestMatchers("/api/**"));
-    http.authorizeHttpRequests(
-        auth ->
-            auth.requestMatchers(HttpMethod.POST, "/api/loans/**")
-                .authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/users/me")
-                .authenticated()
-                .anyRequest()
-                .authenticated());
+    http.securityMatchers(
+            matcher ->
+                matcher
+                    .requestMatchers(HttpMethod.POST, "/api/loans/**")
+                    .requestMatchers(HttpMethod.GET, "/api/users/me"))
+        .authorizeHttpRequests(request -> request.anyRequest().authenticated());
+
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     http.exceptionHandling(ex -> ex.authenticationEntryPoint(accessTokenEntryPoint));
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
@@ -157,16 +144,8 @@ public class SecurityFilterChainConfig {
   public SecurityFilterChain loginFilterChain(HttpSecurity http) throws Exception {
 
     http.securityMatchers(
-        matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"));
-    http.authorizeHttpRequests(
-        request ->
-            request
-                .requestMatchers(HttpMethod.GET, "/login")
-                .permitAll() // login
-                .requestMatchers(HttpMethod.GET, "/error/**")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/default-ui.css")
-                .permitAll()); // login 페이지 css
+            matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
+        .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.formLogin(Customizer.withDefaults()); // form Login 활성화
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
