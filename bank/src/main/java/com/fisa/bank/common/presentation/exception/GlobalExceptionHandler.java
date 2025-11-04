@@ -42,8 +42,7 @@ public class GlobalExceptionHandler {
    *
    * @param e
    * @return
-   */
-  @ExceptionHandler(RuntimeException.class)
+   */@ExceptionHandler(RuntimeException.class)
   public ApiResponse<FailureBody> handle(RuntimeException e) {
     log.error(e.getMessage(), e);
     return ApiResponseGenerator.fail(HttpStatus.INTERNAL_SERVER_ERROR, "500", e.getMessage());
