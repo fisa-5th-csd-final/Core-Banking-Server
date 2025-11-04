@@ -264,6 +264,8 @@ public class LoanService {
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
 
+    Account account = loanLedger.getAccount();
+
     // TODO: 상환 방법에 따른 월 상환액 계산
     MonthlyRepayment monthlyRepayment = new MonthlyRepayment();
     // 이번 달 상환 금액 -> 상환 타입별로 달라짐.
@@ -279,6 +281,11 @@ public class LoanService {
               loanLedger.getLoanEndDate());
     }
 
+    // 계좌 잔액과 납입해야 하는 금액 비교
+    if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
+      throw new InSufficientBalanceAmountException();
+    }
+
     // 2. 원금 균등
 
     // 3. 만기 일시 - 만기일
@@ -287,11 +294,21 @@ public class LoanService {
     // 이번 달 상환 금액보다 request.getAmount가 더 작다면 예외 발생시키기
     System.out.println(monthlyRepayment.getMonthlyPayment());
     System.out.println(request.getAmount());
+
     if (request.getAmount().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
       throw new InsufficientRepaymentException(
           request.getAmount(), monthlyRepayment.getMonthlyPayment());
     }
 
     // TODO: 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
+  }
+
+  public void cancelLoan(Long loanLedgerId) {
+    UserId userId = requesterInfo.getUserId();
+
+    LoanLedger ledger =
+        loanLedgerRepository
+            .findById(LoanLedgerId.of(loanLedgerId))
+            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
   }
 }
