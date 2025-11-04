@@ -9,3 +9,11 @@ spring:
 
 bank:
   code: "020"  # 우리 은행 코드
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha

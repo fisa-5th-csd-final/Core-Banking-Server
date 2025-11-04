@@ -16,6 +16,16 @@ import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.common.presentation.response.code.ResponseCode;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@Tag(name = "Account", description = "계좌 관리 API")
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
@@ -24,7 +34,7 @@ public class AccountController {
   private final AccountService accountService;
   private final RequesterInfo requesterInfo;
 
-  // 계좌 생성 API
+  @Operation(summary = "계좌 생성", description = "새로운 계좌를 생성합니다.")
   @PostMapping
   public ApiResponse<SuccessBody<AccountResponse>> createAccount() {
     Long userId = requesterInfo.getUserId().getValue();
@@ -32,16 +42,16 @@ public class AccountController {
     return ApiResponseGenerator.success(ResponseCode.CREATE, response);
   }
 
-  // 계좌 상세 조회
+  @Operation(summary = "계좌 상세 조회", description = "계좌 번호로 계좌의 상세 정보를 조회합니다.")
   @GetMapping("/{accountNumber}")
   public ApiResponse<SuccessBody<AccountDetailResponse>> getAccountDetail(
-      @PathVariable String accountNumber) {
+      @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber) {
     Long userId = requesterInfo.getUserId().getValue();
     AccountDetailResponse response = accountService.getAccountDetail(accountNumber, userId);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 
-  // 계좌 리스트 조회
+  @Operation(summary = "계좌 목록 조회", description = "사용자의 모든 계좌 목록을 조회합니다.")
   @GetMapping
   public ApiResponse<SuccessBody<List<AccountListResponse>>> getAccountsByUserId() {
     Long userId = requesterInfo.getUserId().getValue();
@@ -49,9 +59,10 @@ public class AccountController {
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 
-  // 계좌 삭제
+  @Operation(summary = "계좌 삭제", description = "계좌를 삭제합니다.")
   @DeleteMapping("/{accountNumber}")
-  public ApiResponse<SuccessBody<Void>> deleteAccount(@PathVariable String accountNumber) {
+  public ApiResponse<SuccessBody<Void>> deleteAccount(
+      @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber) {
     Long userId = requesterInfo.getUserId().getValue();
     accountService.deleteAccount(accountNumber, userId);
     return ApiResponseGenerator.success(ResponseCode.DELETE);
