@@ -1,5 +1,8 @@
 package com.fisa.bank.account.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +30,7 @@ import com.fisa.bank.common.presentation.response.code.ResponseCode;
  *
  * <p>계좌 관련 거래(입금, 출금, 송금)를 처리하는 컨트롤러
  */
+@Tag(name = "Account Transaction", description = "계좌 거래 API")
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
@@ -35,27 +39,29 @@ public class AccountTransactionController {
   private final AccountTransactionService accountTransactionService;
   private final RequesterInfo requesterInfo;
 
-  // 출금 API
+  @Operation(summary = "출금", description = "계좌에서 금액을 출금합니다.")
   @PostMapping("/{accountNumber}/withdraw")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> withdraw(
-      @PathVariable String accountNumber, @Valid @RequestBody AccountWithdrawRequest request) {
+      @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
+      @Valid @RequestBody AccountWithdrawRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionResponse response =
         accountTransactionService.withdraw(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
-  // 입금
+  @Operation(summary = "입금", description = "계좌에 금액을 입금합니다.")
   @PostMapping("/{accountNumber}/deposit")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
-      @PathVariable String accountNumber, @Valid @RequestBody AccountDepositRequest request) {
+      @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
+      @Valid @RequestBody AccountDepositRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionResponse response =
         accountTransactionService.deposit(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
-  // 송금
+  @Operation(summary = "송금", description = "다른 계좌로 금액을 송금합니다.")
   @PostMapping("/transfer")
   public ApiResponse<SuccessBody<TransferResponse>> transfer(
       @Valid @RequestBody TransferRequest request) {
@@ -64,22 +70,25 @@ public class AccountTransactionController {
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
-  // 카드결제
+  @Operation(summary = "카드 결제", description = "계좌를 통해 카드 결제를 진행합니다.")
   @PostMapping("/{accountNumber}/pay")
   public ApiResponse<SuccessBody<CardPaymentResponse>> pay(
-      @PathVariable String accountNumber, @Valid @RequestBody CardPaymentRequest request) {
+      @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
+      @Valid @RequestBody CardPaymentRequest request) {
     Long userId = requesterInfo.getUserId().getValue();
     CardPaymentResponse response =
         accountTransactionService.payByCard(accountNumber, request, userId);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
-  // 거래내역 조회
+  @Operation(summary = "거래내역 조회", description = "특정 기간의 계좌 거래내역을 조회합니다.")
   @GetMapping("/{accountNumber}/transactions")
   public ApiResponse<SuccessBody<AccountTransactionListResponse>> getTransactions(
-      @PathVariable String accountNumber,
-      @RequestParam LocalDate startDate,
-      @RequestParam LocalDate endDate) {
+      @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
+      @Parameter(description = "조회 시작일 (YYYY-MM-DD)", required = true) @RequestParam
+          LocalDate startDate,
+      @Parameter(description = "조회 종료일 (YYYY-MM-DD)", required = true) @RequestParam
+          LocalDate endDate) {
     Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionListResponse response =
         accountTransactionService.getTransactions(accountNumber, startDate, endDate, userId);
