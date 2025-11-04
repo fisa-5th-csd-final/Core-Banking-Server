@@ -77,7 +77,10 @@ public class SecurityFilterChainConfig {
                 PathPatternRequestMatcher.withDefaults().matcher("/api/interests/**"),
                 PathPatternRequestMatcher.withDefaults().matcher("/api/loans/products/**"),
                 PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/loans"),
-                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*")
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/api/loans/*"),
+                PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
+                PathPatternRequestMatcher.withDefaults().matcher("/v3/api-docs/**"),
+                PathPatternRequestMatcher.withDefaults().matcher("/swagger-resources/**")
         );
 
         http.securityMatcher(requestMatcher);
@@ -86,7 +89,8 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers("/api/loans/**").permitAll()
-                        .requestMatchers("/api/interests/**").permitAll());
+                        .requestMatchers("/api/interests/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
