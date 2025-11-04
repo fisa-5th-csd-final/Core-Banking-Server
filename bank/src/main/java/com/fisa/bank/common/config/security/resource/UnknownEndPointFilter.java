@@ -1,8 +1,10 @@
 package com.fisa.bank.common.config.security.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @RequiredArgsConstructor
 public class UnknownEndPointFilter extends OncePerRequestFilter {
   private final RequestMappingHandlerMapping mapping;
+  private final ObjectMapper om;
 
   @Override
   protected void doFilterInternal(
@@ -46,17 +49,19 @@ public class UnknownEndPointFilter extends OncePerRequestFilter {
 
   private void response404(HttpServletResponse response) throws IOException {
     // 엔드포인트가 존재하지 않으면 404 반환
+      Map<String, String> body = Map.of("message", "존재하지 않는 엔드포인트입니다.");
     response.setContentType("application/json; charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-    response.getWriter().write("{\"message\": \"존재하지 않는 엔드포인트입니다.\"}");
+    response.getWriter().write(om.writeValueAsString(body));
     response.getWriter().flush();
     response.getWriter().close();
   }
 
   private void response405(HttpServletResponse response) throws IOException {
+      Map<String, String> body = Map.of("message", "이 엔드포인트는 해당 메소드를 지원하지 않습니다.");
     response.setContentType("application/json; charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-    response.getWriter().write("{\"message\": \"이 엔드포인트는 해당 메소드를 지원하지 않습니다.\"}");
+    response.getWriter().write(om.writeValueAsString(body));
     response.getWriter().flush();
     response.getWriter().close();
   }
