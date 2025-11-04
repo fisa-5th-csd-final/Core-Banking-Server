@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +19,7 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
-import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
-import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
-import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
-import com.fisa.bank.loan.application.dto.response.PagedResponse;
+import com.fisa.bank.loan.application.dto.response.*;
 import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
@@ -319,5 +317,26 @@ public class LoanService {
         0, // currentTerm은 실제로 사용되지 않음
         loanLedger.getNextRepaymentDate(),
         loanLedger.getLoanEndDate());
+  @Transactional
+  public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
+    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
+
+    System.out.println("allLoanLedgers = " + allLoanLedgers);
+
+    List<LoanLedgerResponse> loanLedgerResponses =
+        allLoanLedgers.stream().map((loanLedger) -> LoanLedgerResponse.from(loanLedger)).toList();
+    return loanLedgerResponses;
+  }
+
+  @Transactional
+  public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
+    // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
+    // TODO: 월 상환액, 상환 계좌 추가해야 됨.
+    LoanLedger loanLedger =
+        loanLedgerRepository
+            .findById(LoanLedgerId.of(loanLedgerId))
+            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+
+    return LoanLedgerDetailResponse.from(loanLedger);
   }
 }

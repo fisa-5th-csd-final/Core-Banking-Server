@@ -1,5 +1,8 @@
 package com.fisa.bank.common.config.security.resource;
 
+import static com.fisa.bank.common.config.security.jwt.JwtConst.ACCESS_TOKEN;
+import static com.fisa.bank.common.config.security.jwt.JwtConst.REFRESH_TOKEN;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -74,7 +77,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
   private String createBody(String accessToken, String refreshToken) {
     try {
       return objectMapper.writeValueAsString(
-          Map.of("access_token", accessToken, "refresh_token", refreshToken));
+          Map.of(ACCESS_TOKEN, accessToken, REFRESH_TOKEN, refreshToken));
     } catch (JsonProcessingException e) {
       throw new IllegalStateException("Exception occur in json processing");
     }
