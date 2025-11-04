@@ -102,11 +102,11 @@ public class SecurityFilterChainConfig {
                         HttpMethod.GET,
                         "/api/loans/products",
                         "/api/loans/{loanProductId}",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-resources/**",
-                        "/api/loans/products/**",
-                        "/api/interests/**")
+                        "/api/interests/{loanProductId}",
+                        "/swagger-ui/index.html", // TODO: Swagger 전용 필터체인으로 분리
+                        "/v3/api-docs", // TODO: Swagger 전용 필터체인으로 분리
+                        "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
+                        )
                     .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
                     .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId}"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
@@ -130,8 +130,22 @@ public class SecurityFilterChainConfig {
     http.securityMatchers(
             matcher ->
                 matcher
-                    .requestMatchers(HttpMethod.POST, "/api/loans/**")
-                    .requestMatchers(HttpMethod.GET, "/api/users/me"))
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/loans/{loanProductId}",
+                        "/api/loans/{loanLedgerId}/repayment",
+                        "/api/accounts",
+                        "/api/accounts/{accountNumber}/deposit",
+                        "/api/accounts/{accountNumber}/pay",
+                        "/api/accounts/{accountNumber}/withdraw",
+                        "/api/accounts/transfer")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/users/me",
+                        "/api/accounts/{accountNumber}",
+                        "/api/accounts",
+                        "/api/accounts/{accountNumber}/transactions")
+                    .requestMatchers(HttpMethod.DELETE, "/api/accounts/{accountNumber}"))
         .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
