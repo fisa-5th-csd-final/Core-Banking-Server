@@ -99,6 +99,10 @@ public class LoanLedger {
   @Column(nullable = false)
   private int term;
 
+  public void pay(BigDecimal amount) {
+    this.remainPrincipal = this.remainPrincipal.subtract(amount);
+  }
+
   public void addLoanTransactionList(LoanTransaction loanTransaction) {
     loanTransactionList.add(loanTransaction);
     loanTransaction.setLoanLedger(this);

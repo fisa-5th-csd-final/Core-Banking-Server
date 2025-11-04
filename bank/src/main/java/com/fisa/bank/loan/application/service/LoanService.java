@@ -227,7 +227,6 @@ public class LoanService {
     // 대출 이력성 테이블에 저장 LoanTransaction
     LoanTransaction loanTransaction =
         LoanTransaction.builder()
-            .date(startDate)
             .remainPrincipal(remainPrincipal)
             .amount(remainPrincipal)
             .transactionType(TransactionType.LOAN)
@@ -286,10 +285,6 @@ public class LoanService {
       throw new InSufficientBalanceAmountException();
     }
 
-    // 2. 원금 균등
-
-    // 3. 만기 일시 - 만기일
-
     // 납입 금액 vs 이번 달 상환금 -> 상환가능한지 체크
     // 이번 달 상환 금액보다 request.getAmount가 더 작다면 예외 발생시키기
     System.out.println(monthlyRepayment.getMonthlyPayment());
@@ -300,15 +295,81 @@ public class LoanService {
           request.getAmount(), monthlyRepayment.getMonthlyPayment());
     }
 
-    // TODO: 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
+    loanLedger.pay(monthlyRepayment.getMonthlyPayment()); // 상환 처리
+
+    // 이력 테이블 생성
+    if (loanLedger.getRepaymentType() == RepaymentType.EQUAL_INSTALLMENT) { // 원리금 균등 상환일 경우 처리
+      LoanTransaction loanTransaction =
+          LoanTransaction.builder()
+              .transactionType(TransactionType.REPAYMENT)
+              .amount(monthlyRepayment.getMonthlyPayment())
+              .remainPrincipal(loanLedger.getRemainPrincipal())
+              .repaymentPrincipalAmount(monthlyRepayment.getPrincipalPayment())
+              .repaymentInterestAmount(monthlyRepayment.getInterestPayment())
+              .loanLedger(loanLedger)
+              .build();
+
+      loanTransactionRepository.save(loanTransaction);
+    }
+
+    // TODO: 상태에 따라서, 알고리즘이 바뀌어야 하는 경우는, 전략 패턴을 적용해보면 좋을 듯
+    // 2. 원금 균등
+
+    // 3. 만기 일시 - 만기일
+
   }
 
   public void cancelLoan(Long loanLedgerId) {
     UserId userId = requesterInfo.getUserId();
 
-    LoanLedger ledger =
+    LoanLedger loanLedger =
         loanLedgerRepository
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+
+    MonthlyRepayment monthlyRepayment = new MonthlyRepayment();
+    // 이번 달 상환 금액 -> 상환 타입별로 달라짐.
+    // 1. 원리금 균등
+    if (loanLedger.getRepaymentType() == RepaymentType.EQUAL_INSTALLMENT) {
+      monthlyRepayment =
+          EqualInstallmentCalculator.calculateEqualInstallment(
+              loanLedger.getPrincipal(),
+              loanLedger.getRemainPrincipal(),
+              loanLedger.getCompletedInterest(),
+              loanLedger.getTerm() * 12, // 연 -> 개월로 변경
+              loanLedger.getNextRepaymentDate(),
+              loanLedger.getLoanEndDate());
+    }
+
+    BigDecimal earlyPaidRate =
+        EarlyRepayInterestRate.getEarlyRepayInterestRate(
+            loanLedger.getLoanProduct().getType(), loanLedger.getInterestType());
+    BigDecimal earlyPaidCost = loanLedger.getRemainPrincipal().multiply(earlyPaidRate);
+
+    BigDecimal paidTotalAmount = monthlyRepayment.getMonthlyPayment().add(earlyPaidCost);
+
+    Account account = loanLedger.getAccount();
+
+    if (account.getBalance().compareTo(earlyPaidCost.add(monthlyRepayment.getMonthlyPayment()))
+        < 0) {
+      throw new InSufficientBalanceAmountException();
+    }
+
+    BigDecimal afterBalance = account.getBalance().subtract(paidTotalAmount);
+
+    loanLedger.pay(paidTotalAmount); // 상환
+    account.updateBalance(afterBalance); // 잔액 변경
+
+    LoanTransaction loanTransaction =
+        LoanTransaction.builder() // 이력 테이블 추가
+            .transactionType(TransactionType.REPAYMENT)
+            .amount(monthlyRepayment.getMonthlyPayment())
+            .remainPrincipal(BigDecimal.ZERO)
+            .repaymentPrincipalAmount(monthlyRepayment.getPrincipalPayment().add(earlyPaidCost))
+            .repaymentInterestAmount(monthlyRepayment.getInterestPayment())
+            .loanLedger(loanLedger)
+            .build();
+
+    loanTransactionRepository.save(loanTransaction);
   }
 }
