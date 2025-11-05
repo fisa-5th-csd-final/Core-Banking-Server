@@ -11,17 +11,20 @@ public class MonthlyRepayment {
   private BigDecimal principalPayment;
   private BigDecimal interestPayment;
   private BigDecimal monthlyPayment;
+  private BigDecimal remainPrincipal;
 
   public MonthlyRepayment(
       int term,
       BigDecimal principalPayment,
       BigDecimal interestPayment,
-      BigDecimal monthlyPayment) {
+      BigDecimal monthlyPayment,
+      BigDecimal remainPrincipal) {
     this.term = term;
     //        this.remainingTerm = term;
     this.principalPayment = principalPayment;
     this.interestPayment = interestPayment;
     this.monthlyPayment = monthlyPayment;
+    this.remainPrincipal = remainPrincipal;
   }
 
   public MonthlyRepayment() {}
