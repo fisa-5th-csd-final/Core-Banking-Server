@@ -46,11 +46,12 @@ public class EqualPrincipalCalculator implements LoanCalculator {
     // 첫 상환일에 원금을 가장 많이 내도록 조정
     BigDecimal monthlyPrincipal =
         principal.divide(BigDecimal.valueOf(totalTermInMonths), 0, RoundingMode.DOWN);
-    if (currentTerm == 1) {
+    boolean isFirstRepayment = remainPrincipal.compareTo(principal) == 0;
+
+    if (isFirstRepayment) {
       principalPayment =
           remainPrincipal.subtract(
               monthlyPrincipal.multiply(BigDecimal.valueOf(totalTermInMonths - 1)));
-      currentTerm++;
     } else {
       // 2회차 이후는 기존 균등 원금 상환
       principalPayment = monthlyPrincipal;
