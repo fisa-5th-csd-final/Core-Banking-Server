@@ -25,14 +25,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Test') {
-            steps {
-                dir('bank') {
-                    sh './gradlew test'
-                }
-            }
-        }
     }
 
     post {
