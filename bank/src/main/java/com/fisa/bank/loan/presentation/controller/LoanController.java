@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
@@ -26,6 +27,7 @@ import com.fisa.bank.loan.persistence.entity.LoanProduct;
 public class LoanController {
 
   private final LoanService loanService;
+  private final RequesterInfo requesterInfo;
 
   // 은행
   @PostMapping
@@ -81,10 +83,9 @@ public class LoanController {
     loanService.repayMonthlyLoan(loanLedgerId, request);
   }
 
-  @GetMapping
+  @GetMapping("/ledgers/{userId}")
   public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers(
-      @RequestBody Long userId) {
-
+      @PathVariable Long userId) {
     List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedger(userId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, myLoanLedger);

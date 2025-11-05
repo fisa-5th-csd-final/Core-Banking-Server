@@ -6,12 +6,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.common.presentation.util.SpringRequesterInfo;
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.service.InterestService;
@@ -45,9 +47,9 @@ public class LoanService {
   private final InterestService interestService;
   private final PreferInterestRepository preferInterestRepository;
   private final UserRepository userRepository;
-  private final SpringRequesterInfo springRequesterInfo;
   private final LoanLedgerRepository loanLedgerRepository;
   private final LoanTransactionRepository loanTransactionRepository;
+  private final RequesterInfo requesterInfo = new SpringRequesterInfo();
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -117,7 +119,7 @@ public class LoanService {
   public LoanApplyforResponse applyForLoan(LoanApplyForRequest request, Long loanProductId) {
 
     // 유저 정보 추출
-    UserId userId = springRequesterInfo.getUserId();
+    UserId userId = requesterInfo.getUserId();
     User user = userRepository.getReferenceById(userId);
     if (loanLedgerRepository.existsByUser_UserIdAndLoanProduct_LoanProductId(
         userId, LoanProductId.of(loanProductId))) {
@@ -278,6 +280,7 @@ public class LoanService {
             .lastRepaymentDate(lastRepaymentDate)
             .nextRepaymentDate(nextRepaymentDate)
             .build());
+
     // 거래 테이블에도 저장
     LoanTransaction loanTransaction =
         LoanTransaction.builder()
@@ -317,18 +320,23 @@ public class LoanService {
         0, // currentTerm은 실제로 사용되지 않음
         loanLedger.getNextRepaymentDate(),
         loanLedger.getLoanEndDate());
-  @Transactional
+    
+  @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
-    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
-    System.out.println("allLoanLedgers = " + allLoanLedgers);
+    Long userIdLogin = requesterInfo.getUserId().getValue();
+    if (!Objects.equals(userIdLogin, userId)) {
+      throw new LoanLedgerAccessDeniedException();
+    }
+
+    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
     List<LoanLedgerResponse> loanLedgerResponses =
         allLoanLedgers.stream().map((loanLedger) -> LoanLedgerResponse.from(loanLedger)).toList();
     return loanLedgerResponses;
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
     // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
     // TODO: 월 상환액, 상환 계좌 추가해야 됨.
@@ -336,7 +344,13 @@ public class LoanService {
         loanLedgerRepository
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+    UserId userIdOfLoanLedger = loanLedger.getUser().getUserId();
 
+    UserId userId = requesterInfo.getUserId();
+    // 대출한 유저의 id와 로그인한 유저의 id 비교
+    if (!userIdOfLoanLedger.equals(userId)) {
+      throw new LoanLedgerAccessDeniedException();
+    }
     return LoanLedgerDetailResponse.from(loanLedger);
   }
 }
