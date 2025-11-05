@@ -320,7 +320,8 @@ public class LoanService {
         0, // currentTerm은 실제로 사용되지 않음
         loanLedger.getNextRepaymentDate(),
         loanLedger.getLoanEndDate());
-    
+  }
+
   @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
 
