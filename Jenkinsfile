@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Checking out source code..."
-                sh 'chmod +x ./gradlew'
+                sh 'chmod +x bank/gradlew'
                 checkout scm
             }
         }
