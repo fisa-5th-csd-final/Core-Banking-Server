@@ -295,6 +295,7 @@ public class LoanService {
             .lastRepaymentDate(lastRepaymentDate)
             .nextRepaymentDate(nextRepaymentDate)
             .build());
+
     // 거래 테이블에도 저장
     LoanTransaction loanTransaction =
         LoanTransaction.builder()
@@ -311,9 +312,13 @@ public class LoanService {
 
   @Transactional
   public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
-    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
-    System.out.println("allLoanLedgers = " + allLoanLedgers);
+    Long userIdLogined = springRequesterInfo.getUserId().getValue();
+    if (userIdLogined != userId) {
+      throw new LoanLedgerAccessDeniedException();
+    }
+
+    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
     List<LoanLedgerResponse> loanLedgerResponses =
         allLoanLedgers.stream().map((loanLedger) -> LoanLedgerResponse.from(loanLedger)).toList();
@@ -328,7 +333,13 @@ public class LoanService {
         loanLedgerRepository
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+    UserId userIdOfLoanLedger = loanLedger.getUser().getUserId();
 
+    UserId userId = springRequesterInfo.getUserId();
+    // 대출한 유저의 id와 로그인한 유저의 id 비교
+    if (!userIdOfLoanLedger.equals(userId)) {
+      throw new LoanLedgerAccessDeniedException();
+    }
     return LoanLedgerDetailResponse.from(loanLedger);
   }
 }

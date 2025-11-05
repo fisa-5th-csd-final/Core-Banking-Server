@@ -146,7 +146,8 @@ public class SecurityFilterChainConfig {
                         "/api/accounts",
                         "/api/accounts/{accountNumber}/transactions",
                         "/api/loans",
-                        "/api/loans/ledger/{loanLedgerId}")
+                        "/api/loans/ledger/{loanLedgerId}",
+                        "/api/loans/ledgers/{userId}")
                     .requestMatchers(HttpMethod.DELETE, "/api/accounts/{accountNumber}"))
         .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
