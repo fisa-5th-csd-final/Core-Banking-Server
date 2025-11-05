@@ -317,7 +317,7 @@ public class LoanService {
         loanLedger.getRemainPrincipal(),
         loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
         loanLedger.getTerm() * 12, // 연 -> 개월로 변경
-        0, // currentTerm은 실제로 사용되지 않음
+        1, // currentTerm은 실제로 사용되지 않음
         loanLedger.getNextRepaymentDate(),
         loanLedger.getLoanEndDate());
   }
