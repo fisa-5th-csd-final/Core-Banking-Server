@@ -31,7 +31,7 @@ public class BulletCalculator implements LoanCalculator {
         remainPrincipal
             .multiply(annualInterestRate)
             .multiply(BigDecimal.valueOf(daysInMonth))
-            .divide(BigDecimal.valueOf(365), 2, RoundingMode.HALF_DOWN);
+            .divide(BigDecimal.valueOf(nextRepaymentDate.toLocalDate().lengthOfYear()), 2, RoundingMode.HALF_DOWN);
 
     BigDecimal principalPayment = BigDecimal.ZERO;
 
