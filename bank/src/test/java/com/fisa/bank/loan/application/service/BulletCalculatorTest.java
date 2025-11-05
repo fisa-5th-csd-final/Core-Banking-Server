@@ -54,7 +54,7 @@ public class BulletCalculatorTest {
           repayment.getPrincipalPayment(),
           repayment.getMonthlyPayment());
 
-      remainPrincipal = remainPrincipal.subtract(repayment.getPrincipalPayment());
+      remainPrincipal = repayment.getRemainPrincipal();
       nextRepaymentDate = nextRepaymentDate.plusMonths(1);
 
       if (month == totalTerm) {
