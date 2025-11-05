@@ -29,6 +29,7 @@ public class EqualInstallmentCalculator {
       Integer term,
       LocalDateTime nextRepaymentDate,
       LocalDateTime loanEndDate) {
+
     // 월 금리 계산
     BigDecimal monthlyRate =
         completedInterest.divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_DOWN);
@@ -51,6 +52,11 @@ public class EqualInstallmentCalculator {
       principalPayment = remainPrincipal.setScale(0, RoundingMode.UP);
       monthlyPayment = principalPayment.add(interestPayment);
     }
-    return new MonthlyRepayment(term, principalPayment, interestPayment, monthlyPayment);
+    return new MonthlyRepayment(
+        term,
+        principalPayment,
+        interestPayment,
+        monthlyPayment,
+        remainPrincipal.subtract(principalPayment));
   }
 }
