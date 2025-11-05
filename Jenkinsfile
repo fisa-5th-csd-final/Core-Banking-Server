@@ -38,6 +38,24 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube Analysis') {
+                    environment {
+                        SONAR_SCANNER_HOME = tool 'SonarScanner'
+                    }
+                    steps {
+                        withSonarQubeEnv('SonarQube') {
+                            dir('bank') {
+                                sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                                    -Dsonar.projectKey=core-banking \
+                                    -Dsonar.projectName='Core Banking System' \
+                                    -Dsonar.sources=src/main/java \
+                                    -Dsonar.java.binaries=build/classes/java/main \
+                                    -Dsonar.sourceEncoding=UTF-8"
+                            }
+                        }
+                    }
+                }
     }
 
     post {
