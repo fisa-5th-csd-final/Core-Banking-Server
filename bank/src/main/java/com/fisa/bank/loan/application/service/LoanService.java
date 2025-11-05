@@ -309,7 +309,7 @@ public class LoanService {
     LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
     List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
