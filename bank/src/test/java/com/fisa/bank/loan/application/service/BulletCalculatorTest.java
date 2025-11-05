@@ -15,7 +15,7 @@ public class BulletCalculatorTest {
   @DisplayName("만기일시상환 계산기 - 월별 이자 및 만기 원금 상환 출력 + 검증")
   void printAndAssertBulletLoanRepayments() {
     // given
-    BulletCalculator calculator = new BulletCalculator();
+    BulletCalculator calculator = BulletCalculator.getInstance();
 
     BigDecimal principal = BigDecimal.valueOf(1_000_000); // 원금
     BigDecimal annualRate = BigDecimal.valueOf(0.05); // 연이율 5%

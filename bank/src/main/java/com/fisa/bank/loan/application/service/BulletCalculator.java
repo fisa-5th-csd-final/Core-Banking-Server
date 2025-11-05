@@ -9,6 +9,15 @@ import java.time.YearMonth;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 
 public class BulletCalculator implements LoanCalculator {
+
+  private static final BulletCalculator INSTANCE = new BulletCalculator();
+
+  private BulletCalculator() {}
+
+  public static BulletCalculator getInstance() {
+    return INSTANCE;
+  }
+
   @Override
   public MonthlyRepayment calculate(
       BigDecimal principal,
@@ -31,7 +40,10 @@ public class BulletCalculator implements LoanCalculator {
         remainPrincipal
             .multiply(annualInterestRate)
             .multiply(BigDecimal.valueOf(daysInMonth))
-            .divide(BigDecimal.valueOf(nextRepaymentDate.toLocalDate().lengthOfYear()), 2, RoundingMode.HALF_DOWN);
+            .divide(
+                BigDecimal.valueOf(nextRepaymentDate.toLocalDate().lengthOfYear()),
+                2,
+                RoundingMode.HALF_DOWN);
 
     BigDecimal principalPayment = BigDecimal.ZERO;
 
