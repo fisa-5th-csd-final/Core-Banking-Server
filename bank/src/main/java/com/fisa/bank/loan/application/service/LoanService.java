@@ -310,7 +310,7 @@ public class LoanService {
     LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
 
     Long userIdLogined = springRequesterInfo.getUserId().getValue();
@@ -325,7 +325,7 @@ public class LoanService {
     return loanLedgerResponses;
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
     // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
     // TODO: 월 상환액, 상환 계좌 추가해야 됨.
