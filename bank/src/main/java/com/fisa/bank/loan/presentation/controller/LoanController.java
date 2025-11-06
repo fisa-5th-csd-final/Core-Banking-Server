@@ -3,6 +3,8 @@ package com.fisa.bank.loan.presentation.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,8 @@ import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
+import com.fisa.bank.loan.application.dto.response.LoanLedgerDetailResponse;
+import com.fisa.bank.loan.application.dto.response.LoanLedgerResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
 import com.fisa.bank.loan.application.dto.response.PagedResponse;
