@@ -1,0 +1,129 @@
+package com.fisa.bank.common.config.security.mock;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.common.config.security.resource.JwtAuthenticationConverter;
+import com.fisa.bank.common.config.security.resource.LoginFailureHandler;
+import com.fisa.bank.common.config.security.resource.LoginSuccessHandler;
+import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
+import com.fisa.bank.user.persistence.repository.UserAuthRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationConverter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+@Profile({"test"})
+@Configuration
+@RequiredArgsConstructor
+public class TestAuthorizationConfig {
+
+    // Spring Security 의 AuthenticationManger 등록
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean("TestLoginAuthenticationFilter")
+    public AuthenticationFilter testLoginFilter(
+        AuthenticationManager authenticationManager,
+        @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
+        @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
+        @Qualifier("TestUsernamePasswordConverter") AuthenticationConverter authenticationConverter
+    ){
+        AuthenticationFilter authenticationFilter = new TestLoginAuthenticationFilter(authenticationManager, authenticationConverter);
+
+        RequestMatcher requestMatcher =
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login/{userId}");
+
+        authenticationFilter.setRequestMatcher(requestMatcher);
+        authenticationFilter.setFailureHandler(failureHandler);
+        authenticationFilter.setSuccessHandler(successHandler);
+
+        return authenticationFilter;
+    }
+
+    @Bean("TestJwtAuthenticationFilter")
+    public AuthenticationFilter testJwtFilter(
+            @Qualifier("UsernamePasswordAuthenticationProvider") AuthenticationProvider authenticationProvider,
+            @Qualifier("TestAuthenticationConverter") AuthenticationConverter authenticationConverter
+    ){
+        AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
+        AuthenticationFilter authenticationFilter = new TestJwtAuthenticationFilter(authenticationManager, authenticationConverter);
+
+        RequestMatcher requestMatcher =
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/**");
+
+        authenticationFilter.setRequestMatcher(requestMatcher);
+
+        return authenticationFilter;
+    }
+
+    @Bean("UsernamePasswordAuthenticationProvider")
+    public AuthenticationProvider usernameProvider(){
+        return new TestUsernamePasswordAuthenticationProvider();
+    }
+
+    @Bean("LoginFailureHandler")
+    public AuthenticationFailureHandler loginFailureHandler(ObjectMapper om){
+        return new LoginFailureHandler(om);
+    }
+
+    @Bean("LoginSuccessHandler")
+    public AuthenticationSuccessHandler loginSuccessHandler(
+            ObjectMapper objectMapper,
+            UserJwtGenerator jwtGenerator
+    ){
+        return new TestLoginSuccessHandler(jwtGenerator, objectMapper);
+    }
+
+    @Bean("TestAuthenticationConverter")
+    public AuthenticationConverter authenticationConverter(){
+        return new JwtAuthenticationConverter();
+    }
+
+    @Bean("PasswordEncoder")
+    public PasswordEncoder passwordEncoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean("UserDetailsService")
+    public UserDetailsService userDetailsService(){
+        return new TestUserDetailsService();
+    }
+
+    /** 로그인 전용 필터 서블릿 필터에서 제외 */
+    @Bean
+    public FilterRegistrationBean<AuthenticationFilter> loginFilterRegistrationBean(
+            @Qualifier("TestLoginAuthenticationFilter") AuthenticationFilter authenticationFilter) {
+        FilterRegistrationBean<AuthenticationFilter> registrationBean =
+                new FilterRegistrationBean<>(authenticationFilter);
+        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<UnknownEndPointFilter> unknownFilterRegistrationBean(
+            UnknownEndPointFilter unknownEndPointFilter) {
+        FilterRegistrationBean<UnknownEndPointFilter> registrationBean =
+                new FilterRegistrationBean<>(unknownEndPointFilter);
+        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+        return registrationBean;
+    }
+
+}
