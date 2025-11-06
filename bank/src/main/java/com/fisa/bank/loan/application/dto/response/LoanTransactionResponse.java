@@ -28,7 +28,9 @@ public class LoanTransactionResponse {
         entity.getDate(),
         entity.getTransactionType(),
         entity.getAmount(),
-        entity.getRemainPrincipal());
+        entity.getRemainPrincipal(),
+        entity.getRepaymentInterestAmount(),
+        entity.getRepaymentPrincipalAmount());
   }
 
   public LoanTransactionResponse(
@@ -36,11 +38,15 @@ public class LoanTransactionResponse {
       LocalDateTime date,
       TransactionType transactionType,
       BigDecimal amount,
-      BigDecimal remainPrincipal) {
+      BigDecimal remainPrincipal,
+      BigDecimal repaymentInterestAmount,
+      BigDecimal repaymentPrincipalAmount) {
     this.trxLId = trxLId;
     this.date = date;
     this.transactionType = transactionType;
     this.amount = amount;
     this.remainPrincipal = remainPrincipal;
+    this.repaymentInterestAmount = repaymentInterestAmount;
+    this.repaymentPrincipalAmount = repaymentPrincipalAmount;
   }
 }
