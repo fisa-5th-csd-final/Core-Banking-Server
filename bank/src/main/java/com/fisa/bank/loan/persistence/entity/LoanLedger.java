@@ -40,6 +40,7 @@ public class LoanLedger extends BaseEntity {
 
   // LoanLedger 1 : N LoanTransaction
   @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @Builder.Default
   private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -91,7 +92,7 @@ public class LoanLedger extends BaseEntity {
   @Column(nullable = false)
   private LocalDateTime loanEndDate;
 
-  @OneToOne(fetch = FetchType.EAGER, mappedBy = "account_id")
+  @OneToOne(fetch = FetchType.EAGER)
   private Account account;
 
   // 연체 일수

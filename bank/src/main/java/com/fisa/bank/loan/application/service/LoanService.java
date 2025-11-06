@@ -1,5 +1,9 @@
 package com.fisa.bank.loan.application.service;
 
+import com.fisa.bank.account.application.exception.AccountNotFoundException;
+import com.fisa.bank.account.persistence.entity.Account;
+import com.fisa.bank.loan.application.model.EarlyRepayment;
+import com.fisa.bank.loan.application.util.LoanTransactionFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -13,8 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fisa.bank.account.application.exception.AccountNotFoundException;
-import com.fisa.bank.account.persistence.entity.Account;
+
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
@@ -25,11 +28,9 @@ import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.*;
 import com.fisa.bank.loan.application.exception.*;
-import com.fisa.bank.loan.application.model.EarlyRepayment;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
-import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
-import com.fisa.bank.loan.application.util.LoanTransactionFactory;
+import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.persistence.entity.*;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
@@ -272,6 +273,17 @@ public class LoanService {
       throw new InsufficientRepaymentException(
           request.getAmount(), monthlyRepayment.getMonthlyPayment());
     }
+
+      Account account = loanLedger.getAccount();
+
+      if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment())
+              < 0) {
+          throw new InSufficientBalanceAmountException();
+      }
+
+      BigDecimal afterBalance = account.getBalance().subtract(monthlyRepayment.getMonthlyPayment());
+
+      account.updateBalance(afterBalance); // 잔액 변경
 
     // 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
     // 원장 테이블 업데이트
