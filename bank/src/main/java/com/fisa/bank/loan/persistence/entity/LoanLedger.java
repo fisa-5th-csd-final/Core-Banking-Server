@@ -91,6 +91,7 @@ public class LoanLedger extends BaseEntity {
   private LocalDateTime loanEndDate;
 
   @OneToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "account_id")
   private Account account;
 
   // 연체 일수

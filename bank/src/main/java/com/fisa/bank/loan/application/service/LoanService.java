@@ -322,6 +322,13 @@ public class LoanService {
         loanLedgerRepository
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+
+    UserId userIdOfLedger = loanLedger.getUser().getUserId();
+      Account account = loanLedger.getAccount();
+
+      // 내 대출인지 확인
+      if(!userIdOfLedger.equals(userId)) throw new LoanLedgerAccessDeniedException();
+
     // 수수료율
     BigDecimal earlyPaidRate =
         EarlyRepayInterestRate.getEarlyRepayInterestRate(
@@ -329,8 +336,6 @@ public class LoanService {
 
     // 중도 상환 금액 계산
     EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, today, earlyPaidRate);
-
-    Account account = loanLedger.getAccount();
 
     if (account.getBalance().compareTo(earlyRepayment.getMustPaidAmount()) < 0) {
       throw new InSufficientBalanceAmountException();
@@ -348,8 +353,10 @@ public class LoanService {
 
     account.updateBalance(afterBalance); // 잔액 변경
 
-    LoanTransaction loanTransaction =
-        LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
+    LoanTransaction loanTransaction = LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
+
+    loanLedger.addLoanTransactionList(loanTransaction);
+    loanTransaction.setLoanLedger(loanLedger);
 
     loanTransactionRepository.save(loanTransaction);
   }

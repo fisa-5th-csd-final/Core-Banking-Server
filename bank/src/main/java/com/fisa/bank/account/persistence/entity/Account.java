@@ -10,6 +10,7 @@
  */
 package com.fisa.bank.account.persistence.entity;
 
+import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -48,6 +49,9 @@ public class Account extends BaseEntity {
 
   @Column(nullable = false, length = 3)
   private String bankCode;
+
+  @OneToOne(fetch = FetchType.EAGER, mappedBy = "account")
+  private LoanLedger loanLedger;
 
   public static Account create(String accountNumber, User user, String bankCode) {
     return Account.builder()
