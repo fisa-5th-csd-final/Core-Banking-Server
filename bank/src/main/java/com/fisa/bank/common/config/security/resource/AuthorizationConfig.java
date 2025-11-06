@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationConverter;
@@ -82,6 +83,11 @@ public class AuthorizationConfig {
         new FilterRegistrationBean<>(authenticationFilter);
     registrationBean.setEnabled(false); // 서블릿 필터에서 제거
     return registrationBean;
+  }
+
+  @Bean("UserDetailsService")
+  public UserDetailsService userDetailsService(UserAuthRepository userAuthRepository){
+      return new CustomUserDetailsService(userAuthRepository);
   }
 
     @Bean("BcryptPasswordEncoder")

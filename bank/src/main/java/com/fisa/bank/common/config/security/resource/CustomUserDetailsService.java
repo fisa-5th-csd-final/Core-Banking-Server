@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import com.fisa.bank.user.persistence.entity.UserAuth;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 
-@Component
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
