@@ -264,29 +264,9 @@ public class LoanService {
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
 
-    Account account = loanLedger.getAccount();
-
-    // TODO: 상환 방법에 따른 월 상환액 계산
-    MonthlyRepayment monthlyRepayment = new MonthlyRepayment();
-    // 이번 달 상환 금액 -> 상환 타입별로 달라짐.
-    // 1. 원리금 균등
-    if (loanLedger.getRepaymentType() == RepaymentType.EQUAL_INSTALLMENT) {
-      monthlyRepayment =
-          EqualInstallmentCalculator.calculateEqualInstallment(
-              loanLedger.getPrincipal(),
-              loanLedger.getRemainPrincipal(),
-              loanLedger
-                  .getCompletedInterest()
-                  .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
-              loanLedger.getTerm() * 12, // 연 -> 개월로 변경
-              loanLedger.getNextRepaymentDate(),
-              loanLedger.getLoanEndDate());
-    }
-
-    // 계좌 잔액과 납입해야 하는 금액 비교
-    if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
-      throw new InSufficientBalanceAmountException();
-    }
+    // 상환 방법에 따른 월 상환액 계산
+    LoanCalculator calculator = getCalculator(loanLedger.getRepaymentType());
+    MonthlyRepayment monthlyRepayment = calculateMonthlyRepayment(loanLedger, calculator);
 
     // 납입 금액 vs 이번 달 상환금 -> 상환가능한지 체크
     // 이번 달 상환 금액보다 request.getAmount가 더 작다면 예외 발생시키기
@@ -298,10 +278,12 @@ public class LoanService {
           request.getAmount(), monthlyRepayment.getMonthlyPayment());
     }
 
-    // 상환, 원장 테이블 업데이트
-      // 남은 원금
-      // 다음 상환일
-      // 마지막 상환 날짜와 다음 상환 날짜 업데이트
+    // 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
+    // 원장 테이블 업데이트
+    // 남은 원금
+    // 다음 상환일
+    // 마지막 상환 날짜와 다음 상환 날짜 업데이트
+    
     LocalDateTime lastRepaymentDate = loanLedger.getNextRepaymentDate();
     LocalDateTime nextRepaymentDate = lastRepaymentDate.plusMonths(1);
     loanLedger.updateLoanLedger(
@@ -354,6 +336,33 @@ public class LoanService {
   public void cancelLoan(Long loanLedgerId) {
     UserId userId = requesterInfo.getUserId();
 
+  }
+
+  /** 상환 타입에 따른 Calculator 반환 */
+  private LoanCalculator getCalculator(RepaymentType repaymentType) {
+    switch (repaymentType) {
+      case EQUAL_INSTALLMENT:
+        return EqualInstallmentCalculator.getInstance();
+      case EQUAL_PRINCIPAL:
+        return EqualPrincipalCalculator.getInstance();
+      case BULLET:
+        // TODO: BulletCalculator 구현 필요
+      default:
+        throw new IllegalArgumentException("지원하지 않는 상환 타입입니다: " + repaymentType);
+    }
+  }
+
+  /** 월별 상환액 계산 (공통 파라미터 추출) */
+  private MonthlyRepayment calculateMonthlyRepayment(
+      LoanLedger loanLedger, LoanCalculator calculator) {
+    return calculator.calculate(
+        loanLedger.getPrincipal(),
+        loanLedger.getRemainPrincipal(),
+        loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
+        loanLedger.getTerm() * 12, // 연 -> 개월로 변경
+        0, // currentTerm은 실제로 사용되지 않음
+        loanLedger.getNextRepaymentDate(),
+        loanLedger.getLoanEndDate());
   }
 
   @Transactional(readOnly = true)
