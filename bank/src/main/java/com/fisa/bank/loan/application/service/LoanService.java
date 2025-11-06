@@ -244,20 +244,6 @@ public class LoanService {
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
 
-    switch (loanLedger.getRepaymentType()) {
-      case EQUAL_INSTALLMENT:
-        calculatorService.setLoanCalculator(new EqualInstallmentCalculator());
-        break;
-      case EQUAL_PRINCIPAL:
-        calculatorService.setLoanCalculator(new EqualPrincipalCalculator());
-        break;
-      case BULLET:
-        calculatorService.setLoanCalculator(new BulletCalculator());
-        break;
-      default:
-        throw new UnknownCalculatorException();
-    }
-
     MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
 
     // 납입 금액이 상환금보다 작은지 확인
