@@ -31,12 +31,11 @@ public class TestSecurityFilterChainConfig {
     OAuth2AuthorizationServerConfigurer authorizationServer =
         OAuth2AuthorizationServerConfigurer.authorizationServer();
 
-    //    commonConfiguration(http); // 공통 설정
     http.formLogin(Customizer.withDefaults());
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     http.csrf(AbstractHttpConfigurer::disable);
-    // SAS 엔드포인트만 매칭
 
+    // SAS 엔드포인트만 매칭
     http.securityMatcher(authorizationServer.getEndpointsMatcher())
         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
@@ -44,7 +43,7 @@ public class TestSecurityFilterChainConfig {
     http.with(
         authorizationServer,
         as -> as.tokenGenerator(tokenGenerator).oidc(Customizer.withDefaults()));
-    // 인증 안 된 HTML 요청은 /login으로
+
     http.exceptionHandling(Customizer.withDefaults());
     http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
