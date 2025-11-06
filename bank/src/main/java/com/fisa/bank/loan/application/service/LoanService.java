@@ -27,7 +27,6 @@ import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayment;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
-import com.fisa.bank.loan.application.service.calculator.*;
 import com.fisa.bank.loan.application.service.calculator.CalculatorService;
 import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.util.LoanTransactionFactory;
@@ -255,7 +254,7 @@ public class LoanService {
     Account account = loanLedger.getAccount();
 
     if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
-      throw new InSufficientBalanceAmountException();
+      throw new InsufficientBalanceAmountException();
     }
 
     BigDecimal afterBalance = account.getBalance().subtract(monthlyRepayment.getMonthlyPayment());
@@ -311,7 +310,7 @@ public class LoanService {
     EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, today, earlyPaidRate);
 
     if (account.getBalance().compareTo(earlyRepayment.getMustPaidAmount()) < 0) {
-      throw new InSufficientBalanceAmountException();
+      throw new InsufficientBalanceAmountException();
     }
 
     BigDecimal afterBalance = account.getBalance().subtract(earlyRepayment.getMustPaidAmount());
