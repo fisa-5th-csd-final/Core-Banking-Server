@@ -42,10 +42,11 @@ public class AuthorizationConfig {
    */
   @Bean("unAuthenticatedFilter")
   public AuthenticationFilter unAuthenticated(
-      AuthenticationManager authenticationManager,
       @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
       @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
-      @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter) {
+      @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter,
+      @Qualifier("UsernamePasswordAuthenticationProvider") AuthenticationProvider authenticationProvider) {
+      AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
         new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
     RequestMatcher requestMatcher =
@@ -115,8 +116,16 @@ public class AuthorizationConfig {
       return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
   }
 
+  @Bean("UsernamePasswordAuthenticationProvider")
+  public AuthenticationProvider usernamePasswordAuthenticationProvider(
+          @Qualifier("BcryptPasswordEncoder") PasswordEncoder passwordEncoder,
+          @Qualifier("UserDetailsService") UserDetailsService userDetailsService
+  ){
+      return new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService);
+  }
+
   @Bean("JwtAuthenticationProvider")
-  public AuthenticationProvider authenticationProvider(JwtDecoder jwtDecoder){
+  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder){
       return new JwtAuthenticationProvider(jwtDecoder);
   }
 
