@@ -2,10 +2,10 @@ package com.fisa.bank.loan.presentation.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +71,7 @@ public class LoanController {
   @PostMapping("/{loanProductId}")
   public ApiResponse<SuccessBody<LoanApplyforResponse>> applyForLoan(
       @PathVariable Long loanProductId, @Valid @RequestBody LoanApplyForRequest request) {
-      log.info("대출 가입");
+    log.info("대출 가입");
     LoanApplyforResponse loanApplyforResponse = loanService.applyForLoan(request, loanProductId);
 
     return ApiResponseGenerator.success(ResponseCode.CREATE, loanApplyforResponse);
@@ -88,7 +88,7 @@ public class LoanController {
   @DeleteMapping("/{loanLedgerId}")
   public ApiResponse<SuccessBody<Void>> deleteLoanLedger(
       @PathVariable("loanLedgerId") Long loanLedgerId) {
-      log.info("대출 해지");
+    log.info("대출 해지");
     loanService.cancelLoan(loanLedgerId);
     return ApiResponseGenerator.success(ResponseCode.DELETE);
   }
@@ -96,7 +96,7 @@ public class LoanController {
   @GetMapping("/ledgers/{userId}")
   public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers(
       @PathVariable Long userId) {
-      log.info("대출 리스트 조회");
+    log.info("대출 리스트 조회");
     List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedger(userId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, myLoanLedger);
@@ -105,7 +105,7 @@ public class LoanController {
   @GetMapping("/ledger/{loanLedgerId}")
   public ApiResponse<SuccessBody<LoanLedgerDetailResponse>> getLoanLedgerDetail(
       @PathVariable Long loanLedgerId) {
-      log.info("대출 세부 정보 조회");
+    log.info("대출 세부 정보 조회");
     LoanLedgerDetailResponse loanLedgerDetail = loanService.getLoanLedgerDetail(loanLedgerId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);

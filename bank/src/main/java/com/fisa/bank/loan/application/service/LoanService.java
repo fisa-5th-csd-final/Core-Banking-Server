@@ -295,7 +295,7 @@ public class LoanService {
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
             .lastRepaymentDate(lastRepaymentDate)
             .nextRepaymentDate(nextRepaymentDate)
-                .status(loanLedger.getRepaymentStatus())
+            .status(loanLedger.getRepaymentStatus())
             .build());
 
     // 거래 테이블에도 저장
@@ -324,10 +324,10 @@ public class LoanService {
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
 
     UserId userIdOfLedger = loanLedger.getUser().getUserId();
-      Account account = loanLedger.getAccount();
+    Account account = loanLedger.getAccount();
 
-      // 내 대출인지 확인
-      if(!userIdOfLedger.equals(userId)) throw new LoanLedgerAccessDeniedException();
+    // 내 대출인지 확인
+    if (!userIdOfLedger.equals(userId)) throw new LoanLedgerAccessDeniedException();
 
     // 수수료율
     BigDecimal earlyPaidRate =
@@ -344,16 +344,17 @@ public class LoanService {
     BigDecimal afterBalance = account.getBalance().subtract(earlyRepayment.getMustPaidAmount());
 
     loanLedger.updateLoanLedger(
-            UpdateLoanLedgerParam.builder()
-                      .remainPrincipal(BigDecimal.ZERO)
-                      .lastRepaymentDate(today)
-                      .nextRepaymentDate(null)
-                    .status(RepaymentStatus.TERMINATED)
-                      .build());
+        UpdateLoanLedgerParam.builder()
+            .remainPrincipal(BigDecimal.ZERO)
+            .lastRepaymentDate(today)
+            .nextRepaymentDate(null)
+            .status(RepaymentStatus.TERMINATED)
+            .build());
 
     account.updateBalance(afterBalance); // 잔액 변경
 
-    LoanTransaction loanTransaction = LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
+    LoanTransaction loanTransaction =
+        LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
 
     loanLedger.addLoanTransactionList(loanTransaction);
     loanTransaction.setLoanLedger(loanLedger);

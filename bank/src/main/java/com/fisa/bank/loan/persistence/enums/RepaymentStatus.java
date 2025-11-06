@@ -4,6 +4,6 @@ package com.fisa.bank.loan.persistence.enums;
 public enum RepaymentStatus {
   NORMAL,
   OVERDUE,
-    TERMINATED,
-    COMPLETED;
+  TERMINATED,
+  COMPLETED;
 }

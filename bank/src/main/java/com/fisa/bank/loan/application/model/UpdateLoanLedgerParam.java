@@ -1,11 +1,12 @@
 package com.fisa.bank.loan.application.model;
 
-import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 
 @Getter
 @Builder

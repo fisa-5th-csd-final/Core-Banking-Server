@@ -10,7 +10,6 @@
  */
 package com.fisa.bank.account.persistence.entity;
 
-import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +21,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.account.persistence.entity.id.*;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.user.persistence.entity.User;
 
 @Entity
