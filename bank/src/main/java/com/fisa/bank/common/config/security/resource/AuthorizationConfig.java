@@ -1,8 +1,5 @@
 package com.fisa.bank.common.config.security.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
-import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +20,10 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 
 // OAuth2.0 Authorization Server 를 설정하는 Config
 @Profile({"local", "dev", "prod"})
@@ -45,8 +46,9 @@ public class AuthorizationConfig {
       @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
       @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
       @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter,
-      @Qualifier("UsernamePasswordAuthenticationProvider") AuthenticationProvider authenticationProvider) {
-      AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
+      @Qualifier("UsernamePasswordAuthenticationProvider")
+          AuthenticationProvider authenticationProvider) {
+    AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
         new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
     RequestMatcher requestMatcher =
@@ -88,45 +90,43 @@ public class AuthorizationConfig {
   }
 
   @Bean("UserDetailsService")
-  public UserDetailsService userDetailsService(UserAuthRepository userAuthRepository){
-      return new CustomUserDetailsService(userAuthRepository);
+  public UserDetailsService userDetailsService(UserAuthRepository userAuthRepository) {
+    return new CustomUserDetailsService(userAuthRepository);
   }
 
-    @Bean("BcryptPasswordEncoder")
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean("BcryptPasswordEncoder")
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
   @Bean("JwtAuthenticationConverter")
-  public AuthenticationConverter authenticationConverter(){
-      return new JwtAuthenticationConverter();
+  public AuthenticationConverter authenticationConverter() {
+    return new JwtAuthenticationConverter();
   }
 
   @Bean("LoginFailureHandler")
-    public AuthenticationFailureHandler loginFailureHandler(ObjectMapper om){
-      return new LoginFailureHandler(om);
+  public AuthenticationFailureHandler loginFailureHandler(ObjectMapper om) {
+    return new LoginFailureHandler(om);
   }
 
   @Bean("LoginSuccessHandler")
   public AuthenticationSuccessHandler loginSuccessHandler(
-          ObjectMapper objectMapper,
-          UserAuthRepository userAuthRepository,
-          UserJwtGenerator jwtGenerator
-  ){
-      return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
+      ObjectMapper objectMapper,
+      UserAuthRepository userAuthRepository,
+      UserJwtGenerator jwtGenerator) {
+    return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
   }
 
   @Bean("UsernamePasswordAuthenticationProvider")
   public AuthenticationProvider usernamePasswordAuthenticationProvider(
-          @Qualifier("BcryptPasswordEncoder") PasswordEncoder passwordEncoder,
-          @Qualifier("UserDetailsService") UserDetailsService userDetailsService
-  ){
-      return new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService);
+      @Qualifier("BcryptPasswordEncoder") PasswordEncoder passwordEncoder,
+      @Qualifier("UserDetailsService") UserDetailsService userDetailsService) {
+    return new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService);
   }
 
   @Bean("JwtAuthenticationProvider")
-  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder){
-      return new JwtAuthenticationProvider(jwtDecoder);
+  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder) {
+    return new JwtAuthenticationProvider(jwtDecoder);
   }
 
   /** 로그인 전용 필터 서블릿 필터에서 제외 */

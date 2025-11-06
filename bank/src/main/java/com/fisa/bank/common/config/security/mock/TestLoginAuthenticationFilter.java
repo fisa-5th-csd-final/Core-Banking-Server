@@ -4,7 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
@@ -12,9 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 
-/**
- * 테스트 환경에서 임시 토큰을 발급하기 위한 LoginAuthenticationFilter
- */
+/** 테스트 환경에서 임시 토큰을 발급하기 위한 LoginAuthenticationFilter */
 public class TestLoginAuthenticationFilter extends AuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;

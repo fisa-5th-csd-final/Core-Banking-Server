@@ -1,6 +1,7 @@
 package com.fisa.bank.common.config.security.mock;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,12 +14,13 @@ public class TestUsernamePasswordAuthenticationConverter implements Authenticati
 
   @Override
   public Authentication convert(HttpServletRequest request) {
-      try{
-          String userId = request.getRequestURI().replace("/api/login/", "");
+    try {
+      String userId = request.getRequestURI().replace("/api/login/", "");
 
-          return new UsernamePasswordAuthenticationToken(userId, "{noop}password");
+      return new UsernamePasswordAuthenticationToken(userId, "{noop}password");
     } catch (Exception e) {
-        throw new AuthenticationServiceException("Failed to create UsernamePasswordAuthentication", e);
+      throw new AuthenticationServiceException(
+          "Failed to create UsernamePasswordAuthentication", e);
     }
   }
 }
