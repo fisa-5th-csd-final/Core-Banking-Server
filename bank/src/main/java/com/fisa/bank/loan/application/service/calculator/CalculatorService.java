@@ -14,7 +14,6 @@ import com.fisa.bank.loan.persistence.enums.RepaymentType;
 
 @Service
 public class CalculatorService {
-  private LoanCalculator loanCalculator;
   private final Map<RepaymentType, LoanCalculator> calculators;
 
   public CalculatorService() {
@@ -30,7 +29,7 @@ public class CalculatorService {
     if (calculator == null) {
       throw new UnknownCalculatorException();
     }
-    return loanCalculator.calculate(
+    return calculator.calculate(
         loanLedger.getPrincipal(),
         loanLedger.getRemainPrincipal(),
         loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
