@@ -50,6 +50,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     } catch (JwtEncodingException e) {
       throw new InvalidBearerTokenException("Jwt format is invalid", e);
     } catch (Exception e) {
+        e.printStackTrace();
       throw new AuthenticationServiceException("Unexpected Exception occurred", e);
     }
   }
