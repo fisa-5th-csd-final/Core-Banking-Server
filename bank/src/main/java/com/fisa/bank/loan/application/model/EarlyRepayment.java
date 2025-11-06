@@ -1,13 +1,11 @@
 package com.fisa.bank.loan.application.model;
 
-import lombok.Getter;
-
+import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
-import com.fisa.bank.loan.persistence.entity.LoanLedger;
+import java.time.temporal.ChronoUnit;
+import lombok.Getter;
 
 /** 중도 상환할 경우, 납입 정보를 담는 객체 */
 @Getter
@@ -39,20 +37,19 @@ public class EarlyRepayment {
       LocalDateTime repaidAt,
       LocalDateTime loanEndAt) {
     ZoneId KST = ZoneId.of("Asia/Seoul");
-    long secondOfOneDay = 86400;
 
-    Instant loanStart = loanStartedAt.atZone(KST).toInstant();
-    Instant loanEnd = loanEndAt.atZone(KST).toInstant();
-    Instant repaid = repaidAt.atZone(KST).toInstant();
-
-    long totalDay = (loanEnd.getEpochSecond() - loanStart.getEpochSecond()) / secondOfOneDay;
-    long usingDay = (repaid.getEpochSecond() - loanStart.getEpochSecond()) / secondOfOneDay;
+    long totalDay = ChronoUnit.DAYS.between(loanStartedAt.toLocalDate(), loanEndAt.toLocalDate());
+    long usingDay = ChronoUnit.DAYS.between(loanStartedAt.toLocalDate(), repaidAt.toLocalDate());
     long remaining = (totalDay - usingDay);
+
+      if (totalDay <= 0) {
+          throw new IllegalArgumentException("날짜 정보를 잘못 입력하였습니다.");
+      }
 
     return remain
         .multiply(rate)
         .multiply(BigDecimal.valueOf(remaining))
-        .divide(java.math.BigDecimal.valueOf(usingDay));
+        .divide(java.math.BigDecimal.valueOf(totalDay));
   }
 
   public static EarlyRepayment create(LoanLedger loanLedger, LocalDateTime now, BigDecimal rate) {
