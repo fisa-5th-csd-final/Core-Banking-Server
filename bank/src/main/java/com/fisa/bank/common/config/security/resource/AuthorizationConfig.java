@@ -4,13 +4,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFilter;
@@ -18,7 +21,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.user.persistence.repository.UserAuthRepository;
+
 // OAuth2.0 Authorization Server 를 설정하는 Config
+@Profile({"local", "dev", "prod"})
 @Configuration
 public class AuthorizationConfig {
 
@@ -35,10 +43,13 @@ public class AuthorizationConfig {
    */
   @Bean("unAuthenticatedFilter")
   public AuthenticationFilter unAuthenticated(
-      AuthenticationManager authenticationManager,
-      AuthenticationSuccessHandler successHandler,
-      AuthenticationFailureHandler failureHandler,
-      @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter) {
+      @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
+      @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
+      @Qualifier("UsernamePasswordAuthenticationConverter")
+          AuthenticationConverter appUnAuthConverter,
+      @Qualifier("UsernamePasswordAuthenticationProvider")
+          AuthenticationProvider authenticationProvider) {
+    AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
         new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
     RequestMatcher requestMatcher =
@@ -58,8 +69,8 @@ public class AuthorizationConfig {
    */
   @Bean("authenticatedFilter")
   public AuthenticationFilter authenticated(
-      @Qualifier("AppAuthenticationProvider") AuthenticationProvider authenticationProvider,
-      @Qualifier("AppAuthenticationConverter") AuthenticationConverter authenticationConverter) {
+      @Qualifier("JwtAuthenticationProvider") AuthenticationProvider authenticationProvider,
+      @Qualifier("JwtAuthenticationConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
         new JwtAuthenticationFilter(authenticationManager, authenticationConverter);
@@ -67,11 +78,6 @@ public class AuthorizationConfig {
     authenticationFilter.setRequestMatcher(requestMatcher);
 
     return authenticationFilter;
-  }
-
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
   }
 
   /** jwt 인증필터 서블릿 필터에서 제외 */
@@ -82,6 +88,51 @@ public class AuthorizationConfig {
         new FilterRegistrationBean<>(authenticationFilter);
     registrationBean.setEnabled(false); // 서블릿 필터에서 제거
     return registrationBean;
+  }
+
+  @Bean("UserDetailsService")
+  public UserDetailsService userDetailsService(UserAuthRepository userAuthRepository) {
+    return new CustomUserDetailsService(userAuthRepository);
+  }
+
+  @Bean("BcryptPasswordEncoder")
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean("JwtAuthenticationConverter")
+  public AuthenticationConverter authenticationConverter() {
+    return new JwtAuthenticationConverter();
+  }
+
+  @Bean("LoginFailureHandler")
+  public AuthenticationFailureHandler loginFailureHandler(ObjectMapper om) {
+    return new LoginFailureHandler(om);
+  }
+
+  @Bean("LoginSuccessHandler")
+  public AuthenticationSuccessHandler loginSuccessHandler(
+      ObjectMapper objectMapper,
+      UserAuthRepository userAuthRepository,
+      UserJwtGenerator jwtGenerator) {
+    return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
+  }
+
+  @Bean("UsernamePasswordAuthenticationConverter")
+  public AuthenticationConverter usernamePasswordAuthenticationConverter(ObjectMapper om) {
+    return new UsernamePasswordAuthenticationConverter(om);
+  }
+
+  @Bean("UsernamePasswordAuthenticationProvider")
+  public AuthenticationProvider usernamePasswordAuthenticationProvider(
+      @Qualifier("BcryptPasswordEncoder") PasswordEncoder passwordEncoder,
+      @Qualifier("UserDetailsService") UserDetailsService userDetailsService) {
+    return new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService);
+  }
+
+  @Bean("JwtAuthenticationProvider")
+  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder) {
+    return new JwtAuthenticationProvider(jwtDecoder);
   }
 
   /** 로그인 전용 필터 서블릿 필터에서 제외 */

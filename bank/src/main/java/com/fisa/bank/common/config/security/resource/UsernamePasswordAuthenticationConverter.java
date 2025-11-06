@@ -10,14 +10,12 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** 사용자가 요청한 HTTP Request에서 자격 증명(ID/PW)을 꺼내서 Authentication으로 만드는 역할 */
-@Component("AppUnAuthenticationConverter")
 @RequiredArgsConstructor
 public class UsernamePasswordAuthenticationConverter implements AuthenticationConverter {
 

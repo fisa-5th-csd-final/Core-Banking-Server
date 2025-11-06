@@ -1,4 +1,4 @@
-package com.fisa.bank.common.config.security.resource;
+package com.fisa.bank.common.config.security.mock;
 
 import static com.fisa.bank.common.config.security.jwt.JwtConst.ACCESS_TOKEN;
 import static com.fisa.bank.common.config.security.jwt.JwtConst.REFRESH_TOKEN;
@@ -20,22 +20,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
-import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 
 /** 로그인 성공 핸들러 스프링 시큐리티에 의해, 사용자 인증이 성공하면 Authentication 객체를 Jwt 토큰으로 인코딩하여 ResponseBody에 담는다. */
 @Slf4j
 @RequiredArgsConstructor
-public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class TestLoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final UserJwtGenerator jwtGenerator;
   private final ObjectMapper objectMapper;
-  private final UserAuthRepository userAuthRepository;
 
   @Override
   public void onAuthenticationSuccess(
@@ -47,11 +44,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
       if (Objects.nonNull(user)) {
 
-        Long userId = getUserId(user.getUsername());
-        /*
-           TODO: jwt에 권한 정보를 담을 경우, 토큰이 탈취되면 디코딩해서 권한 정보가 노출될 수 있다.
-               따라서 보안이 중요한 서비스의 경우에는, 외부에서 어떤 권한인지 식별할 수 없도록 별도로 매핑해서 토큰을 생성해야 한다.
-        */
+        Long userId = Long.valueOf(user.getUsername());
+
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
         String accessToken = jwtGenerator.createAccessToken(userId, authorities).getTokenValue();
         String refreshToken = jwtGenerator.createRefreshToken(userId).getTokenValue();
@@ -79,13 +73,5 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     } catch (JsonProcessingException e) {
       throw new IllegalStateException("Exception occur in json processing");
     }
-  }
-
-  private Long getUserId(String loginId) {
-    return userAuthRepository
-        .findUserIdByLoginId(loginId)
-        .orElseThrow(
-            () -> new UsernameNotFoundException("username %s not found".formatted(loginId)))
-        .getValue();
   }
 }

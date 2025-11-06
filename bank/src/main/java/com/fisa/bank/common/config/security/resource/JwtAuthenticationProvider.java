@@ -2,6 +2,8 @@ package com.fisa.bank.common.config.security.resource;
 
 import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,10 +22,9 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncodingException;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
-import org.springframework.stereotype.Component;
 
 /** UserIdAuthentication의 인증을 수행하는 Provider */
-@Component("AppAuthenticationProvider")
+@Slf4j
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   private final JwtDecoder jwtDecoder;
@@ -52,6 +53,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     } catch (JwtEncodingException e) {
       throw new InvalidBearerTokenException("Jwt format is invalid", e);
     } catch (Exception e) {
+      log.error("Unexpected Exception occurred", e);
       throw new AuthenticationServiceException("Unexpected Exception occurred", e);
     }
   }

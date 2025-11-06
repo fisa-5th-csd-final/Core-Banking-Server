@@ -6,6 +6,7 @@ spring:
     include:
       - db
       - auth
+    active: ${PROFILE}
 
 bank:
   code: "020"  # 우리 은행 코드

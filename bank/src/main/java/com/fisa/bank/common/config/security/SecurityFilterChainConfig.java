@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,7 @@ import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
 
 @Configuration
 @RequiredArgsConstructor
+@Profile({"local", "prod", "dev"})
 public class SecurityFilterChainConfig {
 
   private final RequiredAuthenticationEntryPoint requiredAuthenticationEntryPoint;

@@ -12,13 +12,11 @@ import java.util.Map;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** 로그인 실패 시 핸들러 401 unAuthorized 응답과 합께 에러 응답을 바디로 담아서 보낸다. */
-@Component
 @RequiredArgsConstructor
 public class LoginFailureHandler implements AuthenticationFailureHandler {
 
