@@ -16,8 +16,8 @@ public class EqualPrincipalCalculatorTest {
     BigDecimal annualInterestRate = BigDecimal.valueOf(0.05); // 연이율 5%
     int totalTermInMonths = 12; // 12개월
 
-    LocalDateTime nextRepaymentDate = LocalDateTime.of(2025, 12, 3, 17, 9, 30); // 첫 상환일
-    LocalDateTime loanEndDate = LocalDateTime.of(2026, 11, 3, 17, 9, 30); // 마지막 상환일
+    LocalDateTime nextRepaymentDate = LocalDateTime.of(2025, 11, 3, 17, 9, 30); // 첫 상환일
+    LocalDateTime loanEndDate = LocalDateTime.of(2026, 10, 3, 17, 9, 30); // 마지막 상환일
 
     BigDecimal remainPrincipal = principal;
 

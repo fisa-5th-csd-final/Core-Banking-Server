@@ -3,15 +3,10 @@ package com.fisa.bank.loan.application.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 
-/*
-   원금 균등 상환 - 월별 상환액 계산기
-   P - 대출 원금
-   r - 월 이자율(금리)
-   N - 총 상환 횟수(개월)
-*/
 public class EqualPrincipalCalculator implements LoanCalculator {
 
   private static final EqualPrincipalCalculator INSTANCE = new EqualPrincipalCalculator();
@@ -32,29 +27,37 @@ public class EqualPrincipalCalculator implements LoanCalculator {
       LocalDateTime nextRepaymentDate,
       LocalDateTime loanEndDate) {
 
-    // 월 이자율 계산 (연 이자율 / 12)
-    BigDecimal monthlyRate =
-        annualInterestRate.divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_DOWN);
+    int month = nextRepaymentDate.getMonthValue();
+    int year = nextRepaymentDate.getYear();
+    int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+
+    BigDecimal interestPayment =
+        remainPrincipal
+            .multiply(annualInterestRate)
+            .multiply(BigDecimal.valueOf(daysInMonth))
+            .divide(
+                BigDecimal.valueOf(nextRepaymentDate.toLocalDate().lengthOfYear()),
+                0,
+                RoundingMode.DOWN);
 
     // 매월 동일한 원금 상환액 = 총 원금 / 총 상환 기간
-    BigDecimal monthlyPrincipalPayment =
-        principal.divide(BigDecimal.valueOf(totalTermInMonths), 0, RoundingMode.DOWN);
-
-    // 해당 월의 이자 = 남은 원금 * 월 이자율
-    BigDecimal interestPayment =
-        remainPrincipal.multiply(monthlyRate).setScale(0, RoundingMode.DOWN);
-
     BigDecimal principalPayment;
-    BigDecimal monthlyPayment;
 
-    // 다음 상환 날짜와 마지막 상환 날짜가 같다면 마지막 상환일이므로, 갚아야 하는 원금을 남은 원금으로 치환.
-    if (nextRepaymentDate.toLocalDate().equals(loanEndDate.toLocalDate())) {
-      principalPayment = remainPrincipal.setScale(0, RoundingMode.UP);
-      monthlyPayment = principalPayment.add(interestPayment);
+    // 첫 상환일에 원금을 가장 많이 내도록 조정
+    BigDecimal monthlyPrincipal =
+        principal.divide(BigDecimal.valueOf(totalTermInMonths), 0, RoundingMode.DOWN);
+    boolean isFirstRepayment = remainPrincipal.compareTo(principal) == 0;
+
+    if (isFirstRepayment) {
+      principalPayment =
+          remainPrincipal.subtract(
+              monthlyPrincipal.multiply(BigDecimal.valueOf(totalTermInMonths - 1)));
     } else {
-      principalPayment = monthlyPrincipalPayment;
-      monthlyPayment = principalPayment.add(interestPayment);
+      // 2회차 이후는 기존 균등 원금 상환
+      principalPayment = monthlyPrincipal;
     }
+
+    BigDecimal monthlyPayment = principalPayment.add(interestPayment);
 
     return new MonthlyRepayment(
         currentTerm,
