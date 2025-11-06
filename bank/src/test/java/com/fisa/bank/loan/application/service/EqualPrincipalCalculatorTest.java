@@ -4,12 +4,17 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
+import com.fisa.bank.loan.application.service.calculator.EqualPrincipalCalculator;
 
 public class EqualPrincipalCalculatorTest {
+  private final EqualPrincipalCalculator calculatorService = new EqualPrincipalCalculator();
+
   @Test
+  @DisplayName("원금균등상환 계산기 - 월별 이자 및 만기 원금 상환 출력")
   void printMonthlyRepaymentWithDates() {
     // 대출 조건
     BigDecimal principal = BigDecimal.valueOf(1_000_000); // 원금
@@ -29,15 +34,14 @@ public class EqualPrincipalCalculatorTest {
 
       // 월별 상환액 계산
       MonthlyRepayment repayment =
-          EqualPrincipalCalculator.getInstance()
-              .calculate(
-                  principal,
-                  remainPrincipal,
-                  annualInterestRate,
-                  totalTermInMonths,
-                  month,
-                  nextRepaymentDate,
-                  loanEndDate);
+          calculatorService.calculate(
+              principal,
+              remainPrincipal,
+              annualInterestRate,
+              totalTermInMonths,
+              month,
+              nextRepaymentDate,
+              loanEndDate);
 
       System.out.printf(
           "%2d  %-19s  %12s  %12s  %12s  %12s\n",
