@@ -66,7 +66,7 @@ public class AuthorizationConfig {
   @Bean("authenticatedFilter")
   public AuthenticationFilter authenticated(
       @Qualifier("JwtAuthenticationProvider") AuthenticationProvider authenticationProvider,
-      @Qualifier("AppAuthenticationConverter") AuthenticationConverter authenticationConverter) {
+      @Qualifier("JwtAuthenticationConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
         new JwtAuthenticationFilter(authenticationManager, authenticationConverter);
