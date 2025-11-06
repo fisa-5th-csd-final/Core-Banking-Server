@@ -1,4 +1,4 @@
-package com.fisa.bank.loan.application.service;
+package com.fisa.bank.loan.application.service.calculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

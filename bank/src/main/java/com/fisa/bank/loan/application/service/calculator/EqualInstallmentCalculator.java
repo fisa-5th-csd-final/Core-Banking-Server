@@ -1,4 +1,4 @@
-package com.fisa.bank.loan.application.service;
+package com.fisa.bank.loan.application.service.calculator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,7 +16,7 @@ public class EqualInstallmentCalculator implements LoanCalculator {
 
   private static final EqualInstallmentCalculator INSTANCE = new EqualInstallmentCalculator();
 
-  private EqualInstallmentCalculator() {}
+  public EqualInstallmentCalculator() {}
 
   public static EqualInstallmentCalculator getInstance() {
     return INSTANCE;

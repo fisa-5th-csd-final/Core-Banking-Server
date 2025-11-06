@@ -79,10 +79,12 @@ public class LoanController {
 
   // 대출 상환
   @PostMapping("/{loanLedgerId}/repayment")
-  public void repayMonthlyLoan(
+  public ApiResponse<SuccessBody<LoanTransactionResponse>> repayMonthlyLoan(
       @PathVariable Long loanLedgerId, @RequestBody LoanMonthlyRepayRequest request) {
     log.info("대출 상환");
-    loanService.repayMonthlyLoan(loanLedgerId, request);
+    LoanTransactionResponse loanTransactionResponse =
+        loanService.repayMonthlyLoan(loanLedgerId, request);
+    return ApiResponseGenerator.success(ResponseCode.UPDATE, loanTransactionResponse);
   }
 
   @DeleteMapping("/{loanLedgerId}")

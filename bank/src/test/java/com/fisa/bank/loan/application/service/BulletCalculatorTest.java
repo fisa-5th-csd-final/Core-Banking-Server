@@ -8,14 +8,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
+import com.fisa.bank.loan.application.service.calculator.BulletCalculator;
 
 public class BulletCalculatorTest {
 
+  private final BulletCalculator calculatorService = new BulletCalculator();
+
   @Test
-  @DisplayName("만기일시상환 계산기 - 월별 이자 및 만기 원금 상환 출력 + 검증")
+  @DisplayName("만기일시상환 계산기 - 월별 이자 및 만기 원금 상환 출력")
   void printAndAssertBulletLoanRepayments() {
-    // given
-    BulletCalculator calculator = BulletCalculator.getInstance();
 
     BigDecimal principal = BigDecimal.valueOf(1_000_000); // 원금
     BigDecimal annualRate = BigDecimal.valueOf(0.05); // 연이율 5%
@@ -30,12 +31,9 @@ public class BulletCalculatorTest {
     System.out.printf(
         "%-4s %-17s %7s %8s %12s %12s%n", "회차", "상환일", "남은 원금", "이자", "원금 상환", "월 상환액");
 
-    // when
-    MonthlyRepayment lastMonth = null;
-
     for (int month = 1; month <= totalTerm; month++) {
       MonthlyRepayment repayment =
-          calculator.calculate(
+          calculatorService.calculate(
               principal,
               remainPrincipal,
               annualRate,
@@ -56,19 +54,6 @@ public class BulletCalculatorTest {
 
       remainPrincipal = repayment.getRemainPrincipal();
       nextRepaymentDate = nextRepaymentDate.plusMonths(1);
-
-      if (month == totalTerm) {
-        lastMonth = repayment;
-      }
     }
-
-    //        // then
-    //        assertThat(lastMonth).isNotNull();
-    //        assertThat(lastMonth.getPrincipalPayment()).isEqualByComparingTo(principal);
-    //        assertThat(lastMonth.getInterestPayment()).isGreaterThan(BigDecimal.ZERO);
-    //        assertThat(lastMonth.getMonthlyPayment())
-    //
-    // .isEqualByComparingTo(lastMonth.getPrincipalPayment().add(lastMonth.getInterestPayment()));
-    //        assertThat(lastMonth.getRemainPrincipal()).isEqualByComparingTo(BigDecimal.ZERO);
   }
 }

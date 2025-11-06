@@ -1,4 +1,4 @@
-package com.fisa.bank.loan.application.service;
+package com.fisa.bank.loan.application.service.calculator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -12,7 +12,7 @@ public class BulletCalculator implements LoanCalculator {
 
   private static final BulletCalculator INSTANCE = new BulletCalculator();
 
-  private BulletCalculator() {}
+  public BulletCalculator() {}
 
   public static BulletCalculator getInstance() {
     return INSTANCE;

@@ -111,4 +111,35 @@ public class LoanLedger extends BaseEntity {
     this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
     this.repaymentStatus = updateLoanLedgerParam.getStatus();
   }
+
+  public static LoanLedger createLoanLedger(
+      LoanProduct loanProduct,
+      User user,
+      BigDecimal completedInterest,
+      BigDecimal principal,
+      BigDecimal remainPrincipal,
+      RepaymentType repaymentType,
+      LocalDateTime nextRepaymentDate,
+      LocalDateTime loanEndDate,
+      InterestType interestType,
+      BigDecimal earlyRepayInterestRate,
+      int term,
+      Account account) {
+    return LoanLedger.builder()
+        .loanProduct(loanProduct)
+        .user(user)
+        .completedInterest(completedInterest)
+        .principal(principal)
+        .remainPrincipal(remainPrincipal)
+        .repaymentType(repaymentType)
+        .repaymentStatus(RepaymentStatus.NORMAL)
+        .nextRepaymentDate(nextRepaymentDate)
+        .loanEndDate(loanEndDate)
+        .overdueCount(0)
+        .interestType(interestType)
+        .earlyRepayInterestRate(earlyRepayInterestRate)
+        .term(term)
+        .account(account)
+        .build();
+  }
 }
