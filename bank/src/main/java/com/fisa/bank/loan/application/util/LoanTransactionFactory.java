@@ -39,10 +39,10 @@ public class LoanTransactionFactory {
    * @return
    */
   public static LoanTransaction createEarlyRepay(
-      LoanLedger loanLedger, EarlyRepayment earlyRepayment) {
+      LoanLedger loanLedger, EarlyRepayment earlyRepayment, LocalDateTime transactionTime) {
     return create(
         loanLedger,
-        LocalDateTime.now(),
+        transactionTime,
         TransactionType.REPAYMENT,
         earlyRepayment.getMustPaidAmount(),
         earlyRepayment.getEarlyPaidCost(),
@@ -59,10 +59,10 @@ public class LoanTransactionFactory {
    * @return
    */
   public static LoanTransaction createRepay(
-      LoanLedger loanLedger, BigDecimal amount, MonthlyRepayment monthlyRepayment) {
+      LoanLedger loanLedger, BigDecimal amount, MonthlyRepayment monthlyRepayment, LocalDateTime transactionTime) {
     return create(
         loanLedger,
-        LocalDateTime.now(),
+        transactionTime,
         TransactionType.REPAYMENT,
         amount,
         monthlyRepayment.getInterestPayment(),
@@ -77,10 +77,10 @@ public class LoanTransactionFactory {
    * @param remainPrincipal
    * @return
    */
-  public static LoanTransaction createLoan(LoanLedger loanLedger, BigDecimal remainPrincipal) {
+  public static LoanTransaction createLoan(LoanLedger loanLedger, BigDecimal remainPrincipal, LocalDateTime transactionTime) {
     return create(
         loanLedger,
-        LocalDateTime.now(),
+        transactionTime,
         TransactionType.LOAN,
         remainPrincipal,
         null,

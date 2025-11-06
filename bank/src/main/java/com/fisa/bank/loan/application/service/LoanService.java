@@ -354,7 +354,7 @@ public class LoanService {
     account.updateBalance(afterBalance); // 잔액 변경
 
     LoanTransaction loanTransaction =
-        LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
+        LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment, today);
 
     loanLedger.addLoanTransactionList(loanTransaction);
     loanTransaction.setLoanLedger(loanLedger);
