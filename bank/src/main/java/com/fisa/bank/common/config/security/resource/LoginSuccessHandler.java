@@ -30,9 +30,9 @@ import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 
 /** 로그인 성공 핸들러 스프링 시큐리티에 의해, 사용자 인증이 성공하면 Authentication 객체를 Jwt 토큰으로 인코딩하여 ResponseBody에 담는다. */
-@Component
-@RequiredArgsConstructor
+
 @Slf4j
+@RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final UserJwtGenerator jwtGenerator;

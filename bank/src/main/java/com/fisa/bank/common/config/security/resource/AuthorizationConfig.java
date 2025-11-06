@@ -1,5 +1,8 @@
 package com.fisa.bank.common.config.security.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -38,8 +41,8 @@ public class AuthorizationConfig {
   @Bean("unAuthenticatedFilter")
   public AuthenticationFilter unAuthenticated(
       AuthenticationManager authenticationManager,
-      AuthenticationSuccessHandler successHandler,
-      AuthenticationFailureHandler failureHandler,
+      @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
+      @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
       @Qualifier("AppUnAuthenticationConverter") AuthenticationConverter appUnAuthConverter) {
     AuthenticationFilter authenticationFilter =
         new LoginAuthenticationFilter(authenticationManager, appUnAuthConverter);
@@ -71,11 +74,6 @@ public class AuthorizationConfig {
     return authenticationFilter;
   }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
   /** jwt 인증필터 서블릿 필터에서 제외 */
   @Bean
   public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(
@@ -86,9 +84,28 @@ public class AuthorizationConfig {
     return registrationBean;
   }
 
+    @Bean("BcryptPasswordEncoder")
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
   @Bean("AppAuthenticationConverter")
   public AuthenticationConverter authenticationConverter(){
       return new JwtAuthenticationConverter();
+  }
+
+  @Bean("LoginFailureHandler")
+    public AuthenticationFailureHandler loginFailureHandler(ObjectMapper om){
+      return new LoginFailureHandler(om);
+  }
+
+  @Bean("LoginSuccessHandler")
+  public AuthenticationSuccessHandler loginSuccessHandler(
+          ObjectMapper objectMapper,
+          UserAuthRepository userAuthRepository,
+          UserJwtGenerator jwtGenerator
+  ){
+      return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
   }
 
   /** 로그인 전용 필터 서블릿 필터에서 제외 */
