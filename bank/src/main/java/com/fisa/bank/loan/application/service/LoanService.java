@@ -3,7 +3,6 @@ package com.fisa.bank.loan.application.service;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +27,8 @@ import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayment;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
+import com.fisa.bank.loan.application.service.calculator.*;
+import com.fisa.bank.loan.application.service.calculator.CalculatorService;
 import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.util.LoanTransactionFactory;
 import com.fisa.bank.loan.persistence.entity.*;
@@ -55,6 +56,7 @@ public class LoanService {
   private final LoanTransactionRepository loanTransactionRepository;
   private final RequesterInfo requesterInfo;
   private final AccountRepository accountRepository;
+  private final CalculatorService calculatorService;
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -136,13 +138,9 @@ public class LoanService {
     }
 
     // 대출 원장성 테이블에 저장 LoanLedger
-    // 미리 세팅해둘 데이터
     // 남은 상환액(원금) - 초기값은 원금과 동일
     BigDecimal remainPrincipal = request.getPrincipal();
-    // 대출 상태 - 초기값은 정상
-    RepaymentStatus repaymentStatus = RepaymentStatus.NORMAL;
 
-    // 요청해서 세팅해야 하는 데이터
     // 대출 유형 - 대출 상품에서 조회
     LoanProduct loanProduct =
         loanRepository
@@ -197,77 +195,72 @@ public class LoanService {
     // 중도 상환 수수료 - 금리 유형, 대출 유형으로 조회
     BigDecimal earlyRepayInterestRate =
         EarlyRepayInterestRate.getEarlyRepayInterestRate(loanType, interestType);
-    // 최종 금리 = 기본 금리 + 가산 금리 - 우대 금리
-    // 우대 금리 vs 상한 우대 금리
+
+    // 우대 금리 vs 상한 우대 금리 중 낮은 금리 선택
     BigDecimal finalPreferInterest =
         limitPreferInterest.compareTo(preferInterest.getPreferInterest()) < 0
             ? limitPreferInterest
             : preferInterest.getPreferInterest();
 
+    // 최종 금리 = 기본 금리 + 가산 금리 - 최종 우대 금리
     BigDecimal completedInterest = baseInterest.add(addInterest).subtract(finalPreferInterest);
 
     // 대출 원장 테이블 데이터 만들기
     LoanLedger loanLedger =
-        LoanLedger.builder()
-            .loanProduct(loanProduct)
-            .user(user)
-            .completedInterest(completedInterest)
-            .principal(request.getPrincipal())
-            .remainPrincipal(remainPrincipal)
-            .repaymentType(request.getRepaymentType())
-            .repaymentStatus(repaymentStatus)
-            .nextRepaymentDate(nextRepaymentDate)
-            .loanEndDate(loanEndDate)
-            .overdueCount(0)
-            .interestType(interestType)
-            .earlyRepayInterestRate(earlyRepayInterestRate)
-            .term(request.getTerm())
-            .account(account)
-            .build();
+        LoanLedger.createLoanLedger(
+            loanProduct,
+            user,
+            completedInterest,
+            request.getPrincipal(),
+            remainPrincipal,
+            request.getRepaymentType(),
+            nextRepaymentDate,
+            loanEndDate,
+            interestType,
+            earlyRepayInterestRate,
+            request.getTerm(),
+            account);
 
     // 대출 이력성 테이블에 저장 LoanTransaction
     LoanTransaction loanTransaction =
-        LoanTransaction.builder()
-            .remainPrincipal(remainPrincipal)
-            .amount(remainPrincipal)
-            .loanLedger(loanLedger)
-            .transactionType(TransactionType.LOAN)
-            .build();
-
+        LoanTransactionFactory.createLoan(loanLedger, remainPrincipal, startDate);
     loanLedger.addLoanTransactionList(loanTransaction);
 
     LoanLedger savedLoanLedger = loanLedgerRepository.save(loanLedger);
-    LoanTransaction savedLoanTransaction = loanTransactionRepository.save(loanTransaction);
+    loanTransactionRepository.save(loanTransaction);
 
-    return LoanApplyforResponse.builder()
-        //
-        // .loanProductId(savedLoanLedger.getLoanProduct().getLoanProductId().getValue())
-        .name(savedLoanLedger.getLoanProduct().getName())
-        //                .completedInterest(savedLoanLedger.getCompletedInterest())
-        //                .principal(savedLoanLedger.getPrincipal())
-        //                .remainPrincipal(savedLoanLedger.getRemainPrincipal())
-        //                .nextRepaymentDate(savedLoanLedger.getNextRepaymentDate())
-        //                .nextRepaymentDate(savedLoanLedger.getNextRepaymentDate())
-        //                .loanEndDate(savedLoanLedger.getLoanEndDate())
-        //                .repaymentStatus(savedLoanLedger.getRepaymentStatus())
-        //                .earlyRepayInterestRate(savedLoanLedger.getEarlyRepayInterestRate())
-        .build();
+    LoanApplyforResponse loanApplyForResponse =
+        LoanApplyforResponse.builder().name(savedLoanLedger.getLoanProduct().getName()).build();
+
+    return loanApplyForResponse;
   }
 
   @Transactional
-  public void repayMonthlyLoan(Long loanLedgerId, LoanMonthlyRepayRequest request) {
+  public LoanTransactionResponse repayMonthlyLoan(
+      Long loanLedgerId, LoanMonthlyRepayRequest request) {
 
     LoanLedger loanLedger =
         loanLedgerRepository
             .findById(LoanLedgerId.of(loanLedgerId))
             .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
 
-    // 상환 방법에 따른 월 상환액 계산
-    LoanCalculator calculator = getCalculator(loanLedger.getRepaymentType());
-    MonthlyRepayment monthlyRepayment = calculateMonthlyRepayment(loanLedger, calculator);
+    switch (loanLedger.getRepaymentType()) {
+      case EQUAL_INSTALLMENT:
+        calculatorService.setLoanCalculator(new EqualInstallmentCalculator());
+        break;
+      case EQUAL_PRINCIPAL:
+        calculatorService.setLoanCalculator(new EqualPrincipalCalculator());
+        break;
+      case BULLET:
+        calculatorService.setLoanCalculator(new BulletCalculator());
+        break;
+      default:
+        throw new UnknownCalculatorException();
+    }
 
-    // 납입 금액 vs 이번 달 상환금 -> 상환가능한지 체크
-    // 이번 달 상환 금액보다 request.getAmount가 더 작다면 예외 발생시키기
+    MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
+
+    // 납입 금액이 상환금보다 작은지 확인
     if (request.getAmount().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
       throw new InsufficientRepaymentException(
           request.getAmount(), monthlyRepayment.getMonthlyPayment());
@@ -283,13 +276,11 @@ public class LoanService {
 
     account.updateBalance(afterBalance); // 잔액 변경
 
-    // 상환 가능하다면, 원장 테이블 업데이트 후 거래 테이블에 데이터 저장
-    // 원장 테이블 업데이트
-    // 남은 원금
-    // 다음 상환일
-    // 마지막 상환 날짜와 다음 상환 날짜 업데이트
+    // 상환 가능하다면, 원장 테이블 업데이트 후 이력성 테이블에 데이터 저장
+    // 남은 원금, 다음 상환일, 마지막 상환 날짜 업데이트
     LocalDateTime lastRepaymentDate = loanLedger.getNextRepaymentDate();
     LocalDateTime nextRepaymentDate = lastRepaymentDate.plusMonths(1);
+
     loanLedger.updateLoanLedger(
         UpdateLoanLedgerParam.builder()
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
@@ -298,19 +289,17 @@ public class LoanService {
             .status(loanLedger.getRepaymentStatus())
             .build());
 
-    // 거래 테이블에도 저장
+    // 이력성 테이블에도 저장
     LoanTransaction loanTransaction =
-        LoanTransaction.builder()
-            .loanLedger(loanLedger)
-            .date(LocalDateTime.now())
-            .transactionType(TransactionType.REPAYMENT)
-            .amount(monthlyRepayment.getMonthlyPayment())
-            .repaymentInterestAmount(monthlyRepayment.getInterestPayment())
-            .repaymentPrincipalAmount(monthlyRepayment.getPrincipalPayment())
-            .remainPrincipal(monthlyRepayment.getRemainPrincipal())
-            .build();
+        LoanTransactionFactory.createRepay(
+            loanLedger,
+            monthlyRepayment.getMonthlyPayment(),
+            monthlyRepayment,
+            LocalDateTime.now());
 
     loanTransactionRepository.save(loanTransaction);
+
+    return LoanTransactionResponse.from(loanTransaction);
   }
 
   @Transactional
@@ -330,9 +319,7 @@ public class LoanService {
     if (!userIdOfLedger.equals(userId)) throw new LoanLedgerAccessDeniedException();
 
     // 수수료율
-    BigDecimal earlyPaidRate =
-        EarlyRepayInterestRate.getEarlyRepayInterestRate(
-            loanLedger.getLoanProduct().getType(), loanLedger.getInterestType());
+    BigDecimal earlyPaidRate = loanLedger.getEarlyRepayInterestRate();
 
     // 중도 상환 금액 계산
     EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, today, earlyPaidRate);
@@ -390,28 +377,5 @@ public class LoanService {
     List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
     return allLoanLedgers.stream().map(LoanLedgerResponse::from).toList();
-  }
-
-  /** 상환 타입에 따른 Calculator 반환 */
-  private LoanCalculator getCalculator(RepaymentType repaymentType) {
-    return switch (repaymentType) {
-      case EQUAL_INSTALLMENT -> EqualInstallmentCalculator.getInstance();
-      case EQUAL_PRINCIPAL -> EqualPrincipalCalculator.getInstance();
-      case BULLET -> BulletCalculator.getInstance();
-      default -> throw new IllegalArgumentException("지원하지 않는 상환 타입입니다: " + repaymentType);
-    };
-  }
-
-  /** 월별 상환액 계산 (공통 파라미터 추출) */
-  private MonthlyRepayment calculateMonthlyRepayment(
-      LoanLedger loanLedger, LoanCalculator calculator) {
-    return calculator.calculate(
-        loanLedger.getPrincipal(),
-        loanLedger.getRemainPrincipal(),
-        loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
-        loanLedger.getTerm() * 12, // 연 -> 개월로 변경
-        1, // currentTerm은 실제로 사용되지 않음
-        loanLedger.getNextRepaymentDate(),
-        loanLedger.getLoanEndDate());
   }
 }
