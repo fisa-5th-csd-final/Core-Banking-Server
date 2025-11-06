@@ -32,7 +32,6 @@ public class LoanTransaction {
   private LoanTransactionId trxLId;
 
   // LoanLedger 1 : N TransactionLoan
-  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "loanLedgerId", nullable = false)
   private LoanLedger loanLedger;

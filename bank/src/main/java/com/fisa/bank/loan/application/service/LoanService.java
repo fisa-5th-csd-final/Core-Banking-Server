@@ -357,7 +357,6 @@ public class LoanService {
         LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment, today);
 
     loanLedger.addLoanTransactionList(loanTransaction);
-    loanTransaction.setLoanLedger(loanLedger);
 
     loanTransactionRepository.save(loanTransaction);
   }
