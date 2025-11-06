@@ -86,8 +86,8 @@ public class LoanController {
   @DeleteMapping("/{loanLedgerId}")
   public ApiResponse<SuccessBody<Void>> deleteLoanLedger(
       @PathVariable("loanLedgerId") Long loanLedgerId) {
-      loanService.cancelLoan(loanLedgerId);
-      return ApiResponseGenerator.success(ResponseCode.DELETE);
+    loanService.cancelLoan(loanLedgerId);
+    return ApiResponseGenerator.success(ResponseCode.DELETE);
   }
 
   @GetMapping("/ledgers/{userId}")
@@ -106,5 +106,4 @@ public class LoanController {
 
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
   }
-
 }
