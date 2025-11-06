@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -22,6 +23,7 @@ import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 
 /** UserIdAuthentication의 인증을 수행하는 Provider */
+@Slf4j
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   private final JwtDecoder jwtDecoder;
@@ -50,7 +52,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     } catch (JwtEncodingException e) {
       throw new InvalidBearerTokenException("Jwt format is invalid", e);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Unexpected Exception occurred", e);
       throw new AuthenticationServiceException("Unexpected Exception occurred", e);
     }
   }
