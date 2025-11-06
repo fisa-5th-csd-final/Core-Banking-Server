@@ -38,7 +38,7 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
   LOAN_LEDGER_ACCESS_DENIED_EXCEPTION(HttpStatus.FORBIDDEN, LoanLedgerAccessDeniedException.class),
   UNKNOWN_CALCULATOR_EXCEPTION(HttpStatus.BAD_REQUEST, UnknownCalculatorException.class),
   INSUFFICIENT_BALANCE_AMOUNT_EXCEPTION(
-      HttpStatus.UNPROCESSABLE_ENTITY, InSufficientBalanceAmountException.class);
+      HttpStatus.UNPROCESSABLE_ENTITY, InsufficientBalanceAmountException.class);
   private final HttpStatus status;
   @Getter private final Class<? extends BusinessException> exception;
 
