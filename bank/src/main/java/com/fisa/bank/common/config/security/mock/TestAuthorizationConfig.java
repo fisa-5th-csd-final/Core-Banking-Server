@@ -1,5 +1,6 @@
 package com.fisa.bank.common.config.security.mock;
 
+import com.fisa.bank.common.config.security.resource.JwtAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFilter;
@@ -41,12 +43,12 @@ public class TestAuthorizationConfig {
 
   @Bean("TestLoginAuthenticationFilter")
   public AuthenticationFilter testLoginFilter(
-      AuthenticationManager authenticationManager,
-      @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
-      @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
+      @Qualifier("TestUsernamePasswordAuthenticationProvider") AuthenticationProvider authenticationProvider,
+      @Qualifier("TestLoginFailureHandler") AuthenticationFailureHandler failureHandler,
+      @Qualifier("TestLoginSuccessHandler") AuthenticationSuccessHandler successHandler,
       @Qualifier("TestUsernamePasswordConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationFilter authenticationFilter =
-        new TestLoginAuthenticationFilter(authenticationManager, authenticationConverter);
+        new TestLoginAuthenticationFilter(new ProviderManager(authenticationProvider), authenticationConverter);
 
     RequestMatcher requestMatcher =
         PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login/{userId}");
@@ -60,7 +62,7 @@ public class TestAuthorizationConfig {
 
   @Bean("TestJwtAuthenticationFilter")
   public AuthenticationFilter testJwtFilter(
-      @Qualifier("UsernamePasswordAuthenticationProvider")
+      @Qualifier("TestJwtAuthenticationProvider")
           AuthenticationProvider authenticationProvider,
       @Qualifier("TestAuthenticationConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
@@ -68,24 +70,29 @@ public class TestAuthorizationConfig {
         new TestJwtAuthenticationFilter(authenticationManager, authenticationConverter);
 
     RequestMatcher requestMatcher =
-        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/**");
+        PathPatternRequestMatcher.withDefaults().matcher("/**");
 
     authenticationFilter.setRequestMatcher(requestMatcher);
 
     return authenticationFilter;
   }
 
-  @Bean("UsernamePasswordAuthenticationProvider")
+  @Bean("TestJwtAuthenticationProvider")
+  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder){
+      return new JwtAuthenticationProvider(jwtDecoder);
+  }
+
+  @Bean("TestUsernamePasswordAuthenticationProvider")
   public AuthenticationProvider usernameProvider() {
     return new TestUsernamePasswordAuthenticationProvider();
   }
 
-  @Bean("LoginFailureHandler")
+  @Bean("TestLoginFailureHandler")
   public AuthenticationFailureHandler loginFailureHandler(ObjectMapper om) {
     return new LoginFailureHandler(om);
   }
 
-  @Bean("LoginSuccessHandler")
+  @Bean("TestLoginSuccessHandler")
   public AuthenticationSuccessHandler loginSuccessHandler(
       ObjectMapper objectMapper, UserJwtGenerator jwtGenerator) {
     return new TestLoginSuccessHandler(jwtGenerator, objectMapper);
@@ -96,12 +103,12 @@ public class TestAuthorizationConfig {
     return new JwtAuthenticationConverter();
   }
 
-  @Bean("PasswordEncoder")
+  @Bean("TestPasswordEncoder")
   public PasswordEncoder passwordEncoder() {
     return PasswordEncoderFactories.createDelegatingPasswordEncoder();
   }
 
-  @Bean("UserDetailsService")
+  @Bean("TestUserDetailsService")
   public UserDetailsService userDetailsService() {
     return new TestUserDetailsService();
   }
