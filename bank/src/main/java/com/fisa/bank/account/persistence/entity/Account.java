@@ -50,7 +50,7 @@ public class Account extends BaseEntity {
   @Column(nullable = false, length = 3)
   private String bankCode;
 
-  @OneToOne(fetch = FetchType.EAGER, mappedBy = "account")
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "account")
   private LoanLedger loanLedger;
 
   public static Account create(String accountNumber, User user, String bankCode) {
