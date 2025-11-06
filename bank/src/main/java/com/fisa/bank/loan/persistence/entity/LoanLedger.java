@@ -84,9 +84,7 @@ public class LoanLedger extends BaseEntity {
   private BigDecimal earlyRepayInterestRate;
 
   // 다음 상환, 마지막 거래 일시, 상환 마감 기한
-  @Column(nullable = false)
   private LocalDateTime nextRepaymentDate;
-
   private LocalDateTime lastRepaymentDate;
 
   @Column(nullable = false)
@@ -102,10 +100,6 @@ public class LoanLedger extends BaseEntity {
   @Column(nullable = false)
   private int term;
 
-  public void pay(BigDecimal amount) {
-    this.remainPrincipal = this.remainPrincipal.subtract(amount);
-  }
-
   public void addLoanTransactionList(LoanTransaction loanTransaction) {
     loanTransactionList.add(loanTransaction);
   }
@@ -114,5 +108,6 @@ public class LoanLedger extends BaseEntity {
     this.remainPrincipal = updateLoanLedgerParam.getRemainPrincipal();
     this.nextRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
     this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
+    this.repaymentStatus = updateLoanLedgerParam.getStatus();
   }
 }

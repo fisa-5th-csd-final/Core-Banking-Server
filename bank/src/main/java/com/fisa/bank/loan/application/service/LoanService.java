@@ -295,6 +295,7 @@ public class LoanService {
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
             .lastRepaymentDate(lastRepaymentDate)
             .nextRepaymentDate(nextRepaymentDate)
+                .status(loanLedger.getRepaymentStatus())
             .build());
 
     // 거래 테이블에도 저장
@@ -337,7 +338,14 @@ public class LoanService {
 
     BigDecimal afterBalance = account.getBalance().subtract(earlyRepayment.getMustPaidAmount());
 
-    loanLedger.pay(earlyRepayment.getMustPaidAmount()); // 상환
+    loanLedger.updateLoanLedger(
+            UpdateLoanLedgerParam.builder()
+                      .remainPrincipal(BigDecimal.ZERO)
+                      .lastRepaymentDate(today)
+                      .nextRepaymentDate(null)
+                    .status(RepaymentStatus.TERMINATED)
+                      .build());
+
     account.updateBalance(afterBalance); // 잔액 변경
 
     LoanTransaction loanTransaction =
