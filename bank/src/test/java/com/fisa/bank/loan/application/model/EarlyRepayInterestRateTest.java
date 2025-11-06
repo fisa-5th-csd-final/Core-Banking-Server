@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
+import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
 import com.fisa.bank.loan.persistence.enums.InterestType;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 

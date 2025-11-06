@@ -1,6 +1,7 @@
 package com.fisa.bank.loan.application.dto.request;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
@@ -28,4 +29,7 @@ public class LoanApplyForRequest {
   @NotNull(message = "상환 기간을 입력해주세요.")
   @Min(value = 1, message = "상환 기간은 최소 1년 이상이어야 합니다.")
   private Integer term;
+
+  @NotBlank(message = "계좌 번호를 입력해주세요")
+  private String accountNumber;
 }

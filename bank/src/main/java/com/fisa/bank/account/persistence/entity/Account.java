@@ -21,6 +21,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.account.persistence.entity.id.*;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
+import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.user.persistence.entity.User;
 
 @Entity
@@ -48,6 +49,9 @@ public class Account extends BaseEntity {
 
   @Column(nullable = false, length = 3)
   private String bankCode;
+
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "account")
+  private LoanLedger loanLedger;
 
   public static Account create(String accountNumber, User user, String bankCode) {
     return Account.builder()

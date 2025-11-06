@@ -1,4 +1,4 @@
-package com.fisa.bank.loan.application.model;
+package com.fisa.bank.loan.application.util;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;

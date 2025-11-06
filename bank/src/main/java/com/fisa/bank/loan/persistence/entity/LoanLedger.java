@@ -12,6 +12,8 @@ import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fisa.bank.account.persistence.entity.Account;
+import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerIdJavaType;
@@ -28,7 +30,7 @@ import com.fisa.bank.user.persistence.entity.User;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class LoanLedger {
+public class LoanLedger extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,13 +84,15 @@ public class LoanLedger {
   private BigDecimal earlyRepayInterestRate;
 
   // 다음 상환, 마지막 거래 일시, 상환 마감 기한
-  @Column(nullable = false)
   private LocalDateTime nextRepaymentDate;
-
   private LocalDateTime lastRepaymentDate;
 
   @Column(nullable = false)
   private LocalDateTime loanEndDate;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "account_id")
+  private Account account;
 
   // 연체 일수
   @Column(nullable = false)
@@ -99,12 +103,12 @@ public class LoanLedger {
 
   public void addLoanTransactionList(LoanTransaction loanTransaction) {
     loanTransactionList.add(loanTransaction);
-    loanTransaction.setLoanLedger(this);
   }
 
   public void updateLoanLedger(UpdateLoanLedgerParam updateLoanLedgerParam) {
     this.remainPrincipal = updateLoanLedgerParam.getRemainPrincipal();
     this.nextRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
     this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
+    this.repaymentStatus = updateLoanLedgerParam.getStatus();
   }
 }

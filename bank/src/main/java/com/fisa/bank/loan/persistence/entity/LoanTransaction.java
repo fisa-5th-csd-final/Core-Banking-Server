@@ -37,8 +37,9 @@ public class LoanTransaction {
   private LoanLedger loanLedger;
 
   // 거래 일시
+  @Builder.Default
   @Column(nullable = false)
-  private LocalDateTime date;
+  private LocalDateTime date = LocalDateTime.now();
 
   // 거래 유형
   @Enumerated(EnumType.STRING)
@@ -58,8 +59,4 @@ public class LoanTransaction {
   // 거래 후 남은 상환액(원금)
   @Column(nullable = false)
   private BigDecimal remainPrincipal;
-
-  public void setLoanLedger(LoanLedger loanLedger) {
-    this.loanLedger = loanLedger;
-  }
 }
