@@ -86,6 +86,11 @@ public class AuthorizationConfig {
     return registrationBean;
   }
 
+  @Bean("AppAuthenticationConverter")
+  public AuthenticationConverter authenticationConverter(){
+      return new JwtAuthenticationConverter();
+  }
+
   /** 로그인 전용 필터 서블릿 필터에서 제외 */
   @Bean
   public FilterRegistrationBean<AuthenticationFilter> loginFilterRegistrationBean(
