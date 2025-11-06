@@ -59,7 +59,10 @@ public class LoanTransactionFactory {
    * @return
    */
   public static LoanTransaction createRepay(
-      LoanLedger loanLedger, BigDecimal amount, MonthlyRepayment monthlyRepayment, LocalDateTime transactionTime) {
+      LoanLedger loanLedger,
+      BigDecimal amount,
+      MonthlyRepayment monthlyRepayment,
+      LocalDateTime transactionTime) {
     return create(
         loanLedger,
         transactionTime,
@@ -77,7 +80,8 @@ public class LoanTransactionFactory {
    * @param remainPrincipal
    * @return
    */
-  public static LoanTransaction createLoan(LoanLedger loanLedger, BigDecimal remainPrincipal, LocalDateTime transactionTime) {
+  public static LoanTransaction createLoan(
+      LoanLedger loanLedger, BigDecimal remainPrincipal, LocalDateTime transactionTime) {
     return create(
         loanLedger,
         transactionTime,

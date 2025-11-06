@@ -1,11 +1,13 @@
 package com.fisa.bank.loan.application.model;
 
-import com.fisa.bank.loan.persistence.entity.LoanLedger;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import lombok.Getter;
+
+import com.fisa.bank.loan.persistence.entity.LoanLedger;
 
 /** 중도 상환할 경우, 납입 정보를 담는 객체 */
 @Getter
@@ -42,9 +44,9 @@ public class EarlyRepayment {
     long usingDay = ChronoUnit.DAYS.between(loanStartedAt.toLocalDate(), repaidAt.toLocalDate());
     long remaining = (totalDay - usingDay);
 
-      if (totalDay <= 0) {
-          throw new IllegalArgumentException("날짜 정보를 잘못 입력하였습니다.");
-      }
+    if (totalDay <= 0) {
+      throw new IllegalArgumentException("날짜 정보를 잘못 입력하였습니다.");
+    }
 
     return remain
         .multiply(rate)
