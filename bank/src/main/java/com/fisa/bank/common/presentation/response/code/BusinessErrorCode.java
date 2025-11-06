@@ -35,7 +35,8 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
       HttpStatus.UNPROCESSABLE_ENTITY, InsufficientRepaymentException.class),
   PREFER_INTEREST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, PreferInterestNotFoundException.class),
   LOAN_LEDGER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanLedgerNotFoundException.class),
-  LOAN_LEDGER_ACCESS_DENIED_EXCEPTION(HttpStatus.FORBIDDEN, LoanLedgerAccessDeniedException.class);
+  LOAN_LEDGER_ACCESS_DENIED_EXCEPTION(HttpStatus.FORBIDDEN, LoanLedgerAccessDeniedException.class),
+  UNKNOWN_CALCULATOR_EXCEPTION(HttpStatus.BAD_REQUEST, UnknownCalculatorException.class);
 
   private final HttpStatus status;
   @Getter private final Class<? extends BusinessException> exception;
