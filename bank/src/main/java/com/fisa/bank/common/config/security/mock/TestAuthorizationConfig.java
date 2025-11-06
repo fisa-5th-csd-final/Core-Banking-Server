@@ -1,6 +1,5 @@
 package com.fisa.bank.common.config.security.mock;
 
-import com.fisa.bank.common.config.security.resource.JwtAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +26,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fisa.bank.common.config.security.jwt.UserJwtGenerator;
 import com.fisa.bank.common.config.security.resource.JwtAuthenticationConverter;
+import com.fisa.bank.common.config.security.resource.JwtAuthenticationProvider;
 import com.fisa.bank.common.config.security.resource.LoginFailureHandler;
 import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
 
@@ -43,12 +43,14 @@ public class TestAuthorizationConfig {
 
   @Bean("TestLoginAuthenticationFilter")
   public AuthenticationFilter testLoginFilter(
-      @Qualifier("TestUsernamePasswordAuthenticationProvider") AuthenticationProvider authenticationProvider,
+      @Qualifier("TestUsernamePasswordAuthenticationProvider")
+          AuthenticationProvider authenticationProvider,
       @Qualifier("TestLoginFailureHandler") AuthenticationFailureHandler failureHandler,
       @Qualifier("TestLoginSuccessHandler") AuthenticationSuccessHandler successHandler,
       @Qualifier("TestUsernamePasswordConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationFilter authenticationFilter =
-        new TestLoginAuthenticationFilter(new ProviderManager(authenticationProvider), authenticationConverter);
+        new TestLoginAuthenticationFilter(
+            new ProviderManager(authenticationProvider), authenticationConverter);
 
     RequestMatcher requestMatcher =
         PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/login/{userId}");
@@ -62,15 +64,13 @@ public class TestAuthorizationConfig {
 
   @Bean("TestJwtAuthenticationFilter")
   public AuthenticationFilter testJwtFilter(
-      @Qualifier("TestJwtAuthenticationProvider")
-          AuthenticationProvider authenticationProvider,
+      @Qualifier("TestJwtAuthenticationProvider") AuthenticationProvider authenticationProvider,
       @Qualifier("TestAuthenticationConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
         new TestJwtAuthenticationFilter(authenticationManager, authenticationConverter);
 
-    RequestMatcher requestMatcher =
-        PathPatternRequestMatcher.withDefaults().matcher("/**");
+    RequestMatcher requestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/**");
 
     authenticationFilter.setRequestMatcher(requestMatcher);
 
@@ -78,8 +78,8 @@ public class TestAuthorizationConfig {
   }
 
   @Bean("TestJwtAuthenticationProvider")
-  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder){
-      return new JwtAuthenticationProvider(jwtDecoder);
+  public AuthenticationProvider jwtAuthenticationProvider(JwtDecoder jwtDecoder) {
+    return new JwtAuthenticationProvider(jwtDecoder);
   }
 
   @Bean("TestUsernamePasswordAuthenticationProvider")
