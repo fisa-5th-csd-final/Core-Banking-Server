@@ -2,11 +2,12 @@ package com.fisa.bank.common.config.security.resource;
 
 import static com.fisa.bank.common.config.security.jwt.JwtConst.*;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;

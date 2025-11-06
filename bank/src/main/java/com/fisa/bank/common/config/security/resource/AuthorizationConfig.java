@@ -45,7 +45,8 @@ public class AuthorizationConfig {
   public AuthenticationFilter unAuthenticated(
       @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler successHandler,
       @Qualifier("LoginFailureHandler") AuthenticationFailureHandler failureHandler,
-      @Qualifier("UsernamePasswordAuthenticationConverter") AuthenticationConverter appUnAuthConverter,
+      @Qualifier("UsernamePasswordAuthenticationConverter")
+          AuthenticationConverter appUnAuthConverter,
       @Qualifier("UsernamePasswordAuthenticationProvider")
           AuthenticationProvider authenticationProvider) {
     AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
@@ -118,8 +119,8 @@ public class AuthorizationConfig {
   }
 
   @Bean("UsernamePasswordAuthenticationConverter")
-  public AuthenticationConverter usernamePasswordAuthenticationConverter(ObjectMapper om){
-      return new UsernamePasswordAuthenticationConverter(om);
+  public AuthenticationConverter usernamePasswordAuthenticationConverter(ObjectMapper om) {
+    return new UsernamePasswordAuthenticationConverter(om);
   }
 
   @Bean("UsernamePasswordAuthenticationProvider")
