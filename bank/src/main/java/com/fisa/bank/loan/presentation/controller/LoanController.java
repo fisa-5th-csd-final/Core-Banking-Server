@@ -82,6 +82,23 @@ public class LoanController {
     loanService.repayMonthlyLoan(loanLedgerId, request);
   }
 
+  @GetMapping("/ledgers/{userId}")
+  public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers(
+      @PathVariable Long userId) {
+    List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedger(userId);
+
+    return ApiResponseGenerator.success(ResponseCode.GET, myLoanLedger);
+  }
+
+  @GetMapping("/ledger/{loanLedgerId}")
+  public ApiResponse<SuccessBody<LoanLedgerDetailResponse>> getLoanLedgerDetail(
+      @PathVariable Long loanLedgerId) {
+
+    LoanLedgerDetailResponse loanLedgerDetail = loanService.getLoanLedgerDetail(loanLedgerId);
+
+    return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
+  }
+
   @DeleteMapping("/{loanLedgerId}")
   public ApiResponse<SuccessBody<Void>> deleteLoanLedger(
       @PathVariable("loanLedgerId") Long loanLedgerId) {
