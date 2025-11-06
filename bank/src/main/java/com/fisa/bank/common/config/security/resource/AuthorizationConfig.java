@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFilter;
@@ -64,7 +65,7 @@ public class AuthorizationConfig {
    */
   @Bean("authenticatedFilter")
   public AuthenticationFilter authenticated(
-      @Qualifier("AppAuthenticationProvider") AuthenticationProvider authenticationProvider,
+      @Qualifier("JwtAuthenticationProvider") AuthenticationProvider authenticationProvider,
       @Qualifier("AppAuthenticationConverter") AuthenticationConverter authenticationConverter) {
     AuthenticationManager authenticationManager = new ProviderManager(authenticationProvider);
     AuthenticationFilter authenticationFilter =
@@ -95,7 +96,7 @@ public class AuthorizationConfig {
         return new BCryptPasswordEncoder();
     }
 
-  @Bean("AppAuthenticationConverter")
+  @Bean("JwtAuthenticationConverter")
   public AuthenticationConverter authenticationConverter(){
       return new JwtAuthenticationConverter();
   }
@@ -112,6 +113,11 @@ public class AuthorizationConfig {
           UserJwtGenerator jwtGenerator
   ){
       return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
+  }
+
+  @Bean("JwtAuthenticationProvider")
+  public AuthenticationProvider authenticationProvider(JwtDecoder jwtDecoder){
+      return new JwtAuthenticationProvider(jwtDecoder);
   }
 
   /** 로그인 전용 필터 서블릿 필터에서 제외 */

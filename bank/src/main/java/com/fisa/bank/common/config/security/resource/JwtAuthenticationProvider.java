@@ -23,7 +23,6 @@ import org.springframework.security.oauth2.server.resource.InvalidBearerTokenExc
 import org.springframework.stereotype.Component;
 
 /** UserIdAuthentication의 인증을 수행하는 Provider */
-@Component("AppAuthenticationProvider")
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
   private final JwtDecoder jwtDecoder;
