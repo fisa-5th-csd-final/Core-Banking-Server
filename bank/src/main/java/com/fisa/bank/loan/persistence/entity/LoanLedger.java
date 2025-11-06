@@ -13,6 +13,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.account.persistence.entity.Account;
+import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerIdJavaType;
@@ -29,7 +30,7 @@ import com.fisa.bank.user.persistence.entity.User;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class LoanLedger {
+public class LoanLedger extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -106,7 +107,6 @@ public class LoanLedger {
 
   public void addLoanTransactionList(LoanTransaction loanTransaction) {
     loanTransactionList.add(loanTransaction);
-    loanTransaction.setLoanLedger(this);
   }
 
   public void updateLoanLedger(UpdateLoanLedgerParam updateLoanLedgerParam) {
