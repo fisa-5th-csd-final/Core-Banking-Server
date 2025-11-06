@@ -1,6 +1,5 @@
 package com.fisa.bank.loan.application.service;
 
-import com.fisa.bank.loan.application.util.LoanTransactionFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -30,6 +29,7 @@ import com.fisa.bank.loan.application.model.EarlyRepayment;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
+import com.fisa.bank.loan.application.util.LoanTransactionFactory;
 import com.fisa.bank.loan.persistence.entity.*;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
@@ -330,7 +330,8 @@ public class LoanService {
     loanLedger.pay(earlyRepayment.getMustPaidAmount()); // 상환
     account.updateBalance(afterBalance); // 잔액 변경
 
-    LoanTransaction loanTransaction = LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
+    LoanTransaction loanTransaction =
+        LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment);
 
     loanTransactionRepository.save(loanTransaction);
   }
