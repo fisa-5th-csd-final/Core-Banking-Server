@@ -125,15 +125,15 @@ public class AuthorizationConfig {
     return new JwtAuthenticationProvider(jwtDecoder);
   }
 
-    /** jwt 인증필터 서블릿 필터에서 제외 */
-    @Bean
-    public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(
-            @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) {
-        FilterRegistrationBean<AuthenticationFilter> registrationBean =
-                new FilterRegistrationBean<>(authenticationFilter);
-        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
-        return registrationBean;
-    }
+  /** jwt 인증필터 서블릿 필터에서 제외 */
+  @Bean
+  public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(
+      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter) {
+    FilterRegistrationBean<AuthenticationFilter> registrationBean =
+        new FilterRegistrationBean<>(authenticationFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
 
   /** 로그인 전용 필터 서블릿 필터에서 제외 */
   @Bean
