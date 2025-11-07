@@ -1,11 +1,11 @@
 spring:
   application:
     name: bank
-
+  config:
+    import:
+      - classpath:application-auth.yml
+      - classpath:application-db.yml
   profiles:
-    include:
-      - db
-      - auth
     active: ${PROFILE}
 
 bank:
