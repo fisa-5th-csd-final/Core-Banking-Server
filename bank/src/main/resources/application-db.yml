@@ -1,8 +1,6 @@
-spring:
-  config:
-    activate:
-      on-profile: db
+## 데이터베이스 관련 설정
 
+spring:
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}

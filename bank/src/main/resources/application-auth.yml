@@ -1,7 +1,4 @@
-spring:
-  config:
-    activate:
-      on-profile: auth
+## 인증/인가 관련 설정
 
 jwt:
   access-token:
