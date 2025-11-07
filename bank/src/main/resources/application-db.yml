@@ -1,3 +1,5 @@
+## 데이터베이스 관련 설정
+
 spring:
   datasource:
     url: ${DATABASE_URL}

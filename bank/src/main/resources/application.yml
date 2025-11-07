@@ -5,16 +5,7 @@ spring:
     import:
       - classpath:application-auth.yml
       - classpath:application-db.yml
+      - classpath:application-open-api.yml
+      - classpath:application-bank.yml
   profiles:
     active: ${PROFILE}
-
-bank:
-  code: "020"  # 우리 은행 코드
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    operations-sorter: alpha
-    tags-sorter: alpha
