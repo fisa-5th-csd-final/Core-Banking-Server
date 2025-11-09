@@ -51,12 +51,8 @@ public class UserService {
   }
 
   public UserInfoResponse getUserInfo(UserId userId) {
-    User user = getUserById(userId);
+    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
     return UserInfoResponse.of(user);
-  }
-
-  public User getUserById(UserId userId) {
-    return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
   }
 }
