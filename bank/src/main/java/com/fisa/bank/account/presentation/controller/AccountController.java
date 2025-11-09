@@ -40,8 +40,7 @@ public class AccountController {
   @GetMapping("/{accountNumber}")
   public ApiResponse<SuccessBody<AccountDetailResponse>> getAccountDetail(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber) {
-    Long userId = requesterInfo.getUserId().getValue();
-    AccountDetailResponse response = accountService.getAccountDetail(accountNumber, userId);
+    AccountDetailResponse response = accountService.getAccountDetail(accountNumber);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 
@@ -57,8 +56,7 @@ public class AccountController {
   @DeleteMapping("/{accountNumber}")
   public ApiResponse<SuccessBody<Void>> deleteAccount(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber) {
-    Long userId = requesterInfo.getUserId().getValue();
-    accountService.deleteAccount(accountNumber, userId);
+    accountService.deleteAccount(accountNumber);
     return ApiResponseGenerator.success(ResponseCode.DELETE);
   }
 }
