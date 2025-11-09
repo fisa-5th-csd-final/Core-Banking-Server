@@ -6,20 +6,18 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.fisa.bank.account.application.exception.AccessDeniedException;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.user.application.service.UserService;
+import com.fisa.bank.user.application.service.reader.UserReader;
 import com.fisa.bank.user.persistence.entity.User;
-import com.fisa.bank.user.persistence.entity.id.UserId;
 
 @Component
 @RequiredArgsConstructor
 public class AccountReader {
 
   private final AccountRepository accountRepository;
-  private final UserService userService;
+  private final UserReader userReader;
 
   public Account getAccountByAccountNumber(String accountNumber) {
     return accountRepository
@@ -34,36 +32,14 @@ public class AccountReader {
         .orElseThrow(AccountNotFoundException::new);
   }
 
-  // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환
-  public Account getOwnedAccount(String accountNumber, Long userId) {
-    Account account = getAccountByAccountNumber(accountNumber);
-    Long accountOwnerId = account.getUser().getUserId().getValue();
-
-    if (!accountOwnerId.equals(userId)) {
-      throw new AccessDeniedException();
-    }
-    return account;
-  }
-
-  // 현재 로그인한 사용자가 계좌의 소유자인지 검증 후, 계좌 반환 (비관적 락)
-  public Account getOwnedAccountWithLock(String accountNumber, Long userId) {
-    Account account = getAccountByAccountNumberWithLock(accountNumber);
-    Long accountOwnerId = account.getUser().getUserId().getValue();
-
-    if (!accountOwnerId.equals(userId)) {
-      throw new AccessDeniedException();
-    }
-    return account;
-  }
-
   // 사용자 가져오기
   public User getUserById(Long userId) {
-    return userService.getUserById(UserId.of(userId));
+    return userReader.getUserById(userId);
   }
 
   // 송금용 두 계좌 조회 (데드락 방지를 위해 정렬된 순서로 락 획득)
   public TransferAccountsPair lockTransferAccounts(
-      String fromAccountNumber, String toAccountNumber, Long userId) {
+      String fromAccountNumber, String toAccountNumber) {
     List<String> ordered = List.of(fromAccountNumber, toAccountNumber).stream().sorted().toList();
 
     List<Account> locked = accountRepository.lockTwoAccountsByNumbers(ordered);
@@ -79,11 +55,6 @@ public class AccountReader {
             .filter(a -> a.getAccountNumber().equals(toAccountNumber))
             .findFirst()
             .orElseThrow(() -> new AccountNotFoundException("수취 계좌를 찾을 수 없습니다."));
-
-    Long accountOwnerId = from.getUser().getUserId().getValue();
-    if (!accountOwnerId.equals(userId)) {
-      throw new AccessDeniedException();
-    }
 
     return new TransferAccountsPair(from, to);
   }
