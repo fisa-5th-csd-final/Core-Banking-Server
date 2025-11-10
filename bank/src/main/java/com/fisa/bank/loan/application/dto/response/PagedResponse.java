@@ -12,14 +12,14 @@ import org.springframework.data.domain.Page;
 @Getter
 public class PagedResponse<T> {
 
-  private List<T> data;
+  private List<T> content;
   private int pageNumber;
   private int pageSize;
   private long totalElements;
   private int totalPages;
 
   public PagedResponse(Page<T> page) {
-    this.data = page.getContent();
+    this.content = page.getContent();
     this.pageNumber = page.getNumber();
     this.pageSize = page.getSize();
     this.totalElements = page.getTotalElements();
