@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fisa.bank.account.application.exception.AccountNotFoundException;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
+import com.fisa.bank.common.application.exception.AlreadyDeletedException;
 import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.service.InterestService;
@@ -82,10 +83,14 @@ public class LoanService {
   @Transactional
   public void deleteLoanProduct(Long loanProductId) {
     // 있는지 확인 후
-    if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
-      throw new LoanProductNotFoundException(loanProductId);
+    LoanProduct loanProduct =
+        loanRepository
+            .findById(LoanProductId.of(loanProductId))
+            .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+    if (loanProduct.isDeleted()) {
+      throw new AlreadyDeletedException(loanProduct.getClass().getSimpleName(), loanProductId);
     }
-    loanRepository.deleteById(LoanProductId.of(loanProductId));
+    loanProduct.delete();
   }
 
   @Transactional

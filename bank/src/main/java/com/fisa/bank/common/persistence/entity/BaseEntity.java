@@ -18,15 +18,18 @@ public abstract class BaseEntity {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private LocalDateTime deletedAt;
+  private boolean isDeleted;
 
   public BaseEntity() {
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
     this.deletedAt = null;
+    this.isDeleted = false;
   }
 
   @PreRemove
   public void delete() {
     this.deletedAt = LocalDateTime.now();
+    this.isDeleted = true;
   }
 }

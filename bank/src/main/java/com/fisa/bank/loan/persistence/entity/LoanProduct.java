@@ -10,6 +10,7 @@ import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductIdJavaType;
@@ -20,7 +21,7 @@ import com.fisa.bank.loan.persistence.enums.LoanType;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class LoanProduct {
+public class LoanProduct extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

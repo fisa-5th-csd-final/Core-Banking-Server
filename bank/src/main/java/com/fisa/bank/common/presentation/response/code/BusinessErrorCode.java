@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import com.fisa.bank.account.application.exception.*;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.common.application.exception.AlreadyDeletedException;
 import com.fisa.bank.common.application.exception.BusinessException;
 import com.fisa.bank.common.presentation.response.code.ApiResponseCode.ErrorResponseCode;
 import com.fisa.bank.interest.application.exception.InterestException;
@@ -21,6 +22,8 @@ import com.fisa.bank.user.application.exception.UserNotFoundException;
 public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
 
   /** 여기에 커스텀 BusinessException을 정의하면 됩니다. */
+  // Common
+  ALREADY_DELETED_EXCEPTION(HttpStatus.NOT_FOUND, AlreadyDeletedException.class),
   // Auth
   INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.class),
   INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class),
