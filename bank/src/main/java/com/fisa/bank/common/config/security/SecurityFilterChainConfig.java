@@ -150,7 +150,10 @@ public class SecurityFilterChainConfig {
                         "/api/loans",
                         "/api/loans/ledger/{loanLedgerId}",
                         "/api/loans/ledgers/{userId}")
-                    .requestMatchers(HttpMethod.DELETE, "/api/accounts/{accountNumber}", "/api/loans/{loanLedgerId}"))
+                    .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/accounts/{accountNumber}",
+                        "/api/loans/{loanLedgerId}"))
         .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
