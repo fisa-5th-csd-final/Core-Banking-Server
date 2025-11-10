@@ -26,7 +26,7 @@ import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 public class OwnershipAspect {
 
   private final AccountReader accountReader;
-  private final LoanLedgerRepository loanLedgerRepository;
+  private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
 
   @Before("@annotation(verifyOwner)")
