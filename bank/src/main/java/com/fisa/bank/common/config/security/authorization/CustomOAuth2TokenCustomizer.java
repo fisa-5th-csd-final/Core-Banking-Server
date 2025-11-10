@@ -19,6 +19,16 @@ import com.fisa.bank.user.persistence.entity.id.UserId;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 
 /** OAuth2 Client에게 AccessToken을 발급할 때, Jwt에 사용자의 UserId 클레임을 삽입하는 역할을 수행 */
+
+/** OAuth2TokenCustomizer가 호출되는 시점
+ * 1. Client 동적 등록을 위해, ClientRegistrar 로 인증을 수행할 경우에, 해당 클라이언트에 대한 인증 결과로 액세스 토큰을 발급한다.
+ *    이때 AccessToken을 발급하기 위해, OAuth2TokenGenerator가 Customizer를 전부 호출한다.
+ *
+ * 2. 사용자가 로그인을 수행하고, OIDC 정보 제공 동의를 했을 때
+ *    클라이언트에게 AccessToken을 발급한다. 이때 사용자가 로그인을 수행했으니까, UsernamePasswordAuthentication 객체가
+ *    만들어지는데, 이떄도 또한 TokenGenerator가 Customizer를 호출한다.
+ *    사용자가 로그인을 했을 경우에는 UserId 를 담기 위해서 이 Customizer 에서 Claim을 커스텀하는 과정을 거친다.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -52,11 +62,7 @@ public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
       if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
         // ID Token 커스텀 (OIDC 표준 + 도메인 확장)
       }
-      return;
     }
-
-    log.warn("Accepted Authentication {}", principal);
-    throw new AuthenticationServiceException(
-        "Principal should be UsernamePasswordAuthenticationToken");
+    // UsernamePassword Authentication이 아니라면 그냥 통과
   }
 }
