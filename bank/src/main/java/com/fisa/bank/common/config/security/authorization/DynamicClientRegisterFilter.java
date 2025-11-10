@@ -75,9 +75,7 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
 
   private void renderRegistrationPage(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    var application = JakartaServletWebApplication.buildApplication(request.getServletContext());
-    var exchange = application.buildExchange(request, response);
-    WebContext ctx = new WebContext(exchange);
+    WebContext ctx = createWebContext(request, response);
     ctx.setVariable("registrationEndpoint", registrationEndpoint());
     ctx.setVariable("registrarClientId", registrarClientId);
     ctx.setVariable("registrarClientSecret", registrarClientSecret);
@@ -87,9 +85,7 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
 
   private void renderGuidePage(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    var application = JakartaServletWebApplication.buildApplication(request.getServletContext());
-    var exchange = application.buildExchange(request, response);
-    WebContext ctx = new WebContext(exchange);
+      WebContext ctx = createWebContext(request, response);
     writeHtml(response, templateEngine.process("dcr-guide", ctx));
   }
 
@@ -105,4 +101,10 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
         ? serverBaseUrl + "connect/register"
         : serverBaseUrl + "/connect/register";
   }
+
+    private WebContext createWebContext(HttpServletRequest request, HttpServletResponse response) {
+        var application = JakartaServletWebApplication.buildApplication(request.getServletContext());
+        var exchange = application.buildExchange(request, response);
+        return new WebContext(exchange);
+    }
 }
