@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.common.presentation.response.ApiResponse;
 import com.fisa.bank.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.common.presentation.response.body.SuccessBody;
@@ -29,7 +28,6 @@ import com.fisa.bank.loan.persistence.entity.LoanProduct;
 public class LoanController {
 
   private final LoanService loanService;
-  private final RequesterInfo requesterInfo;
 
   // 은행
   @PostMapping
@@ -46,7 +44,7 @@ public class LoanController {
       @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
     PagedResponse<LoanProductResponse<LoanProduct>> allProducts =
-        loanService.findAllProducts(pageable);
+        loanService.getAllProducts(pageable);
 
     return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
   }
@@ -54,7 +52,7 @@ public class LoanController {
   @GetMapping("/{loanProductId}")
   public ApiResponse<SuccessBody<LoanProductResponse<LoanProduct>>> getLoanProductById(
       @PathVariable Long loanProductId) {
-    LoanProductResponse<LoanProduct> loanProduct = loanService.findProductById(loanProductId);
+    LoanProductResponse<LoanProduct> loanProduct = loanService.getProductById(loanProductId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, loanProduct);
   }
@@ -99,7 +97,7 @@ public class LoanController {
   public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers(
       @PathVariable Long userId) {
     log.info("대출 리스트 조회");
-    List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedger(userId);
+    List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedgers(userId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, myLoanLedger);
   }
