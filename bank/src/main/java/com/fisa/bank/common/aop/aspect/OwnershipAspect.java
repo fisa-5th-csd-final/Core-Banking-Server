@@ -14,6 +14,11 @@ import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.common.aop.annotation.VerifyOwner;
 import com.fisa.bank.common.application.util.RequesterInfo;
+import com.fisa.bank.loan.application.exception.LoanLedgerAccessDeniedException;
+import com.fisa.bank.loan.application.exception.LoanLedgerNotFoundException;
+import com.fisa.bank.loan.persistence.entity.LoanLedger;
+import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
+import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 
 @Aspect
 @Component
@@ -21,6 +26,7 @@ import com.fisa.bank.common.application.util.RequesterInfo;
 public class OwnershipAspect {
 
   private final AccountReader accountReader;
+  private final LoanLedgerRepository loanLedgerRepository;
   private final RequesterInfo requesterInfo;
 
   @Before("@annotation(verifyOwner)")
@@ -38,7 +44,20 @@ public class OwnershipAspect {
           throw new AccessDeniedException();
         }
       }
-      case LOAN -> {}
+      case LOAN -> {
+        Long loanLedgerId = ((Number) idValue).longValue();
+        LoanLedger loanLedger =
+            loanLedgerRepository
+                .findById(LoanLedgerId.of(loanLedgerId))
+                .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+        if (!loanLedger
+            .getUser()
+            .getUserId()
+            .getValue()
+            .equals(requesterInfo.getUserId().getValue())) {
+          throw new LoanLedgerAccessDeniedException();
+        }
+      }
     }
   }
 
