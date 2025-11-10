@@ -177,7 +177,7 @@ public class SecurityFilterChainConfig {
             matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
-    http.authenticationManager(new ProviderManager(authenticationProvider));
+    http.authenticationProvider(authenticationProvider);
     http.formLogin(Customizer.withDefaults()); // form Login 활성화
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     http.csrf(AbstractHttpConfigurer::disable);
