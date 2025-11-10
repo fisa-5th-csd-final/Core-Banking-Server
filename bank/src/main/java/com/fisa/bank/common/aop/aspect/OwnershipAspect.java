@@ -15,10 +15,8 @@ import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.common.aop.annotation.VerifyOwner;
 import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.loan.application.exception.LoanLedgerAccessDeniedException;
-import com.fisa.bank.loan.application.exception.LoanLedgerNotFoundException;
+import com.fisa.bank.loan.application.service.reader.LoanReader;
 import com.fisa.bank.loan.persistence.entity.LoanLedger;
-import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
-import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 
 @Aspect
 @Component
@@ -46,7 +44,7 @@ public class OwnershipAspect {
       }
       case LOAN -> {
         Long loanLedgerId = ((Number) idValue).longValue();
-        LoanLedger loanLedger = loanReader.getLoanLedgerById(loanLedgerId);
+        LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
         if (!loanLedger
             .getUser()
             .getUserId()
