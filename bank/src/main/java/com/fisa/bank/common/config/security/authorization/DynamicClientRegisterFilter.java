@@ -1,18 +1,21 @@
 package com.fisa.bank.common.config.security.authorization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** 클라이언트를 동적으로 등록하기 위한 엔드포인트를 관리하는 서블릿 필터 해당 필터는 Spring Security Filter Chain에 등록하지 않는다. */
 @Component
