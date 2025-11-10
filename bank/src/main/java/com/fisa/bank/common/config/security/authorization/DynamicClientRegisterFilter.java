@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
@@ -97,9 +98,10 @@ public class DynamicClientRegisterFilter extends OncePerRequestFilter {
   }
 
   private String registrationEndpoint() {
-    return serverBaseUrl.endsWith("/")
-        ? serverBaseUrl + "connect/register"
-        : serverBaseUrl + "/connect/register";
+    return UriComponentsBuilder.fromUriString(serverBaseUrl)
+        .path("/connect/register")
+        .build()
+        .toUriString();
   }
 
   private WebContext createWebContext(HttpServletRequest request, HttpServletResponse response) {
