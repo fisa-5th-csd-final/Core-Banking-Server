@@ -1,5 +1,6 @@
 package com.fisa.bank.common.config.security;
 
+import com.fisa.bank.common.config.security.resource.UsernamePasswordAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,7 +10,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -165,14 +169,17 @@ public class SecurityFilterChainConfig {
   /** 시큐리티 기본 로그인 및 에러 리다이렉트 필터체인 */
   @Bean
   @Order(4)
-  public SecurityFilterChain loginFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain loginFilterChain(HttpSecurity http, @Qualifier("UsernamePasswordAuthenticationProvider")
+                                              AuthenticationProvider authenticationProvider) throws Exception {
 
     http.securityMatchers(
             matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
+    http.authenticationManager(new ProviderManager(authenticationProvider));
     http.formLogin(Customizer.withDefaults()); // form Login 활성화
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+    http.csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
   }
