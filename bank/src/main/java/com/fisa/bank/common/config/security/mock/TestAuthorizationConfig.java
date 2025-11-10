@@ -35,12 +35,6 @@ import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
 @RequiredArgsConstructor
 public class TestAuthorizationConfig {
 
-  // Spring Security 의 AuthenticationManger 등록
-  @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-  }
-
   @Bean("TestLoginAuthenticationFilter")
   public AuthenticationFilter testLoginFilter(
       @Qualifier("TestUsernamePasswordAuthenticationProvider")

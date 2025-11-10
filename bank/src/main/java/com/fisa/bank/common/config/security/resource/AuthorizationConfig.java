@@ -30,12 +30,6 @@ import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 @Configuration
 public class AuthorizationConfig {
 
-  // Spring Security 의 AuthenticationManger 등록
-  @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-  }
-
   /**
    * 사용자로부터 자격 증명 (ID/PW)를 받고 인증을 수행하는 필터
    *
