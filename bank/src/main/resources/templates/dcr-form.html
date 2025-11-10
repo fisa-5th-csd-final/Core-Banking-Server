@@ -155,13 +155,13 @@
     <div class="footer">© Your Bank — Dynamic Client Registration</div>
 </div>
 
-<script>
+<script th:inline="javascript">
     const $ = (sel) => document.querySelector(sel);
 
     // 전역 설정: 서버에서 /dcr-config로 주입
-    let REG_ENDPOINT = 'http://localhost:8080/connect/register';
-    let REG_CLIENT_ID = 'registrar-client';
-    let REG_CLIENT_SECRET = 'secret';
+    let REG_ENDPOINT = [[${registrationEndpoint}]];
+    let REG_CLIENT_ID = [[${registrarClientId}]];
+    let REG_CLIENT_SECRET = [[${registrarClientSecret}]];
 
     async function loadDcrConfig() {
         try {
