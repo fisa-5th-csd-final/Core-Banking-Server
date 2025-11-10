@@ -208,7 +208,7 @@ public class LoanService {
   public LoanTransactionResponse repayMonthlyLoan(
       Long loanLedgerId, LoanMonthlyRepayRequest request) {
 
-    LoanLedger loanLedger = loanReader.getLoanLedgerById(loanLedgerId);
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
 
@@ -259,7 +259,7 @@ public class LoanService {
   public void cancelLoan(Long loanLedgerId) {
     LocalDateTime today = LocalDateTime.now();
 
-    LoanLedger loanLedger = loanReader.getLoanLedgerById(loanLedgerId);
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     Account account = loanLedger.getAccount();
 
@@ -321,7 +321,7 @@ public class LoanService {
   @Transactional(readOnly = true)
   @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
-    LoanLedger loanLedger = loanReader.getLoanLedgerById(loanLedgerId);
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
     return LoanLedgerDetailResponse.from(loanLedger, monthlyRepayment);

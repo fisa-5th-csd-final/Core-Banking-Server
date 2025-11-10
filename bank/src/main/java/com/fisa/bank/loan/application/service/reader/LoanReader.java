@@ -36,7 +36,7 @@ public class LoanReader {
         .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
   }
 
-  public LoanLedger getLoanLedgerById(Long loanLedgerId) {
+  public LoanLedger findLoanLedgerById(Long loanLedgerId) {
     return loanLedgerRepository
         .findById(LoanLedgerId.of(loanLedgerId))
         .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
