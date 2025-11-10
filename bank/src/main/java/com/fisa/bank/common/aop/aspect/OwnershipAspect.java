@@ -46,10 +46,7 @@ public class OwnershipAspect {
       }
       case LOAN -> {
         Long loanLedgerId = ((Number) idValue).longValue();
-        LoanLedger loanLedger =
-            loanLedgerRepository
-                .findById(LoanLedgerId.of(loanLedgerId))
-                .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+        LoanLedger loanLedger = loanReader.getLoanLedgerById(loanLedgerId);
         if (!loanLedger
             .getUser()
             .getUserId()
