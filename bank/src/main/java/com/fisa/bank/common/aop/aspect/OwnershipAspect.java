@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import com.fisa.bank.account.application.exception.AccessDeniedException;
@@ -42,22 +43,26 @@ public class OwnershipAspect {
   }
 
   private Object extractParamValue(JoinPoint joinPoint, String paramName) {
-    for (Object arg : joinPoint.getArgs()) {
+    MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+    String[] parameterNames = signature.getParameterNames();
+    Object[] args = joinPoint.getArgs();
+
+    for (int i = 0; i < parameterNames.length; i++) {
+      if (parameterNames[i].equals(paramName)) {
+        return args[i];
+      }
+    }
+
+    for (Object arg : args) {
       if (arg == null) continue;
-
-      // 직접 파라미터로 전달된 경우
-      if (arg instanceof String && paramName.equals("accountNumber")) return arg;
-      if (arg instanceof Long && paramName.equals("loanId")) return arg;
-
-      // DTO나 record에서 필드 추출
       try {
-        for (Field f : arg.getClass().getDeclaredFields()) {
-          if (f.getName().equals(paramName)) {
-            f.setAccessible(true);
-            return f.get(arg);
-          }
-        }
-      } catch (IllegalAccessException ignored) {
+        Field field = arg.getClass().getDeclaredField(paramName);
+        field.setAccessible(true);
+        return field.get(arg);
+      } catch (NoSuchFieldException ignored) {
+        // Not in this arg, continue.
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException("Failed to access field: " + paramName, e);
       }
     }
     throw new IllegalArgumentException(paramName + " 파라미터를 찾을 수 없습니다.");
