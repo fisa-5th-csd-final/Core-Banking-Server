@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
-import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.common.application.exception.AlreadyDeletedException;
 import com.fisa.bank.common.aop.annotation.DomainType;
 import com.fisa.bank.common.aop.annotation.VerifyOwner;
 import com.fisa.bank.common.application.util.RequesterInfo;
@@ -96,12 +94,8 @@ public class LoanService {
   @Transactional
   public void deleteLoanProduct(Long loanProductId) {
     // 있는지 확인 후
-    if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
-      throw new LoanProductNotFoundException(loanProductId);
-    }
     loanRepository.deleteById(LoanProductId.of(loanProductId));
   }
-
 
     @Transactional(readOnly = true)
     public PagedResponse<LoanProductResponse<LoanProduct>> getAllProducts(Pageable pageable) {
@@ -336,8 +330,10 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public List<LoanLedgerResponse> getMyLoanLedgers(Long userId) {
-    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+  public List<LoanLedgerResponse> getMyLoanLedgers() {
+      Long userId = requesterInfo.getUserId().getValue();
+
+      List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }
 }
