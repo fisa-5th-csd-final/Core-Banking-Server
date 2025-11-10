@@ -5,16 +5,19 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fisa.bank.account.application.exception.AccountNotFoundException;
+import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.common.application.exception.AlreadyDeletedException;
+import com.fisa.bank.common.aop.annotation.DomainType;
+import com.fisa.bank.common.aop.annotation.VerifyOwner;
 import com.fisa.bank.common.application.util.RequesterInfo;
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.interest.application.service.InterestService;
@@ -22,12 +25,19 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
-import com.fisa.bank.loan.application.dto.response.*;
+import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
+import com.fisa.bank.loan.application.dto.response.LoanLedgerDetailResponse;
+import com.fisa.bank.loan.application.dto.response.LoanLedgerResponse;
+import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
+import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
+import com.fisa.bank.loan.application.dto.response.LoanTransactionResponse;
+import com.fisa.bank.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayment;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.loan.application.service.calculator.CalculatorService;
+import com.fisa.bank.loan.application.service.reader.LoanReader;
 import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.util.LoanTransactionFactory;
 import com.fisa.bank.loan.persistence.entity.*;
@@ -38,6 +48,7 @@ import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
 import com.fisa.bank.loan.persistence.repository.LoanTransactionRepository;
 import com.fisa.bank.loan.persistence.repository.PreferInterestRepository;
+import com.fisa.bank.user.application.service.reader.UserReader;
 import com.fisa.bank.user.persistence.entity.CreditRating;
 import com.fisa.bank.user.persistence.entity.CustomerLevel;
 import com.fisa.bank.user.persistence.entity.User;
@@ -50,12 +61,13 @@ public class LoanService {
   private final LoanRepository loanRepository;
   private final InterestService interestService;
   private final PreferInterestRepository preferInterestRepository;
-  private final UserRepository userRepository;
+  private final UserReader userReader;
   private final LoanLedgerRepository loanLedgerRepository;
   private final LoanTransactionRepository loanTransactionRepository;
-  private final RequesterInfo requesterInfo;
-  private final AccountRepository accountRepository;
+  private final AccountReader accountReader;
   private final CalculatorService calculatorService;
+  private final LoanReader loanReader;
+  private final RequesterInfo requesterInfo;
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -80,63 +92,52 @@ public class LoanService {
     return response;
   }
 
+  // TODO: 추후 soft-delete로 바꿀 예정
   @Transactional
   public void deleteLoanProduct(Long loanProductId) {
     // 있는지 확인 후
-    LoanProduct loanProduct =
-        loanRepository
-            .findByIdIgnoringRestriction(loanProductId)
-            .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
-    if (loanProduct.isDeleted()) {
-      throw new AlreadyDeletedException(loanProduct.getClass().getSimpleName(), loanProductId);
+    if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
+      throw new LoanProductNotFoundException(loanProductId);
     }
-    loanProduct.delete();
+    loanRepository.deleteById(LoanProductId.of(loanProductId));
   }
 
-  @Transactional
-  public PagedResponse<LoanProductResponse<LoanProduct>> findAllProducts(Pageable pageable) {
-    Page<LoanProduct> productPage = loanRepository.findAll(pageable);
 
-    Page<LoanProductResponse<LoanProduct>> response =
-        productPage.map(
-            (loanProduct) -> {
-              InterestRate interestRate = loanProduct.getInterestRateList().get(0);
-              InterestRateResponse interestRateResponse = InterestRateResponse.from(interestRate);
-              return LoanProductResponse.from(loanProduct, interestRateResponse);
-            });
+    @Transactional(readOnly = true)
+    public PagedResponse<LoanProductResponse<LoanProduct>> getAllProducts(Pageable pageable) {
+        Page<LoanProduct> productPage = loanReader.findAllProducts(pageable);
 
-    return new PagedResponse<>(response);
-  }
+        Page<LoanProductResponse<LoanProduct>> responsePage =
+                productPage.map(
+                        loanProduct -> {
+                            InterestRate interestRate = loanProduct.getInterestRateList().get(0);
+                            InterestRateResponse interestRateResponse = InterestRateResponse.from(interestRate);
+                            return LoanProductResponse.from(loanProduct, interestRateResponse);
+                        });
 
-  @Transactional
-  public LoanProductResponse<LoanProduct> findProductById(Long loanProductId) {
+        return new PagedResponse<>(responsePage);
+    }
 
-    LoanProduct loanProduct =
-        loanRepository
-            .findById(LoanProductId.of(loanProductId))
-            .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+    @Transactional(readOnly = true)
+    public LoanProductResponse<LoanProduct> getProductById(Long loanProductId) {
+        LoanProduct loanProduct = loanReader.findProductById(loanProductId);
 
-    InterestRateResponse interestRateResponse =
-        InterestRateResponse.from(loanProduct.getInterestRateList().get(0));
+        InterestRateResponse interestRateResponse =
+                InterestRateResponse.from(loanProduct.getInterestRateList().get(0));
 
-    LoanProductResponse<LoanProduct> response =
-        LoanProductResponse.from(loanProduct, interestRateResponse);
-
-    return response;
-  }
+        return LoanProductResponse.from(loanProduct, interestRateResponse);
+    }
 
   @Transactional
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   public LoanApplyforResponse applyForLoan(LoanApplyForRequest request, Long loanProductId) {
 
     // 유저 정보 추출
     UserId userId = requesterInfo.getUserId();
-    User user = userRepository.getReferenceById(userId);
-    Account account =
-        accountRepository
-            .findByAccountNumber(request.getAccountNumber())
-            .orElseThrow(AccountNotFoundException::new);
-    if (loanLedgerRepository.existsByUser_UserIdAndLoanProduct_LoanProductId(
-        userId, LoanProductId.of(loanProductId))) {
+    // 유저 정보 추출
+    User user = userReader.getUserById(userId.getValue());
+    Account account = accountReader.getAccountByAccountNumber(request.getAccountNumber());
+    if (loanReader.existsByUserIdAndLoanProductId(userId.getValue(), loanProductId)) {
       throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
     }
 
@@ -145,10 +146,7 @@ public class LoanService {
     BigDecimal remainPrincipal = request.getPrincipal();
 
     // 대출 유형 - 대출 상품에서 조회
-    LoanProduct loanProduct =
-        loanRepository
-            .findById(LoanProductId.of(loanProductId))
-            .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+    LoanProduct loanProduct = loanReader.findProductById(loanProductId);
     LoanType loanType = loanProduct.getType();
     InterestType interestType = request.getInterestType();
 
@@ -239,13 +237,11 @@ public class LoanService {
   }
 
   @Transactional
+  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public LoanTransactionResponse repayMonthlyLoan(
       Long loanLedgerId, LoanMonthlyRepayRequest request) {
 
-    LoanLedger loanLedger =
-        loanLedgerRepository
-            .findById(LoanLedgerId.of(loanLedgerId))
-            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
 
@@ -292,20 +288,13 @@ public class LoanService {
   }
 
   @Transactional
+  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public void cancelLoan(Long loanLedgerId) {
     LocalDateTime today = LocalDateTime.now();
-    UserId userId = requesterInfo.getUserId();
 
-    LoanLedger loanLedger =
-        loanLedgerRepository
-            .findById(LoanLedgerId.of(loanLedgerId))
-            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
-    UserId userIdOfLedger = loanLedger.getUser().getUserId();
     Account account = loanLedger.getAccount();
-
-    // 내 대출인지 확인
-    if (!userIdOfLedger.equals(userId)) throw new LoanLedgerAccessDeniedException();
 
     // 수수료율
     BigDecimal earlyPaidRate = loanLedger.getEarlyRepayInterestRate();
@@ -338,31 +327,17 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
+  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
-    // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
-    LoanLedger loanLedger =
-        loanLedgerRepository
-            .findById(LoanLedgerId.of(loanLedgerId))
-            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
-    UserId userIdOfLoanLedger = loanLedger.getUser().getUserId();
-
-    UserId userId = requesterInfo.getUserId();
-    // 대출한 유저의 id와 로그인한 유저의 id 비교
-    if (!userIdOfLoanLedger.equals(userId)) {
-      throw new LoanLedgerAccessDeniedException();
-    }
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
     return LoanLedgerDetailResponse.from(loanLedger, monthlyRepayment);
   }
 
   @Transactional(readOnly = true)
-  public List<LoanLedgerResponse> getMyLoanLedgers() {
-
-    Long userId = requesterInfo.getUserId().getValue();
-
-    List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
-
-    return allLoanLedgers.stream().map(LoanLedgerResponse::from).toList();
+  public List<LoanLedgerResponse> getMyLoanLedgers(Long userId) {
+    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+    return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }
 }

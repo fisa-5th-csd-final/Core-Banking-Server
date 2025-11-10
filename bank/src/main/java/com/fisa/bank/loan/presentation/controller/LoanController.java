@@ -46,7 +46,7 @@ public class LoanController {
       @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
     PagedResponse<LoanProductResponse<LoanProduct>> allProducts =
-        loanService.findAllProducts(pageable);
+        loanService.getAllProducts(pageable);
 
     return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
   }
@@ -54,7 +54,7 @@ public class LoanController {
   @GetMapping("/{loanProductId}")
   public ApiResponse<SuccessBody<LoanProductResponse<LoanProduct>>> getLoanProductById(
       @PathVariable Long loanProductId) {
-    LoanProductResponse<LoanProduct> loanProduct = loanService.findProductById(loanProductId);
+    LoanProductResponse<LoanProduct> loanProduct = loanService.getProductById(loanProductId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, loanProduct);
   }
