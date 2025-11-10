@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -353,12 +352,9 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public List<LoanLedgerResponse> getMyLoanLedger(Long userId) {
+  public List<LoanLedgerResponse> getMyLoanLedgers() {
 
-    Long userIdLogin = requesterInfo.getUserId().getValue();
-    if (!Objects.equals(userIdLogin, userId)) {
-      throw new LoanLedgerAccessDeniedException();
-    }
+    Long userId = requesterInfo.getUserId().getValue();
 
     List<LoanLedger> allLoanLedgers = loanLedgerRepository.findAllByUser_UserId(UserId.of(userId));
 
