@@ -26,7 +26,6 @@ import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.entity.AccountTransaction;
 import com.fisa.bank.account.persistence.entity.CardTransaction;
 import com.fisa.bank.account.persistence.enums.TransactionType;
-import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
 import com.fisa.bank.account.persistence.repository.CardTransactionRepository;
 import com.fisa.bank.common.aop.annotation.DomainType;
@@ -38,7 +37,6 @@ public class AccountTransactionService {
 
   private final AccountTransactionRepository accountTransactionRepository;
   private final CardTransactionRepository cardTransactionRepository;
-  private final AccountRepository accountRepository;
   private final AccountReader accountReader;
 
   @Value("${bank.code}")
