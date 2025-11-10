@@ -95,7 +95,7 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.DELETE);
   }
 
-  @GetMapping("/ledgers")
+  @GetMapping("/ledgers/{userId}")
   public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers() {
     log.info("대출 리스트 조회");
     List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedgers();
