@@ -1,6 +1,5 @@
 package com.fisa.bank.common.config.security;
 
-import com.fisa.bank.common.config.security.resource.UsernamePasswordAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -169,8 +167,11 @@ public class SecurityFilterChainConfig {
   /** 시큐리티 기본 로그인 및 에러 리다이렉트 필터체인 */
   @Bean
   @Order(4)
-  public SecurityFilterChain loginFilterChain(HttpSecurity http, @Qualifier("UsernamePasswordAuthenticationProvider")
-                                              AuthenticationProvider authenticationProvider) throws Exception {
+  public SecurityFilterChain loginFilterChain(
+      HttpSecurity http,
+      @Qualifier("UsernamePasswordAuthenticationProvider")
+          AuthenticationProvider authenticationProvider)
+      throws Exception {
 
     http.securityMatchers(
             matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
