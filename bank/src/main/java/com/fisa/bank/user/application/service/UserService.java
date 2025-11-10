@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fisa.bank.user.application.dto.UserCreateRequest;
 import com.fisa.bank.user.application.dto.UserInfoResponse;
 import com.fisa.bank.user.application.exception.InvalidAuthInfoException;
-import com.fisa.bank.user.application.exception.UserNotFoundException;
+import com.fisa.bank.user.application.service.reader.UserReader;
 import com.fisa.bank.user.application.util.PasswordUtil;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.UserAuth;
@@ -24,6 +24,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final UserAuthRepository authRepository;
+  private final UserReader userReader;
   private final PasswordUtil passwordUtil;
 
   @Transactional
@@ -51,12 +52,8 @@ public class UserService {
   }
 
   public UserInfoResponse getUserInfo(UserId userId) {
-    User user = getUserById(userId);
+    User user = userReader.getUserById(userId.getValue());
 
     return UserInfoResponse.of(user);
-  }
-
-  public User getUserById(UserId userId) {
-    return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
   }
 }

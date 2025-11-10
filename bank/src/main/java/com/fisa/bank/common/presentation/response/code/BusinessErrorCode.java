@@ -21,14 +21,18 @@ import com.fisa.bank.user.application.exception.UserNotFoundException;
 public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
 
   /** 여기에 커스텀 BusinessException을 정의하면 됩니다. */
+  // Auth
   INVALID_PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidPasswordFormatException.class),
   INVALID_AUTH_INFO_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidAuthInfoException.class),
+  // Account
   ACCOUNT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, AccountNotFoundException.class),
   INSUFFICIENT_BALANCE_EXCEPTION(HttpStatus.BAD_REQUEST, InsufficientBalanceException.class),
-  USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class),
   ACCOUNT_OWNER_MISMATCH_EXCEPTION(HttpStatus.BAD_REQUEST, AccountOwnerMismatchException.class),
-  LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanProductNotFoundException.class),
   ACCOUNT_NOT_DELETABLE_EXCEPTION(HttpStatus.BAD_REQUEST, AccountNotDeletableException.class),
+  ACCESSS_DENIED_EXCEPTION(HttpStatus.BAD_REQUEST, AccessDeniedException.class),
+  INVALID_TRANSFER_TARGET_EXCEPTION(HttpStatus.BAD_REQUEST, InvalidTransferTargetException.class),
+  // Loan
+  LOAN_PRODUCT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanProductNotFoundException.class),
   INTEREST_EXCEPTION(HttpStatus.NOT_FOUND, InterestException.class),
   DUPLICATE_LOAN_EXCEPTION(HttpStatus.CONFLICT, DuplicateLoanException.class),
   INSUFFICIENT_REPAYMENT_EXCEPTION(
@@ -36,9 +40,9 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
   PREFER_INTEREST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, PreferInterestNotFoundException.class),
   LOAN_LEDGER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanLedgerNotFoundException.class),
   LOAN_LEDGER_ACCESS_DENIED_EXCEPTION(HttpStatus.FORBIDDEN, LoanLedgerAccessDeniedException.class),
-  UNKNOWN_CALCULATOR_EXCEPTION(HttpStatus.BAD_REQUEST, UnknownCalculatorException.class),
-  INSUFFICIENT_BALANCE_AMOUNT_EXCEPTION(
-      HttpStatus.UNPROCESSABLE_ENTITY, InsufficientBalanceAmountException.class);
+  // user
+  USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class);
+
   private final HttpStatus status;
   @Getter private final Class<? extends BusinessException> exception;
 

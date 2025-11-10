@@ -44,9 +44,8 @@ public class AccountTransactionController {
   public ApiResponse<SuccessBody<AccountTransactionResponse>> withdraw(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
       @Valid @RequestBody AccountWithdrawRequest request) {
-    Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionResponse response =
-        accountTransactionService.withdraw(accountNumber, request, userId);
+        accountTransactionService.withdraw(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -55,9 +54,7 @@ public class AccountTransactionController {
   public ApiResponse<SuccessBody<AccountTransactionResponse>> deposit(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
       @Valid @RequestBody AccountDepositRequest request) {
-    Long userId = requesterInfo.getUserId().getValue();
-    AccountTransactionResponse response =
-        accountTransactionService.deposit(accountNumber, request, userId);
+    AccountTransactionResponse response = accountTransactionService.deposit(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -65,8 +62,7 @@ public class AccountTransactionController {
   @PostMapping("/transfer")
   public ApiResponse<SuccessBody<TransferResponse>> transfer(
       @Valid @RequestBody TransferRequest request) {
-    Long userId = requesterInfo.getUserId().getValue();
-    TransferResponse response = accountTransactionService.transfer(request, userId);
+    TransferResponse response = accountTransactionService.transfer(request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -75,9 +71,7 @@ public class AccountTransactionController {
   public ApiResponse<SuccessBody<CardPaymentResponse>> pay(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber,
       @Valid @RequestBody CardPaymentRequest request) {
-    Long userId = requesterInfo.getUserId().getValue();
-    CardPaymentResponse response =
-        accountTransactionService.payByCard(accountNumber, request, userId);
+    CardPaymentResponse response = accountTransactionService.payByCard(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 
@@ -89,9 +83,8 @@ public class AccountTransactionController {
           LocalDate startDate,
       @Parameter(description = "조회 종료일 (YYYY-MM-DD)", required = true) @RequestParam
           LocalDate endDate) {
-    Long userId = requesterInfo.getUserId().getValue();
     AccountTransactionListResponse response =
-        accountTransactionService.getTransactions(accountNumber, startDate, endDate, userId);
+        accountTransactionService.getTransactions(accountNumber, startDate, endDate);
     return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 }

@@ -17,6 +17,8 @@ import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
+import com.fisa.bank.common.aop.annotation.DomainType;
+import com.fisa.bank.common.aop.annotation.VerifyOwner;
 import com.fisa.bank.user.persistence.entity.User;
 
 @Service
@@ -42,9 +44,10 @@ public class AccountService {
   }
 
   // 계좌 상세 조회
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   @Transactional(readOnly = true)
-  public AccountDetailResponse getAccountDetail(String accountNumber, Long userId) {
-    Account account = accountReader.getOwnedAccount(accountNumber, userId);
+  public AccountDetailResponse getAccountDetail(String accountNumber) {
+    Account account = accountReader.getAccountByAccountNumber(accountNumber);
     return AccountDetailResponse.from(account);
   }
 
@@ -52,14 +55,14 @@ public class AccountService {
   @Transactional(readOnly = true)
   public List<AccountListResponse> getAccountsByUserId(Long userId) {
     User user = accountReader.getUserById(userId);
-
     return accountRepository.findAllByUser(user).stream().map(AccountListResponse::from).toList();
   }
 
   // 계좌 삭제
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   @Transactional
-  public void deleteAccount(String accountNumber, Long userId) {
-    Account account = accountReader.getOwnedAccount(accountNumber, userId);
+  public void deleteAccount(String accountNumber) {
+    Account account = accountReader.getAccountByAccountNumber(accountNumber);
 
     // 잔액이 있는 경우 예외 처리
     if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {

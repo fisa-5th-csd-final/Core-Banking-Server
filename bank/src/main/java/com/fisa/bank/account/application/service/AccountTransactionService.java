@@ -28,6 +28,8 @@ import com.fisa.bank.account.persistence.entity.CardTransaction;
 import com.fisa.bank.account.persistence.enums.TransactionType;
 import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
 import com.fisa.bank.account.persistence.repository.CardTransactionRepository;
+import com.fisa.bank.common.aop.annotation.DomainType;
+import com.fisa.bank.common.aop.annotation.VerifyOwner;
 
 @Service
 @RequiredArgsConstructor
@@ -73,11 +75,10 @@ public class AccountTransactionService {
   }
 
   // 출금
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   @Transactional
-  public AccountTransactionResponse withdraw(
-      String accountNumber, AccountWithdrawRequest request, Long userId) {
-    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-    Account account = accountReader.getOwnedAccountWithLock(accountNumber, userId);
+  public AccountTransactionResponse withdraw(String accountNumber, AccountWithdrawRequest request) {
+    Account account = accountReader.getAccountByAccountNumberWithLock(accountNumber);
 
     AccountTransaction trx =
         recordTransaction(account, request.amount(), TransactionType.ATM_WITHDRAW, false, null);
@@ -86,11 +87,10 @@ public class AccountTransactionService {
   }
 
   // 입금
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   @Transactional
-  public AccountTransactionResponse deposit(
-      String accountNumber, AccountDepositRequest request, Long userId) {
-    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-    Account account = accountReader.getOwnedAccountWithLock(accountNumber, userId);
+  public AccountTransactionResponse deposit(String accountNumber, AccountDepositRequest request) {
+    Account account = accountReader.getAccountByAccountNumberWithLock(accountNumber);
 
     AccountTransaction trx =
         recordTransaction(account, request.amount(), TransactionType.ATM_DEPOSIT, true, null);
@@ -99,52 +99,39 @@ public class AccountTransactionService {
   }
 
   // 송금
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "fromAccountNumber")
   @Transactional
-  public TransferResponse transfer(TransferRequest request, Long userId) {
+  public TransferResponse transfer(TransferRequest request) {
     String fromNo = request.fromAccountNumber();
     String toNo = request.toAccountNumber();
     BigDecimal amount = request.amount();
 
-    // 자기 자신으로 송금 방지
     if (ourBankCode.equals(request.toBankCode()) && fromNo.equals(toNo)) {
       throw new InvalidTransferTargetException();
     }
 
     if (ourBankCode.equals(request.toBankCode())) {
-      // 같은 은행: 두 계좌 모두 조회 및 락 획득
-      AccountReader.TransferAccountsPair accounts =
-          accountReader.lockTransferAccounts(fromNo, toNo, userId);
+      var pair = accountReader.lockTransferAccounts(fromNo, toNo);
+      Account from = pair.from();
+      Account to = pair.to();
 
-      // 거래 처리
+      recordTransaction(from, amount, TransactionType.TRANSFER_SEND, false, to.getAccountNumber());
       recordTransaction(
-          accounts.from(),
-          amount,
-          TransactionType.TRANSFER_SEND,
-          false,
-          accounts.to().getAccountNumber());
-      recordTransaction(
-          accounts.to(),
-          amount,
-          TransactionType.TRANSFER_RECEIVE,
-          true,
-          accounts.from().getAccountNumber());
+          to, amount, TransactionType.TRANSFER_RECEIVE, true, from.getAccountNumber());
 
-      return TransferResponse.of(accounts.from(), accounts.to(), amount);
-
+      return TransferResponse.of(from, to, amount);
     } else {
-      // 타행: 보내는 쪽만 락
-      Account from = accountReader.getOwnedAccountWithLock(fromNo, userId);
+      Account from = accountReader.getAccountByAccountNumberWithLock(fromNo);
       recordTransaction(from, amount, TransactionType.EXTERNAL_TRANSFER_SEND, false, toNo);
       return TransferResponse.ofExternal(from, toNo, amount);
     }
   }
 
   // 카드 결제
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   @Transactional
-  public CardPaymentResponse payByCard(
-      String accountNumber, CardPaymentRequest request, Long userId) {
-    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-    Account account = accountReader.getOwnedAccountWithLock(accountNumber, userId);
+  public CardPaymentResponse payByCard(String accountNumber, CardPaymentRequest request) {
+    Account account = accountReader.getAccountByAccountNumberWithLock(accountNumber);
 
     // 계좌에도 로그 남기기위해 반영
     recordTransaction(
@@ -169,10 +156,10 @@ public class AccountTransactionService {
     return CardPaymentResponse.from(saved);
   }
 
+  @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   public AccountTransactionListResponse getTransactions(
-      String accountNumber, LocalDate startDate, LocalDate endDate, Long userId) {
-    // 토큰을 통해 현재 사용자가 소유한 계좌인지 검증
-    Account account = accountReader.getOwnedAccount(accountNumber, userId);
+      String accountNumber, LocalDate startDate, LocalDate endDate) {
+    Account account = accountReader.getAccountByAccountNumber(accountNumber);
 
     // 거래내역 조회
     List<AccountTransactionResponse> transactions =
