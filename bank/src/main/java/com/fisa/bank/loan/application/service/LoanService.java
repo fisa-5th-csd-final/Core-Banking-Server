@@ -85,7 +85,7 @@ public class LoanService {
     // 있는지 확인 후
     LoanProduct loanProduct =
         loanRepository
-            .findById(LoanProductId.of(loanProductId))
+            .findByIdIgnoringRestriction(loanProductId)
             .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
     if (loanProduct.isDeleted()) {
       throw new AlreadyDeletedException(loanProduct.getClass().getSimpleName(), loanProductId);

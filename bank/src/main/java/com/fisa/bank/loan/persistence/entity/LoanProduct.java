@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
@@ -21,6 +22,7 @@ import com.fisa.bank.loan.persistence.enums.LoanType;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@SQLRestriction("is_deleted = false")
 public class LoanProduct extends BaseEntity {
 
   @Id
