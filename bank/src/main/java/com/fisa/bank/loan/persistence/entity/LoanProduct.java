@@ -31,7 +31,7 @@ public class LoanProduct {
   private LoanProductId loanProductId;
 
   // LoanProduct 1 : N LoanLedger
-  @OneToMany(mappedBy = "loanProduct", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "loanProduct")
   @Builder.Default
   private List<LoanLedger> loanLedgerList = new ArrayList<>();
 

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.common.aop.annotation.DomainType;
@@ -225,7 +226,7 @@ public class LoanService {
     Account account = loanLedger.getAccount();
 
     if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
-      throw new InsufficientBalanceAmountException();
+      throw new InsufficientBalanceException();
     }
 
     // 상환 가능하다면, 원장 테이블 업데이트 후 이력성 테이블에 데이터 저장
@@ -274,7 +275,7 @@ public class LoanService {
     EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, today, earlyPaidRate);
 
     if (account.getBalance().compareTo(earlyRepayment.getMustPaidAmount()) < 0) {
-      throw new InsufficientBalanceAmountException();
+      throw new InsufficientBalanceException();
     }
 
     loanLedger.updateLoanLedger(
