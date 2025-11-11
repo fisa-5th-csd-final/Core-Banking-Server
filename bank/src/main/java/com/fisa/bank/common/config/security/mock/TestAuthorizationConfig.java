@@ -11,7 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,12 +33,6 @@ import com.fisa.bank.common.config.security.resource.UnknownEndPointFilter;
 @Configuration
 @RequiredArgsConstructor
 public class TestAuthorizationConfig {
-
-  // Spring Security 의 AuthenticationManger 등록
-  @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-  }
 
   @Bean("TestLoginAuthenticationFilter")
   public AuthenticationFilter testLoginFilter(

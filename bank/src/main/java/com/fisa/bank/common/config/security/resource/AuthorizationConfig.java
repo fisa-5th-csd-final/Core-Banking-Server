@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,12 +28,6 @@ import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 @Profile({"local", "dev", "prod"})
 @Configuration
 public class AuthorizationConfig {
-
-  // Spring Security 의 AuthenticationManger 등록
-  @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-  }
 
   /**
    * 사용자로부터 자격 증명 (ID/PW)를 받고 인증을 수행하는 필터

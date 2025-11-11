@@ -9,3 +9,6 @@ spring:
       - classpath:application-bank.yml
   profiles:
     active: ${PROFILE}
+
+backend:
+  endpoint: ${BACKEND_ENDPOINT}

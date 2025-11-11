@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 /** 테스트용 UserDetailsService */
-@Component
 public class TestUserDetailsService implements UserDetailsService {
 
   @Override
