@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +66,6 @@ public class AccountTransactionService {
             .balanceBefore(before)
             .balanceAfter(after)
             .isIncome(isIncome)
-            .date(LocalDateTime.now())
             .destinationAccount(destinationAccount)
             .build();
 
@@ -164,13 +162,14 @@ public class AccountTransactionService {
     // 거래내역 조회
     List<AccountTransactionResponse> transactions =
         accountTransactionRepository
-            .findByAccountAndDateGreaterThanEqualAndDateBefore(
+            .findByAccountAndCreatedAtGreaterThanEqualAndCreatedAtBefore(
                 account, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay())
             .stream()
             .map(AccountTransactionResponse::from)
             .toList();
 
     // 응답 DTO 생성
-    return new AccountTransactionListResponse(account.getAccountNumber(), transactions);
+    return new AccountTransactionListResponse(
+        account.getAccountId().getValue(), account.getAccountNumber(), transactions);
   }
 }
