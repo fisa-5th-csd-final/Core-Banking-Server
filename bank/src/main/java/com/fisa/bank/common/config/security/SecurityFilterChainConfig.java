@@ -111,8 +111,7 @@ public class SecurityFilterChainConfig {
                         "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
                         )
                     .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
-                    .requestMatchers(
-                        HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
+                    .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
