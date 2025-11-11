@@ -41,7 +41,7 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
   INSUFFICIENT_REPAYMENT_EXCEPTION(
       HttpStatus.UNPROCESSABLE_ENTITY, InsufficientRepaymentException.class),
   INSUFFICIENT_BALANCE_AMOUNT_EXCEPTION(
-      HttpStatus.NOT_ACCEPTABLE, InsufficientBalanceAmountException.class),
+      HttpStatus.UNPROCESSABLE_ENTITY, InsufficientBalanceAmountException.class),
   PREFER_INTEREST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, PreferInterestNotFoundException.class),
   LOAN_LEDGER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanLedgerNotFoundException.class),
   LOAN_LEDGER_ACCESS_DENIED_EXCEPTION(HttpStatus.FORBIDDEN, LoanLedgerAccessDeniedException.class),
