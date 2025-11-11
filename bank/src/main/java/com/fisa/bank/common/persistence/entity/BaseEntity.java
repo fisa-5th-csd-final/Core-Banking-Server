@@ -1,7 +1,6 @@
 package com.fisa.bank.common.persistence.entity;
 
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PreRemove;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,8 +16,8 @@ public abstract class BaseEntity {
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private LocalDateTime deletedAt;
-  private boolean isDeleted;
+  protected LocalDateTime deletedAt;
+  protected boolean isDeleted;
 
   public BaseEntity() {
     this.createdAt = LocalDateTime.now();
@@ -27,9 +26,8 @@ public abstract class BaseEntity {
     this.isDeleted = false;
   }
 
-  @PreRemove
   public void delete() {
-    this.deletedAt = LocalDateTime.now();
     this.isDeleted = true;
+    this.deletedAt = LocalDateTime.now();
   }
 }

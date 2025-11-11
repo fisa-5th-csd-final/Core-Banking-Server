@@ -1,12 +1,10 @@
 package com.fisa.bank.loan.application.service;
 
-import com.fisa.bank.account.application.service.reader.AccountReader;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +38,6 @@ import com.fisa.bank.loan.application.service.reader.LoanReader;
 import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
 import com.fisa.bank.loan.application.util.LoanTransactionFactory;
 import com.fisa.bank.loan.persistence.entity.*;
-import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.loan.persistence.enums.*;
 import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
@@ -52,7 +49,6 @@ import com.fisa.bank.user.persistence.entity.CreditRating;
 import com.fisa.bank.user.persistence.entity.CustomerLevel;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.id.UserId;
-import com.fisa.bank.user.persistence.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -95,33 +91,35 @@ public class LoanService {
   @Transactional
   public void deleteLoanProduct(Long loanProductId) {
     // 있는지 확인 후
-    loanRepository.deleteById(LoanProductId.of(loanProductId));
+    LoanProduct loanProduct = loanReader.findProductById(loanProductId);
+    loanRepository.delete(loanProduct);
+    //      loanRepository.deleteById(LoanProductId.of(loanProductId));
   }
 
-    @Transactional(readOnly = true)
-    public PagedResponse<LoanProductResponse<LoanProduct>> getAllProducts(Pageable pageable) {
-        Page<LoanProduct> productPage = loanReader.findAllProducts(pageable);
+  @Transactional(readOnly = true)
+  public PagedResponse<LoanProductResponse<LoanProduct>> getAllProducts(Pageable pageable) {
+    Page<LoanProduct> productPage = loanReader.findAllProducts(pageable);
 
-        Page<LoanProductResponse<LoanProduct>> responsePage =
-                productPage.map(
-                        loanProduct -> {
-                            InterestRate interestRate = loanProduct.getInterestRateList().get(0);
-                            InterestRateResponse interestRateResponse = InterestRateResponse.from(interestRate);
-                            return LoanProductResponse.from(loanProduct, interestRateResponse);
-                        });
+    Page<LoanProductResponse<LoanProduct>> responsePage =
+        productPage.map(
+            loanProduct -> {
+              InterestRate interestRate = loanProduct.getInterestRateList().get(0);
+              InterestRateResponse interestRateResponse = InterestRateResponse.from(interestRate);
+              return LoanProductResponse.from(loanProduct, interestRateResponse);
+            });
 
-        return new PagedResponse<>(responsePage);
-    }
+    return new PagedResponse<>(responsePage);
+  }
 
-    @Transactional(readOnly = true)
-    public LoanProductResponse<LoanProduct> getProductById(Long loanProductId) {
-        LoanProduct loanProduct = loanReader.findProductById(loanProductId);
+  @Transactional(readOnly = true)
+  public LoanProductResponse<LoanProduct> getProductById(Long loanProductId) {
+    LoanProduct loanProduct = loanReader.findProductById(loanProductId);
 
-        InterestRateResponse interestRateResponse =
-                InterestRateResponse.from(loanProduct.getInterestRateList().get(0));
+    InterestRateResponse interestRateResponse =
+        InterestRateResponse.from(loanProduct.getInterestRateList().get(0));
 
-        return LoanProductResponse.from(loanProduct, interestRateResponse);
-    }
+    return LoanProductResponse.from(loanProduct, interestRateResponse);
+  }
 
   @Transactional
   @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
@@ -332,9 +330,9 @@ public class LoanService {
 
   @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedgers() {
-      Long userId = requesterInfo.getUserId().getValue();
+    Long userId = requesterInfo.getUserId().getValue();
 
-      List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }
 }
