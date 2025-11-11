@@ -20,6 +20,7 @@ import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
 import com.fisa.bank.common.aop.annotation.DomainType;
 import com.fisa.bank.common.aop.annotation.VerifyOwner;
+import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.user.persistence.entity.User;
 
 @Slf4j
@@ -73,7 +74,10 @@ public class AccountService {
 
     // 연결된 대출 상품이 있을 경우 삭제 불가
     if (account.getLoanLedger() != null) {
-      throw new AccountNotDeletableException("연결된 대출 상품이 있는 계좌는 삭제할 수 없습니다.");
+      if (account.getLoanLedger().getRepaymentStatus() == RepaymentStatus.NORMAL
+          || account.getLoanLedger().getRepaymentStatus() == RepaymentStatus.OVERDUE) {
+        throw new AccountNotDeletableException("연결된 대출 상품이 있는 계좌는 삭제할 수 없습니다.");
+      }
     }
 
     accountRepository.delete(account);
