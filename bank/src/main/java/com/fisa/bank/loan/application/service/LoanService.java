@@ -96,8 +96,13 @@ public class LoanService {
   @Transactional
   public void deleteLoanProduct(Long loanProductId) {
     // 있는지 확인 후
-    if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
-      throw new LoanProductNotFoundException(loanProductId);
+    LoanProduct loanProduct =
+        loanRepository
+            .findById(LoanProductId.of(loanProductId))
+            .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+
+    if (!loanProduct.getLoanLedgerList().isEmpty()) {
+      throw new LoanProductNotDeletableException();
     }
     loanRepository.deleteById(LoanProductId.of(loanProductId));
   }
