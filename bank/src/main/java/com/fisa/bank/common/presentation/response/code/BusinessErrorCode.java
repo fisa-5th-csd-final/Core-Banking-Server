@@ -45,6 +45,7 @@ public enum BusinessErrorCode implements ErrorResponseCode<BusinessException> {
   PREFER_INTEREST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, PreferInterestNotFoundException.class),
   LOAN_LEDGER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, LoanLedgerNotFoundException.class),
   LOAN_LEDGER_ACCESS_DENIED_EXCEPTION(HttpStatus.FORBIDDEN, LoanLedgerAccessDeniedException.class),
+    UNKNOWN_CALCULATOR_EXCEPTION(HttpStatus.BAD_REQUEST, UnknownCalculatorException.class),
   // user
   USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, UserNotFoundException.class);
 
