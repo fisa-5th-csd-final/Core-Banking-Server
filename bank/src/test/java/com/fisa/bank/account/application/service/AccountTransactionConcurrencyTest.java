@@ -130,8 +130,7 @@ class AccountTransactionConcurrencyTest {
         () -> {
           try {
             AccountWithdrawRequest request = new AccountWithdrawRequest(withdrawAmount);
-            accountTransactionService.withdraw(
-                account1.getAccountNumber(), request, testUser.getUserId().getValue());
+            accountTransactionService.withdraw(account1.getAccountNumber(), request);
             successCount.incrementAndGet();
           } catch (InsufficientBalanceException e) {
             failCount.incrementAndGet();
@@ -155,15 +154,18 @@ class AccountTransactionConcurrencyTest {
   void concurrentDeposits() throws InterruptedException {
     int threadCount = 10;
     BigDecimal depositAmount = new BigDecimal("10000");
+    AtomicInteger successCount = new AtomicInteger(0);
+    AtomicInteger failCount = new AtomicInteger(0);
 
     runConcurrentTasks(
         threadCount,
         () -> {
           try {
             AccountDepositRequest request = new AccountDepositRequest(depositAmount);
-            accountTransactionService.deposit(
-                account1.getAccountNumber(), request, testUser.getUserId().getValue());
+            accountTransactionService.deposit(account1.getAccountNumber(), request);
+            successCount.incrementAndGet();
           } catch (Exception e) {
+            failCount.incrementAndGet();
             e.printStackTrace();
           }
         });
@@ -191,13 +193,11 @@ class AccountTransactionConcurrencyTest {
             int index = (int) (Thread.currentThread().getId() % 2);
             if (index == 0) {
               AccountDepositRequest request = new AccountDepositRequest(amount);
-              accountTransactionService.deposit(
-                  account1.getAccountNumber(), request, testUser.getUserId().getValue());
+              accountTransactionService.deposit(account1.getAccountNumber(), request);
               depositCount.incrementAndGet();
             } else {
               AccountWithdrawRequest request = new AccountWithdrawRequest(amount);
-              accountTransactionService.withdraw(
-                  account1.getAccountNumber(), request, testUser.getUserId().getValue());
+              accountTransactionService.withdraw(account1.getAccountNumber(), request);
               withdrawCount.incrementAndGet();
             }
           } catch (Exception e) {
@@ -233,7 +233,7 @@ class AccountTransactionConcurrencyTest {
                     account2.getAccountNumber(),
                     "020",
                     transferAmount);
-            accountTransactionService.transfer(request, testUser.getUserId().getValue());
+            accountTransactionService.transfer(request);
             successCount.incrementAndGet();
           } catch (Exception e) {
             e.printStackTrace();
@@ -272,8 +272,7 @@ class AccountTransactionConcurrencyTest {
         () -> {
           try {
             AccountWithdrawRequest request = new AccountWithdrawRequest(withdrawAmount);
-            accountTransactionService.withdraw(
-                poorAccount.getAccountNumber(), request, testUser.getUserId().getValue());
+            accountTransactionService.withdraw(poorAccount.getAccountNumber(), request);
             successCount.incrementAndGet();
           } catch (InsufficientBalanceException e) {
             failCount.incrementAndGet();

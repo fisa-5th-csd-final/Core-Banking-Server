@@ -85,15 +85,15 @@ class AccountServiceTest {
     // given
     String accountNumber = "1234567890";
     Long userId = 1L;
-    when(accountReader.getOwnedAccount(accountNumber, userId)).thenReturn(testAccount);
+    when(accountReader.getAccountByAccountNumber(accountNumber)).thenReturn(testAccount);
 
     // when
-    AccountDetailResponse response = accountService.getAccountDetail(accountNumber, userId);
+    AccountDetailResponse response = accountService.getAccountDetail(accountNumber);
 
     // then
     assertThat(response).isNotNull();
     assertThat(response.accountNumber()).isEqualTo(accountNumber);
-    verify(accountReader, times(1)).getOwnedAccount(accountNumber, userId);
+    verify(accountReader, times(1)).getAccountByAccountNumber(accountNumber);
   }
 
   @Test
@@ -129,13 +129,13 @@ class AccountServiceTest {
     // given
     String accountNumber = "1234567890";
     Long userId = 1L;
-    when(accountReader.getOwnedAccount(accountNumber, userId)).thenReturn(testAccount);
+    when(accountReader.getAccountByAccountNumber(accountNumber)).thenReturn(testAccount);
 
     // when
-    accountService.deleteAccount(accountNumber, userId);
+    accountService.deleteAccount(accountNumber);
 
     // then
-    verify(accountReader, times(1)).getOwnedAccount(accountNumber, userId);
+    verify(accountReader, times(1)).getAccountByAccountNumber(accountNumber);
     verify(accountRepository, times(1)).delete(testAccount);
   }
 
@@ -148,13 +148,13 @@ class AccountServiceTest {
     Account accountWithBalance = Account.create("1234567890", testUser, "088");
     accountWithBalance.updateBalance(new BigDecimal("10000"));
 
-    when(accountReader.getOwnedAccount(accountNumber, userId)).thenReturn(accountWithBalance);
+    when(accountReader.getAccountByAccountNumber(accountNumber)).thenReturn(accountWithBalance);
 
     // when & then
-    assertThatThrownBy(() -> accountService.deleteAccount(accountNumber, userId))
+    assertThatThrownBy(() -> accountService.deleteAccount(accountNumber))
         .isInstanceOf(AccountNotDeletableException.class);
 
-    verify(accountReader, times(1)).getOwnedAccount(accountNumber, userId);
+    verify(accountReader, times(1)).getAccountByAccountNumber(accountNumber);
     verify(accountRepository, never()).delete(any());
   }
 }
