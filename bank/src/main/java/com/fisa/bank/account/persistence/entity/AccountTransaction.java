@@ -14,7 +14,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -55,9 +54,6 @@ public class AccountTransaction extends BaseEntity {
 
   @Column(name = "balance_after", nullable = false)
   private BigDecimal balanceAfter; // 거래 후 잔액
-
-  @Column(name = "date", nullable = false)
-  private LocalDateTime date;
 
   @Column(name = "destination_account", length = 20)
   private String destinationAccount;

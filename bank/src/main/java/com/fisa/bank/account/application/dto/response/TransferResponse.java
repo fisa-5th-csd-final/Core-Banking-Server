@@ -1,6 +1,7 @@
 package com.fisa.bank.account.application.dto.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.fisa.bank.account.persistence.entity.Account;
 
@@ -10,6 +11,7 @@ public record TransferResponse(
     BigDecimal amount,
     BigDecimal fromBalanceAfter,
     BigDecimal toBalanceAfter,
+    LocalDateTime transactionAt,
     String message) {
 
   // 같은 은행끼리 거래 시 팩토리 메서드
@@ -20,6 +22,7 @@ public record TransferResponse(
         amount,
         fromAccount.getBalance(),
         toAccount.getBalance(),
+        LocalDateTime.now(),
         "이체가 성공적으로 완료되었습니다.");
   }
 
@@ -32,6 +35,7 @@ public record TransferResponse(
         amount,
         fromAccount.getBalance(),
         null, // 타행이므로 잔액 알 수 없음
+        LocalDateTime.now(),
         "타행 이체가 성공적으로 완료되었습니다.");
   }
 }

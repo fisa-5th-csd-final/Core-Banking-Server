@@ -12,6 +12,6 @@ import com.fisa.bank.account.persistence.entity.id.AccountTransactionId;
 public interface AccountTransactionRepository
     extends JpaRepository<AccountTransaction, AccountTransactionId> {
 
-  List<AccountTransaction> findByAccountAndDateGreaterThanEqualAndDateBefore(
+  List<AccountTransaction> findByAccountAndCreatedAtGreaterThanEqualAndCreatedAtBefore(
       Account account, LocalDateTime start, LocalDateTime end);
 }

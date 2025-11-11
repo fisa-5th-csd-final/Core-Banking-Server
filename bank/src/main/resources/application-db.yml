@@ -1,6 +1,12 @@
 ## 데이터베이스 관련 설정
 
 spring:
+  config:
+    activate:
+      on-profile:
+        - local
+        - dev
+        - prod
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -23,3 +29,22 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect # ??
+
+---
+# 테스트용 설정 작성
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: ${TEST_DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect

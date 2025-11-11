@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.fisa.bank.loan.persistence.repository.PreferInterestRepository;
@@ -15,6 +16,7 @@ import com.fisa.bank.user.persistence.entity.CustomerLevel;
    나중에 고객 등급과 신용 등급이 변경됐을 때를 고려해서 Map<복합키, 우대금리>로 구현했습니다.
 */
 @Component
+@Profile({"local", "dev", "prod"})
 public class PreferInterestInitializer implements CommandLineRunner {
 
   private final PreferInterestRepository preferInterestRepository;
