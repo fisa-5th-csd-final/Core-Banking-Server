@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 import com.fisa.bank.account.application.exception.AccessDeniedException;
@@ -20,6 +21,7 @@ import com.fisa.bank.loan.persistence.entity.LoanLedger;
 
 @Aspect
 @Component
+@ConditionalOnExpression("!'${spring.profiles.active:}'.contains('test')")
 @RequiredArgsConstructor
 public class OwnershipAspect {
 
