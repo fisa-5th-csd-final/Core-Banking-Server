@@ -1,0 +1,70 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: core-bank-mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  flyway:
+    image: flyway/flyway:10
+    container_name: core-bank-flyway
+    volumes:
+      - ./bank/src/main/resources/db/migration:/flyway/sql:ro
+    command:
+      - "-url=${DATABASE_URL}"
+      - "-user=${DATABASE_USERNAME}"
+      - "-password=${DATABASE_PASSWORD}"
+      - -locations=filesystem:/flyway/sql
+      - migrate
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: "no"
+
+  core-bank-server:
+    container_name: core-bank-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PROFILE: ${PROFILE}
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_DDL_AUTO: ${DATABASE_DDL_AUTO}
+      BACKEND_ENDPOINT: ${BACKEND_ENDPOINT}
+      ACCESS_TOKEN_EXPIRY: ${ACCESS_TOKEN_EXPIRY}
+      REFRESH_TOKEN_EXPIRY: ${REFRESH_TOKEN_EXPIRY}
+      JWK_SET_URI: ${JWK_SET_URI}
+      JWK_PUBLIC_KEY_PATH: ${JWK_PUBLIC_KEY_PATH}
+      JWK_PRIVATE_KEY_PATH: ${JWK_PRIVATE_KEY_PATH}
+      REGISTRAR_CLIENT_ID: ${REGISTRAR_CLIENT_ID}
+      REGISTRAR_CLIENT_SECRET: ${REGISTRAR_CLIENT_SECRET}
+      REGISTRAR_CLIENT_ENDPOINT: ${REGISTRAR_CLIENT_ENDPOINT}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keys:/app/keys:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+
+volumes:
+  mysql-data:
