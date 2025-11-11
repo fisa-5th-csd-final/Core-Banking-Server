@@ -1,6 +1,7 @@
 package com.fisa.bank.account.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.fisa.bank.common.aop.annotation.DomainType;
 import com.fisa.bank.common.aop.annotation.VerifyOwner;
 import com.fisa.bank.user.persistence.entity.User;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -67,6 +69,11 @@ public class AccountService {
     // 잔액이 있는 경우 예외 처리
     if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {
       throw new AccountNotDeletableException();
+    }
+
+    // 연결된 대출 상품이 있을 경우 삭제 불가
+    if (account.getLoanLedger() != null) {
+      throw new AccountNotDeletableException("연결된 대출 상품이 있는 계좌는 삭제할 수 없습니다.");
     }
 
     accountRepository.delete(account);
