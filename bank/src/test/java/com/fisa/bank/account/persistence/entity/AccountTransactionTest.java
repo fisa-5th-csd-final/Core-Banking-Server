@@ -265,7 +265,7 @@ class AccountTransactionTest {
 
   private Account createTestAccountWithBalance(BigDecimal balance) {
     Account account = Account.create("1234567890", createTestUser(), "088");
-    account.updateBalance(balance);
+    account.deposit(balance);
     return account;
   }
 

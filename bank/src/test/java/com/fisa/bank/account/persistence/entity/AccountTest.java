@@ -37,17 +37,32 @@ class AccountTest {
   }
 
   @Test
-  @DisplayName("잔액 업데이트가 정상적으로 수행된다")
-  void updateBalance() {
+  @DisplayName("입금이 정상적으로 수행된다")
+  void deposit() {
     // given
     Account account = Account.create("1234567890", createTestUser(), "088");
-    BigDecimal newBalance = new BigDecimal("10000");
+    BigDecimal depositAmount = new BigDecimal("10000");
 
     // when
-    account.updateBalance(newBalance);
+    account.deposit(depositAmount);
 
     // then
-    assertThat(account.getBalance()).isEqualByComparingTo(newBalance);
+    assertThat(account.getBalance()).isEqualByComparingTo(depositAmount);
+  }
+
+  @Test
+  @DisplayName("출금이 정상적으로 수행된다")
+  void withdraw() {
+    // given
+    Account account = Account.create("1234567890", createTestUser(), "088");
+    account.deposit(new BigDecimal("10000"));
+    BigDecimal withdrawAmount = new BigDecimal("5000");
+
+    // when
+    account.withdraw(withdrawAmount);
+
+    // then
+    assertThat(account.getBalance()).isEqualByComparingTo(new BigDecimal("5000"));
   }
 
   @Test

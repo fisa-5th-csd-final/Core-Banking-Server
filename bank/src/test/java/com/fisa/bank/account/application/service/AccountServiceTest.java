@@ -146,7 +146,7 @@ class AccountServiceTest {
     String accountNumber = "1234567890";
     Long userId = 1L;
     Account accountWithBalance = Account.create("1234567890", testUser, "088");
-    accountWithBalance.updateBalance(new BigDecimal("10000"));
+    accountWithBalance.deposit(new BigDecimal("10000"));
 
     when(accountReader.getAccountByAccountNumber(accountNumber)).thenReturn(accountWithBalance);
 
