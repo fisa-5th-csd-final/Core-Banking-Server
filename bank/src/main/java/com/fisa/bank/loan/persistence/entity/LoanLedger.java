@@ -1,6 +1,7 @@
 package com.fisa.bank.loan.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.*;
 
 import java.math.BigDecimal;

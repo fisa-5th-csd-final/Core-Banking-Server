@@ -3,15 +3,12 @@ package com.fisa.bank.loan.application.dto.response;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.List;
-
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 
 @Getter
 public class LoanProductResponse<T> {
-  private List<T> data;
 
   private final Long id;
   private final String name;
