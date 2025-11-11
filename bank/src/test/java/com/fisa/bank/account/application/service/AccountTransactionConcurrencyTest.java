@@ -143,7 +143,7 @@ class AccountTransactionConcurrencyTest {
             successCount.incrementAndGet();
           } catch (Exception e) {
             failCount.incrementAndGet();
-            e.printStackTrace();
+            org.junit.jupiter.api.Assertions.fail("예상치 못한 예외 발생", e);
           }
         });
 
