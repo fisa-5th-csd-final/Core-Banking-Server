@@ -1,14 +1,14 @@
 package com.fisa.bank.loan.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OrderBy;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.JavaType;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.*;
 import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.common.persistence.entity.BaseEntity;
@@ -22,7 +22,15 @@ import com.fisa.bank.loan.persistence.enums.LoanType;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@SQLRestriction("is_deleted = false")
+@FilterDef(
+    name = "deletedFilter", // 정의할 필터 이름
+    parameters = @ParamDef(name = "isDeleted", type = Boolean.class) // 필터에 사용될 파라미터
+    )
+// 실제 적용되는 핕터
+@Filter(
+    name = "deletedFilter", // 적용할 필터 이름
+    condition = "is_deleted = :isDeleted" // 필터 조건 - sql 실행 시 해당 조건에 따라 실행
+    )
 public class LoanProduct extends BaseEntity {
 
   @Id

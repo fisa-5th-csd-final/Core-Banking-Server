@@ -1,5 +1,6 @@
 package com.fisa.bank.loan.application.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -319,9 +320,13 @@ public class LoanService {
     loanTransactionRepository.save(loanTransaction);
   }
 
+  private final EntityManager entityManager;
+
   @Transactional(readOnly = true)
   @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
+
+    //          session.enableFilter("deletedFilter").setParameter("isDeleted", true);
     LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);

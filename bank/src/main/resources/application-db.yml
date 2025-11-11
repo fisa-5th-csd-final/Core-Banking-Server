@@ -16,10 +16,12 @@ spring:
     encoding: UTF-8
 
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: ${DATABASE_DDL_AUTO}
     generate-ddl: true
     open-in-view: false # osiv
     properties:
       hibernate:
+        format-sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect # ??

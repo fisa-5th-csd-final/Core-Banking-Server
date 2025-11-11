@@ -1,6 +1,7 @@
 package com.fisa.bank.loan.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -8,8 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.JavaType;
-import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.*;
 import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.account.persistence.entity.Account;
@@ -30,6 +30,15 @@ import com.fisa.bank.user.persistence.entity.User;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
+@FilterDef(
+    name = "ldeletedFilter", // 정의할 필터 이름
+    parameters = @ParamDef(name = "isDeleted", type = Boolean.class) // 필터에 사용될 파라미터
+    )
+// 실제 적용되는 핕터
+@Filter(
+    name = "ldeletedFilter", // 적용할 필터 이름
+    condition = "is_deleted = :isDeleted" // 필터 조건 - sql 실행 시 해당 조건에 따라 실행
+    )
 public class LoanLedger extends BaseEntity {
 
   @Id
