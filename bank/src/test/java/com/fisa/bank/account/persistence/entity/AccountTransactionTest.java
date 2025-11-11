@@ -37,7 +37,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(transactionDate)
             .isIncome(true)
             .build();
 
@@ -69,7 +68,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(transactionDate)
             .isIncome(false)
             .build();
 
@@ -102,7 +100,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(transactionDate)
             .destinationAccount(destinationAccount)
             .isIncome(false)
             .build();
@@ -136,7 +133,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(transactionDate)
             .destinationAccount(sourceAccount)
             .isIncome(true)
             .build();
@@ -170,7 +166,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(transactionDate)
             .destinationAccount(storeName)
             .isIncome(false)
             .build();
@@ -202,7 +197,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(LocalDateTime.now())
             .isIncome(false)
             .build();
 
@@ -232,7 +226,6 @@ class AccountTransactionTest {
             .amount(amount)
             .balanceBefore(balanceBefore)
             .balanceAfter(balanceAfter)
-            .date(transactionDate)
             .destinationAccount(externalAccount)
             .isIncome(false)
             .build();
@@ -258,12 +251,12 @@ class AccountTransactionTest {
             .amount(new BigDecimal("10000"))
             .balanceBefore(BigDecimal.ZERO)
             .balanceAfter(new BigDecimal("10000"))
-            .date(specificDate)
             .isIncome(true)
             .build();
 
     // then
-    assertThat(transaction.getDate()).isEqualTo(specificDate);
+    assertThat(transaction.getCreatedAt()).isNotNull();
+    assertThat(transaction.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
   }
 
   private Account createTestAccount() {
@@ -272,7 +265,7 @@ class AccountTransactionTest {
 
   private Account createTestAccountWithBalance(BigDecimal balance) {
     Account account = Account.create("1234567890", createTestUser(), "088");
-    account.updateBalance(balance);
+    account.deposit(balance);
     return account;
   }
 

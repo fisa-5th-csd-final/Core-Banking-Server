@@ -63,10 +63,10 @@ class AccountTransactionConcurrencyTest {
     testUser = userRepository.saveAndFlush(testUser);
 
     account1 = Account.create("1234567890", testUser, "088");
-    account1.updateBalance(new BigDecimal("1000000"));
+    account1.deposit(new BigDecimal("1000000"));
 
     account2 = Account.create("9876543210", testUser, "088");
-    account2.updateBalance(new BigDecimal("1000000"));
+    account2.deposit(new BigDecimal("1000000"));
 
     accountRepository.saveAndFlush(account1);
     accountRepository.saveAndFlush(account2);
@@ -236,7 +236,7 @@ class AccountTransactionConcurrencyTest {
   @DisplayName("잔액 부족 시 동시 출금이 올바르게 제어된다")
   void concurrentWithdrawalsWithInsufficientBalance() throws InterruptedException {
     Account poorAccount = Account.create("1111111111", testUser, "088");
-    poorAccount.updateBalance(new BigDecimal("50000"));
+    poorAccount.deposit(new BigDecimal("50000"));
     accountRepository.save(poorAccount);
 
     int threadCount = 10;

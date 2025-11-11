@@ -8,7 +8,6 @@ import com.fisa.bank.account.persistence.enums.ConsumptionCategory;
 
 public record CardPaymentResponse(
     Long trxCId,
-    Long accountId,
     String storeName,
     BigDecimal amount,
     ConsumptionCategory category,
@@ -19,7 +18,6 @@ public record CardPaymentResponse(
   public static CardPaymentResponse from(CardTransaction trx) {
     return new CardPaymentResponse(
         trx.getTrxCId().getValue(),
-        trx.getAccount().getAccountId().getValue(),
         trx.getStoreName(),
         trx.getAmount(),
         trx.getCategory(),

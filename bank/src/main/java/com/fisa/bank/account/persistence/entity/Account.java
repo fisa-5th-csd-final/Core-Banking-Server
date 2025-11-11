@@ -19,6 +19,7 @@ import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.persistence.entity.id.*;
 import com.fisa.bank.common.persistence.entity.BaseEntity;
 import com.fisa.bank.loan.persistence.entity.LoanLedger;
@@ -62,8 +63,14 @@ public class Account extends BaseEntity {
         .build();
   }
 
-  // 거래 후 잔액으로 balance 변경
-  public void updateBalance(BigDecimal after) {
-    this.balance = after;
+  public void withdraw(BigDecimal amount) {
+    if (balance.compareTo(amount) < 0) {
+      throw new InsufficientBalanceException();
+    }
+    this.balance = balance.subtract(amount);
+  }
+
+  public void deposit(BigDecimal amount) {
+    this.balance = balance.add(amount);
   }
 }

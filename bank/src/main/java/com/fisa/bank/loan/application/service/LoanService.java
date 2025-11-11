@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
 import com.fisa.bank.loan.application.dto.response.LoanTransactionResponse;
 import com.fisa.bank.loan.application.dto.response.PagedResponse;
+import com.fisa.bank.loan.application.event.LoanCancelledEvent;
+import com.fisa.bank.loan.application.event.LoanRepaidEvent;
 import com.fisa.bank.loan.application.exception.*;
 import com.fisa.bank.loan.application.model.EarlyRepayment;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
@@ -63,6 +66,7 @@ public class LoanService {
   private final CalculatorService calculatorService;
   private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -224,10 +228,6 @@ public class LoanService {
       throw new InsufficientBalanceAmountException();
     }
 
-    BigDecimal afterBalance = account.getBalance().subtract(monthlyRepayment.getMonthlyPayment());
-
-    account.updateBalance(afterBalance); // 잔액 변경
-
     // 상환 가능하다면, 원장 테이블 업데이트 후 이력성 테이블에 데이터 저장
     // 남은 원금, 다음 상환일, 마지막 상환 날짜 업데이트
     LocalDateTime lastRepaymentDate = loanLedger.getNextRepaymentDate();
@@ -251,6 +251,10 @@ public class LoanService {
 
     loanTransactionRepository.save(loanTransaction);
 
+    eventPublisher.publishEvent(
+        new LoanRepaidEvent(
+            account, monthlyRepayment.getMonthlyPayment(), loanLedger.getLoanProduct().getName()));
+
     return LoanTransactionResponse.from(loanTransaction);
   }
 
@@ -273,8 +277,6 @@ public class LoanService {
       throw new InsufficientBalanceAmountException();
     }
 
-    BigDecimal afterBalance = account.getBalance().subtract(earlyRepayment.getMustPaidAmount());
-
     loanLedger.updateLoanLedger(
         UpdateLoanLedgerParam.builder()
             .remainPrincipal(BigDecimal.ZERO)
@@ -283,14 +285,16 @@ public class LoanService {
             .status(RepaymentStatus.TERMINATED)
             .build());
 
-    account.updateBalance(afterBalance); // 잔액 변경
-
     LoanTransaction loanTransaction =
         LoanTransactionFactory.createEarlyRepay(loanLedger, earlyRepayment, today);
 
     loanLedger.addLoanTransactionList(loanTransaction);
 
     loanTransactionRepository.save(loanTransaction);
+
+    eventPublisher.publishEvent(
+        new LoanCancelledEvent(
+            account, earlyRepayment.getMustPaidAmount(), loanLedger.getLoanProduct().getName()));
   }
 
   @Transactional(readOnly = true)
