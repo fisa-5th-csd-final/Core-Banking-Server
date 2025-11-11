@@ -14,6 +14,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.JavaType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -53,6 +55,14 @@ public class Account extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY, mappedBy = "account")
   private LoanLedger loanLedger;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<AccountTransaction> accountTransactions = new ArrayList<>();
+
+  @Builder.Default
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<CardTransaction> cardTransactions = new ArrayList<>();
 
   public static Account create(String accountNumber, User user, String bankCode) {
     return Account.builder()
