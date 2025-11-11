@@ -104,14 +104,15 @@ public class SecurityFilterChainConfig {
                     .requestMatchers(
                         HttpMethod.GET,
                         "/api/loans/products",
-                        "/api/loans/{loanProductId}",
-                        "/api/interests/{loanProductId}",
+                        "/api/loans/{loanProductId:\\d+}",
+                        "/api/interests/{loanProductId:\\d+}",
                         "/swagger-ui/index.html", // TODO: Swagger 전용 필터체인으로 분리
                         "/v3/api-docs", // TODO: Swagger 전용 필터체인으로 분리
                         "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
                         )
                     .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
-                    .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId}"))
+                    .requestMatchers(
+                        HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
@@ -135,8 +136,8 @@ public class SecurityFilterChainConfig {
                 matcher
                     .requestMatchers(
                         HttpMethod.POST,
-                        "/api/loans/{loanProductId}",
-                        "/api/loans/{loanLedgerId}/repayment",
+                        "/api/loans/{loanProductId:\\d+}",
+                        "/api/loans/{loanLedgerId:\\d+}/repayment",
                         "/api/accounts",
                         "/api/accounts/{accountNumber}/deposit",
                         "/api/accounts/{accountNumber}/pay",
@@ -149,12 +150,12 @@ public class SecurityFilterChainConfig {
                         "/api/accounts",
                         "/api/accounts/{accountNumber}/transactions",
                         "/api/loans",
-                        "/api/loans/ledger/{loanLedgerId}",
-                        "/api/loans/ledgers/{userId}")
+                        "/api/loans/ledger/{loanLedgerId:\\d+}",
+                        "/api/loans/ledgers")
                     .requestMatchers(
                         HttpMethod.DELETE,
                         "/api/accounts/{accountNumber}",
-                        "/api/loans/{loanLedgerId}"))
+                        "/api/loans/{loanLedgerId:\\d+}"))
         .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -328,7 +328,8 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public List<LoanLedgerResponse> getMyLoanLedgers(Long userId) {
+  public List<LoanLedgerResponse> getMyLoanLedgers() {
+      Long userId = requesterInfo.getUserId().getValue();
     List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }

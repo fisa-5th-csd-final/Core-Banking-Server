@@ -49,7 +49,7 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
   }
 
-  @GetMapping("/{loanProductId}")
+  @GetMapping("/{loanProductId:\\d+}")
   public ApiResponse<SuccessBody<LoanProductResponse<LoanProduct>>> getLoanProductById(
       @PathVariable Long loanProductId) {
     LoanProductResponse<LoanProduct> loanProduct = loanService.getProductById(loanProductId);
@@ -57,7 +57,7 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, loanProduct);
   }
 
-  @DeleteMapping("/products/{loanProductId}")
+  @DeleteMapping("/products/{loanProductId:\\d+}")
   public ApiResponse<SuccessBody<Void>> deleteLoanProduct(@PathVariable Long loanProductId) {
 
     loanService.deleteLoanProduct(loanProductId);
@@ -66,7 +66,7 @@ public class LoanController {
   }
 
   // 사용자 - 대출 상품 가입, 대출 해지, 대출 상환, 대출 상환 내역 조회
-  @PostMapping("/{loanProductId}")
+  @PostMapping("/{loanProductId:\\d+}")
   public ApiResponse<SuccessBody<LoanApplyforResponse>> applyForLoan(
       @PathVariable Long loanProductId, @Valid @RequestBody LoanApplyForRequest request) {
     log.info("대출 가입");
@@ -76,7 +76,7 @@ public class LoanController {
   }
 
   // 대출 상환
-  @PostMapping("/{loanLedgerId}/repayment")
+  @PostMapping("/{loanLedgerId:\\d+}/repayment")
   public ApiResponse<SuccessBody<LoanTransactionResponse>> repayMonthlyLoan(
       @PathVariable Long loanLedgerId, @RequestBody LoanMonthlyRepayRequest request) {
     log.info("대출 상환");
@@ -85,7 +85,7 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.UPDATE, loanTransactionResponse);
   }
 
-  @DeleteMapping("/{loanLedgerId}")
+  @DeleteMapping("/{loanLedgerId:\\d+}")
   public ApiResponse<SuccessBody<Void>> deleteLoanLedger(
       @PathVariable("loanLedgerId") Long loanLedgerId) {
     log.info("대출 해지");
@@ -93,16 +93,15 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.DELETE);
   }
 
-  @GetMapping("/ledgers/{userId}")
-  public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers(
-      @PathVariable Long userId) {
+  @GetMapping("/ledgers")
+  public ApiResponse<SuccessBody<List<LoanLedgerResponse>>> getMyLoanLedgers() {
     log.info("대출 리스트 조회");
-    List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedgers(userId);
+    List<LoanLedgerResponse> myLoanLedger = loanService.getMyLoanLedgers();
 
     return ApiResponseGenerator.success(ResponseCode.GET, myLoanLedger);
   }
 
-  @GetMapping("/ledger/{loanLedgerId}")
+  @GetMapping("/ledger/{loanLedgerId:\\d+}")
   public ApiResponse<SuccessBody<LoanLedgerDetailResponse>> getLoanLedgerDetail(
       @PathVariable Long loanLedgerId) {
     log.info("대출 세부 정보 조회");
