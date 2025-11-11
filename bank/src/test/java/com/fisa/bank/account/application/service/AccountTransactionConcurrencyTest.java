@@ -13,29 +13,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
 import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.account.application.dto.request.TransferRequest;
 import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.account.persistence.repository.AccountTransactionRepository;
 import com.fisa.bank.user.persistence.entity.User;
 import com.fisa.bank.user.persistence.entity.UserAuth;
 import com.fisa.bank.user.persistence.repository.UserAuthRepository;
 import com.fisa.bank.user.persistence.repository.UserRepository;
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {"bank.code=020"})
+@SpringBootTest(properties = {"bank.code=020"})
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:env.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -44,16 +37,12 @@ class AccountTransactionConcurrencyTest {
 
   @Autowired private AccountTransactionService accountTransactionService;
   @Autowired private AccountRepository accountRepository;
-  @Autowired private AccountTransactionRepository accountTransactionRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private UserAuthRepository userAuthRepository;
-  @Autowired private TestRestTemplate restTemplate;
-  @Autowired private ObjectMapper objectMapper;
 
   private Account account1;
   private Account account2;
   private User testUser;
-  private String accessToken;
 
   @BeforeEach
   void setUp() throws Exception {
@@ -83,18 +72,6 @@ class AccountTransactionConcurrencyTest {
     accountRepository.saveAndFlush(account2);
 
     accountRepository.flush();
-
-    accessToken = getAccessToken(testUser.getUserId().getValue());
-  }
-
-  private String getAccessToken(Long userId) throws Exception {
-    ResponseEntity<String> response =
-        restTemplate.postForEntity("/api/login/" + userId, null, String.class);
-
-    assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-
-    JsonNode jsonNode = objectMapper.readTree(response.getBody());
-    return jsonNode.get("access_token").asText();
   }
 
   /* 공통 동시성 제어 실행 메서드 */
