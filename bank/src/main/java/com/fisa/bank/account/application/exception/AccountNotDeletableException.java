@@ -9,4 +9,9 @@ public class AccountNotDeletableException extends BusinessException {
   public AccountNotDeletableException() {
     super(ERROR_CODE, MESSAGE);
   }
+
+  // 커스텀 메시지 사용
+  public AccountNotDeletableException(String message) {
+    super(ERROR_CODE, message);
+  }
 }
