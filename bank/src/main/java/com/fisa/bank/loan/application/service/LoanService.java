@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fisa.bank.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.account.application.service.reader.AccountReader;
 import com.fisa.bank.account.persistence.entity.Account;
 import com.fisa.bank.common.aop.annotation.DomainType;
@@ -95,8 +96,13 @@ public class LoanService {
   @Transactional
   public void deleteLoanProduct(Long loanProductId) {
     // 있는지 확인 후
-    if (!loanRepository.existsById(LoanProductId.of(loanProductId))) {
-      throw new LoanProductNotFoundException(loanProductId);
+    LoanProduct loanProduct =
+        loanRepository
+            .findById(LoanProductId.of(loanProductId))
+            .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+
+    if (!loanProduct.getLoanLedgerList().isEmpty()) {
+      throw new LoanProductNotDeletableException();
     }
     loanRepository.deleteById(LoanProductId.of(loanProductId));
   }
@@ -225,7 +231,7 @@ public class LoanService {
     Account account = loanLedger.getAccount();
 
     if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
-      throw new InsufficientBalanceAmountException();
+      throw new InsufficientBalanceException();
     }
 
     // 상환 가능하다면, 원장 테이블 업데이트 후 이력성 테이블에 데이터 저장
@@ -274,7 +280,7 @@ public class LoanService {
     EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, today, earlyPaidRate);
 
     if (account.getBalance().compareTo(earlyRepayment.getMustPaidAmount()) < 0) {
-      throw new InsufficientBalanceAmountException();
+      throw new InsufficientBalanceException();
     }
 
     loanLedger.updateLoanLedger(
@@ -298,10 +304,10 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public PagedResponse<LoanProductResponse<LoanProduct>> getAllProducts(Pageable pageable) {
+  public PagedResponse<LoanProductResponse> getAllProducts(Pageable pageable) {
     Page<LoanProduct> productPage = loanReader.findAllProducts(pageable);
 
-    Page<LoanProductResponse<LoanProduct>> responsePage =
+    Page<LoanProductResponse> responsePage =
         productPage.map(
             loanProduct -> {
               InterestRate interestRate = loanProduct.getInterestRateList().get(0);
@@ -313,7 +319,7 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public LoanProductResponse<LoanProduct> getProductById(Long loanProductId) {
+  public LoanProductResponse getProductById(Long loanProductId) {
     LoanProduct loanProduct = loanReader.findProductById(loanProductId);
 
     InterestRateResponse interestRateResponse =

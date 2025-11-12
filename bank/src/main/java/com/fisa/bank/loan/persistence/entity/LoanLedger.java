@@ -1,7 +1,6 @@
 package com.fisa.bank.loan.persistence.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -40,7 +39,7 @@ public class LoanLedger extends BaseEntity {
   private LoanLedgerId loanLedgerId;
 
   // LoanLedger 1 : N LoanTransaction
-  @OneToMany(mappedBy = "loanLedger", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "loanLedger")
   @Builder.Default
   private List<LoanTransaction> loanTransactionList = new ArrayList<>();
 

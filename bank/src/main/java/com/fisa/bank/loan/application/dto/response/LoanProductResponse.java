@@ -1,6 +1,5 @@
 package com.fisa.bank.loan.application.dto.response;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 
 import com.fisa.bank.interest.application.dto.response.InterestRateResponse;
@@ -8,16 +7,16 @@ import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.enums.LoanType;
 
 @Getter
-public class LoanProductResponse<T> {
+public class LoanProductResponse {
 
   private final Long id;
   private final String name;
   private final LoanType type;
   private final InterestRateResponse interestRateResponse;
 
-  public static LoanProductResponse<LoanProduct> from(
+  public static LoanProductResponse from(
       LoanProduct entity, InterestRateResponse interestRateResponse) {
-    return new LoanProductResponse<LoanProduct>(
+    return new LoanProductResponse(
         entity.getLoanProductId().getValue(),
         entity.getName(),
         entity.getType(),
