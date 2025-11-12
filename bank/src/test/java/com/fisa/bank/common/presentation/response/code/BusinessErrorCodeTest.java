@@ -46,10 +46,9 @@ class BusinessErrorCodeTest {
 
     for (BeanDefinition candidate : scanner.findCandidateComponents("com.fisa.bank")) {
       Class<?> clazz = ClassUtils.forName(candidate.getBeanClassName(), classLoader);
-      if (!Modifier.isAbstract(clazz.getModifiers())
-          && BusinessException.class.isAssignableFrom(clazz)) {
-        result.add(clazz.asSubclass(BusinessException.class));
-      }
+        if (!Modifier.isAbstract(clazz.getModifiers())) {
+            result.add(clazz.asSubclass(BusinessException.class));
+        }
     }
 
     return result;
