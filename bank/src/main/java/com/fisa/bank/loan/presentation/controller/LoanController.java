@@ -19,7 +19,6 @@ import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.loan.application.dto.response.*;
 import com.fisa.bank.loan.application.service.LoanService;
-import com.fisa.bank.loan.persistence.entity.LoanProduct;
 
 @Slf4j
 @RestController
@@ -40,19 +39,18 @@ public class LoanController {
   }
 
   @GetMapping("/products")
-  public ApiResponse<SuccessBody<PagedResponse<LoanProductResponse<LoanProduct>>>> getLoanProducts(
+  public ApiResponse<SuccessBody<PagedResponse<LoanProductResponse>>> getLoanProducts(
       @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
-    PagedResponse<LoanProductResponse<LoanProduct>> allProducts =
-        loanService.getAllProducts(pageable);
+    PagedResponse<LoanProductResponse> allProducts = loanService.getAllProducts(pageable);
 
     return ApiResponseGenerator.success(ResponseCode.GET, allProducts);
   }
 
   @GetMapping("/{loanProductId:\\d+}")
-  public ApiResponse<SuccessBody<LoanProductResponse<LoanProduct>>> getLoanProductById(
+  public ApiResponse<SuccessBody<LoanProductResponse>> getLoanProductById(
       @PathVariable Long loanProductId) {
-    LoanProductResponse<LoanProduct> loanProduct = loanService.getProductById(loanProductId);
+    LoanProductResponse loanProduct = loanService.getProductById(loanProductId);
 
     return ApiResponseGenerator.success(ResponseCode.GET, loanProduct);
   }

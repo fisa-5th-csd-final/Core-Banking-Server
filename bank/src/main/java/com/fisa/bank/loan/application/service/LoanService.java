@@ -304,10 +304,10 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public PagedResponse<LoanProductResponse<LoanProduct>> getAllProducts(Pageable pageable) {
+  public PagedResponse<LoanProductResponse> getAllProducts(Pageable pageable) {
     Page<LoanProduct> productPage = loanReader.findAllProducts(pageable);
 
-    Page<LoanProductResponse<LoanProduct>> responsePage =
+    Page<LoanProductResponse> responsePage =
         productPage.map(
             loanProduct -> {
               InterestRate interestRate = loanProduct.getInterestRateList().get(0);
@@ -319,7 +319,7 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public LoanProductResponse<LoanProduct> getProductById(Long loanProductId) {
+  public LoanProductResponse getProductById(Long loanProductId) {
     LoanProduct loanProduct = loanReader.findProductById(loanProductId);
 
     InterestRateResponse interestRateResponse =
