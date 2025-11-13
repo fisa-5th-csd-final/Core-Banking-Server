@@ -51,7 +51,7 @@ public class SecurityFilterChainConfig {
 
     //    commonConfiguration(http); // 공통 설정
     http.formLogin(Customizer.withDefaults());
-    http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+    http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.csrf(AbstractHttpConfigurer::disable);
     // SAS 엔드포인트만 매칭
 
