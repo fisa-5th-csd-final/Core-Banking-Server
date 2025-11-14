@@ -1,0 +1,28 @@
+cdc:
+  enabled: ${CDC_ENABLED:false}
+  kafka:
+    bootstrap-servers: ${CDC_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    topic: ${CDC_KAFKA_TOPIC:bank.cdc.changelog}
+    consumer-group-id: ${CDC_KAFKA_CONSUMER_GROUP:bank-cdc-consumer}
+    consumer-auto-start: ${CDC_KAFKA_CONSUMER_AUTO_START:true}
+  debezium:
+    properties:
+      name: ${CDC_DEBEZIUM_NAME:bank-mysql-connector}
+      connector.class: io.debezium.connector.mysql.MySqlConnector
+      topic.prefix: ${CDC_DEBEZIUM_TOPIC_PREFIX:bank-mysql}
+      database.hostname: ${CDC_DEBEZIUM_DB_HOST:localhost}
+      database.port: ${CDC_DEBEZIUM_DB_PORT:3306}
+      database.user: ${DATABASE_USERNAME}
+      database.password: ${DATABASE_PASSWORD}
+      database.server.id: ${CDC_DEBEZIUM_SERVER_ID:184054}
+      database.server.name: ${CDC_DEBEZIUM_SERVER_NAME:bank-db}
+      database.include.list: ${CDC_DEBEZIUM_DATABASE_INCLUDE:bank}
+      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE:bank.account}
+      include.schema.changes: ${CDC_DEBEZIUM_INCLUDE_SCHEMA:false}
+      decimal.handling.mode: string
+      snapshot.mode: ${CDC_DEBEZIUM_SNAPSHOT_MODE:initial}
+      offset.storage: org.apache.kafka.connect.storage.FileOffsetBackingStore
+      offset.storage.file.filename: ${CDC_DEBEZIUM_OFFSET_FILE:./build/debezium/offsets.dat}
+      offset.flush.interval.ms: ${CDC_DEBEZIUM_OFFSET_FLUSH_MS:60000}
+      schema.history.internal: io.debezium.storage.file.history.FileSchemaHistory
+      schema.history.internal.file.filename: ${CDC_DEBEZIUM_SCHEMA_HISTORY_FILE:./build/debezium/schema-history.dat}
