@@ -16,8 +16,9 @@ cdc:
       database.password: ${DATABASE_PASSWORD}
       database.server.id: ${CDC_DEBEZIUM_SERVER_ID:184054}
       database.server.name: ${CDC_DEBEZIUM_SERVER_NAME:bank-db}
+      database.connectionTimeZone: ${CDC_DEBEZIUM_TIMEZONE}
       database.include.list: ${CDC_DEBEZIUM_DATABASE_INCLUDE:core_bank}
-      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE}
+      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE:core_bank.account}
       include.schema.changes: ${CDC_DEBEZIUM_INCLUDE_SCHEMA:false}
       decimal.handling.mode: string
       snapshot.mode: ${CDC_DEBEZIUM_SNAPSHOT_MODE:initial}
@@ -26,3 +27,4 @@ cdc:
       offset.flush.interval.ms: ${CDC_DEBEZIUM_OFFSET_FLUSH_MS:60000}
       schema.history.internal: io.debezium.storage.file.history.FileSchemaHistory
       schema.history.internal.file.filename: ${CDC_DEBEZIUM_SCHEMA_HISTORY_FILE:./build/debezium/schema-history.dat}
+      time.precision.mode: adaptive_time_microseconds
