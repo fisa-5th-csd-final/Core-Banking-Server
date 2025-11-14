@@ -28,7 +28,7 @@ services:
       - zookeeper
 
   mysql:
-    image: mysql:8.4
+    image: mysql:8.0.41 # debezium 의 cdc 지원 여부 때문에 버전 8.0.x 사용
     container_name: core-bank-mysql
     command: >
       --character-set-server=utf8mb4
