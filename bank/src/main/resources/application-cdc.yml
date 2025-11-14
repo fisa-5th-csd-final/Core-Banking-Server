@@ -16,8 +16,8 @@ cdc:
       database.password: ${DATABASE_PASSWORD}
       database.server.id: ${CDC_DEBEZIUM_SERVER_ID:184054}
       database.server.name: ${CDC_DEBEZIUM_SERVER_NAME:bank-db}
-      database.include.list: ${CDC_DEBEZIUM_DATABASE_INCLUDE:bank}
-      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE:bank.account}
+      database.include.list: ${CDC_DEBEZIUM_DATABASE_INCLUDE:core_bank}
+      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE}
       include.schema.changes: ${CDC_DEBEZIUM_INCLUDE_SCHEMA:false}
       decimal.handling.mode: string
       snapshot.mode: ${CDC_DEBEZIUM_SNAPSHOT_MODE:initial}
