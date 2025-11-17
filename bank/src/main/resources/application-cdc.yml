@@ -14,7 +14,7 @@ cdc:
       database.port: ${CDC_DEBEZIUM_DB_PORT:3306}
       database.user: ${DATABASE_USERNAME}
       database.password: ${DATABASE_PASSWORD}
-      database.server.id: ${CDC_DEBEZIUM_SERVER_ID:184054}
+      database.server.id: ${CDC_DEBEZIUM_SERVER_ID}
       database.server.name: ${CDC_DEBEZIUM_SERVER_NAME:bank-db}
       database.connectionTimeZone: ${CDC_DEBEZIUM_TIMEZONE}
       database.include.list: ${CDC_DEBEZIUM_DATABASE_INCLUDE:core_bank}
