@@ -1,0 +1,19 @@
+package com.fisa.bank.domains.interest.persistence.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.fisa.bank.domains.interest.persistence.entity.InterestRate;
+import com.fisa.bank.domains.interest.persistence.id.InterestRateId;
+import com.fisa.bank.domains.loan.persistence.entity.LoanProduct;
+import com.fisa.bank.domains.loan.persistence.entity.id.LoanProductId;
+
+@Repository
+public interface InterestRateRepository extends JpaRepository<InterestRate, InterestRateId> {
+  Optional<InterestRate> findFirstByLoanProductOrderByCreatedAtDesc(LoanProduct loanProduct);
+
+  List<InterestRate> findAllByLoanProduct_LoanProductId(LoanProductId loanProductId);
+}

@@ -19,16 +19,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.fisa.bank.account.application.dto.response.AccountDetailResponse;
-import com.fisa.bank.account.application.dto.response.AccountListResponse;
-import com.fisa.bank.account.application.dto.response.AccountResponse;
-import com.fisa.bank.account.application.exception.AccountNotDeletableException;
-import com.fisa.bank.account.application.service.reader.AccountReader;
-import com.fisa.bank.account.persistence.entity.Account;
-import com.fisa.bank.account.persistence.entity.id.AccountId;
-import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.user.persistence.entity.User;
-import com.fisa.bank.user.persistence.entity.UserAuth;
+import com.fisa.bank.domains.account.application.dto.response.AccountDetailResponse;
+import com.fisa.bank.domains.account.application.dto.response.AccountListResponse;
+import com.fisa.bank.domains.account.application.dto.response.AccountResponse;
+import com.fisa.bank.domains.account.application.exception.AccountNotDeletableException;
+import com.fisa.bank.domains.account.application.service.AccountService;
+import com.fisa.bank.domains.account.application.service.reader.AccountReader;
+import com.fisa.bank.domains.account.persistence.entity.Account;
+import com.fisa.bank.domains.account.persistence.entity.id.AccountId;
+import com.fisa.bank.domains.account.persistence.repository.AccountRepository;
+import com.fisa.bank.domains.user.persistence.entity.User;
+import com.fisa.bank.domains.user.persistence.entity.UserAuth;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AccountService 테스트")

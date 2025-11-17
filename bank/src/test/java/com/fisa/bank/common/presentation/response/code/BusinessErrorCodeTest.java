@@ -15,7 +15,8 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.ClassUtils;
 
-import com.fisa.bank.common.application.exception.BusinessException;
+import com.fisa.bank.domains.common.application.exception.BusinessException;
+import com.fisa.bank.domains.common.presentation.response.code.BusinessErrorCode;
 
 class BusinessErrorCodeTest {
 
