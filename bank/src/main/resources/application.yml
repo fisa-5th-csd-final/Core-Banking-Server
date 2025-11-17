@@ -7,6 +7,7 @@ spring:
       - classpath:application-db.yml
       - classpath:application-open-api.yml
       - classpath:application-bank.yml
+      - classpath:application-cdc.yml
   profiles:
     active: ${PROFILE}
 

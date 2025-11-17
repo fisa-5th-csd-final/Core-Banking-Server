@@ -49,6 +49,10 @@ dependencies {
 	implementation "org.flywaydb:flyway-mysql"
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// CDC / Kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'io.debezium:debezium-embedded:2.7.3.Final'
+	implementation 'io.debezium:debezium-connector-mysql:2.7.3.Final'
 }
 
 spotless {
