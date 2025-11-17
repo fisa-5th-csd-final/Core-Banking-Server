@@ -43,7 +43,6 @@ public class CdcProperties {
 
     public Debezium {
       properties = properties == null ? Collections.emptyMap() : Map.copyOf(properties);
-      System.out.println(properties);
     }
   }
 }
