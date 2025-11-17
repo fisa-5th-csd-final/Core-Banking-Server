@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.fisa.bank.domains.account.application.service.AccountService;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -24,6 +23,7 @@ import com.fisa.bank.domains.account.application.dto.response.AccountDetailRespo
 import com.fisa.bank.domains.account.application.dto.response.AccountListResponse;
 import com.fisa.bank.domains.account.application.dto.response.AccountResponse;
 import com.fisa.bank.domains.account.application.exception.AccountNotDeletableException;
+import com.fisa.bank.domains.account.application.service.AccountService;
 import com.fisa.bank.domains.account.application.service.reader.AccountReader;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.account.persistence.entity.id.AccountId;

@@ -2,7 +2,6 @@ package com.fisa.bank.account.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fisa.bank.domains.account.application.service.AccountTransactionService;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -22,6 +21,7 @@ import com.fisa.bank.domains.account.application.dto.request.AccountDepositReque
 import com.fisa.bank.domains.account.application.dto.request.AccountWithdrawRequest;
 import com.fisa.bank.domains.account.application.dto.request.TransferRequest;
 import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.domains.account.application.service.AccountTransactionService;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.account.persistence.repository.AccountRepository;
 import com.fisa.bank.domains.user.persistence.entity.User;

@@ -10,8 +10,6 @@
  */
 package com.fisa.bank.domains.account.persistence.entity;
 
-import com.fisa.bank.domains.account.persistence.entity.id.AccountId;
-import com.fisa.bank.domains.account.persistence.entity.id.AccountIdJavaType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +23,8 @@ import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.domains.account.persistence.entity.id.*;
+import com.fisa.bank.domains.account.persistence.entity.id.AccountId;
+import com.fisa.bank.domains.account.persistence.entity.id.AccountIdJavaType;
 import com.fisa.bank.domains.common.persistence.entity.BaseEntity;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.user.persistence.entity.User;
