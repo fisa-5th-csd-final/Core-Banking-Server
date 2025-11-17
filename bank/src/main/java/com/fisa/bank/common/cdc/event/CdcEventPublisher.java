@@ -1,23 +1,28 @@
 package com.fisa.bank.common.cdc.event;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.common.cdc.config.CdcProperties;
 import io.debezium.engine.ChangeEvent;
-import java.io.IOException;
-import java.time.Instant;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.time.Instant;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.common.cdc.config.CdcProperties;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+    prefix = "cdc",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public class CdcEventPublisher {
 
   private final KafkaTemplate<String, CdcEvent> kafkaTemplate;

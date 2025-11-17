@@ -1,10 +1,9 @@
 package com.fisa.bank.common.cdc.config;
 
-import com.fisa.bank.common.cdc.event.CdcEvent;
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import lombok.RequiredArgsConstructor;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -23,10 +22,16 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.fisa.bank.common.cdc.event.CdcEvent;
+
 @EnableKafka
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+    prefix = "cdc",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public class CdcKafkaConfig {
 
   private final CdcProperties properties;

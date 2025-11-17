@@ -1,10 +1,10 @@
 package com.fisa.bank.common.cdc.config;
 
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-
-import lombok.Getter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
@@ -43,7 +43,7 @@ public class CdcProperties {
 
     public Debezium {
       properties = properties == null ? Collections.emptyMap() : Map.copyOf(properties);
-        System.out.println(properties);
+      System.out.println(properties);
     }
   }
 }

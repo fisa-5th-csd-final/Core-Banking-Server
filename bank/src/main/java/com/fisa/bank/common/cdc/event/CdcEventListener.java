@@ -1,20 +1,21 @@
-//package com.fisa.bank.common.cdc.event;
+// package com.fisa.bank.common.cdc.event;
 //
-//import java.util.List;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
+// import java.util.List;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 //
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-//import org.springframework.kafka.annotation.KafkaListener;
-//import org.springframework.kafka.support.KafkaHeaders;
-//import org.springframework.messaging.handler.annotation.Header;
-//import org.springframework.stereotype.Component;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+// import org.springframework.kafka.annotation.KafkaListener;
+// import org.springframework.kafka.support.KafkaHeaders;
+// import org.springframework.messaging.handler.annotation.Header;
+// import org.springframework.stereotype.Component;
 //
-//@Slf4j
-////@Component
-//@RequiredArgsConstructor
-//@ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing = true)
-//public class CdcEventListener {
+// @Slf4j
+//// @Component
+// @RequiredArgsConstructor
+// @ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing =
+// true)
+// public class CdcEventListener {
 //
 //  private final List<CdcEventConsumer> consumers;
 //
@@ -40,4 +41,4 @@
 //          event.operation());
 //    }
 //  }
-//}
+// }

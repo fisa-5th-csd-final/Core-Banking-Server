@@ -1,13 +1,13 @@
-//package com.fisa.bank.account.application.cdc;
+// package com.fisa.bank.account.application.cdc;
 //
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonProperty;
-//import java.math.BigDecimal;
-//import java.time.LocalDateTime;
+// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+// import com.fasterxml.jackson.annotation.JsonProperty;
+// import java.math.BigDecimal;
+// import java.time.LocalDateTime;
 //
 //// CDC 스냅샷 페이로드
-//@JsonIgnoreProperties(ignoreUnknown = true)
-//public record AccountCdcPayload(
+// @JsonIgnoreProperties(ignoreUnknown = true)
+// public record AccountCdcPayload(
 //    @JsonProperty("account_id") Long accountId,
 //    @JsonProperty("account_number") String accountNumber,
 //    @JsonProperty("user_id") Long userId,

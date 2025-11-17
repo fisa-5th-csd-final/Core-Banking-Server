@@ -1,26 +1,31 @@
 package com.fisa.bank.common.cdc.debezium;
 
-import com.fisa.bank.common.cdc.config.CdcProperties;
-import com.fisa.bank.common.cdc.event.CdcEventPublisher;
 import io.debezium.config.Configuration;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
+import com.fisa.bank.common.cdc.config.CdcProperties;
+import com.fisa.bank.common.cdc.event.CdcEventPublisher;
+
 @Slf4j
 @org.springframework.context.annotation.Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+    prefix = "cdc",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public class DebeziumEngineConfiguration {
 
   private final CdcProperties cdcProperties;

@@ -1,21 +1,22 @@
-//package com.fisa.bank.account.application.cdc;
+// package com.fisa.bank.account.application.cdc;
 //
-//import com.fasterxml.jackson.core.JsonProcessingException;
-//import com.fasterxml.jackson.databind.JsonNode;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.fisa.bank.common.cdc.event.CdcEvent;
-//import com.fisa.bank.common.cdc.event.CdcEventConsumer;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-//import org.springframework.stereotype.Component;
+// import com.fasterxml.jackson.core.JsonProcessingException;
+// import com.fasterxml.jackson.databind.JsonNode;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.fisa.bank.common.cdc.event.CdcEvent;
+// import com.fisa.bank.common.cdc.event.CdcEventConsumer;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+// import org.springframework.stereotype.Component;
 //
-//@Slf4j
-//@Component
-//@RequiredArgsConstructor
-//@ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing = true)
+// @Slf4j
+// @Component
+// @RequiredArgsConstructor
+// @ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing =
+// true)
 //// CDC 이벤트를 소비하는 소비자
-//public class AccountCdcConsumer implements CdcEventConsumer {
+// public class AccountCdcConsumer implements CdcEventConsumer {
 //
 //  private static final String TABLE_NAME = "account";
 //
@@ -53,4 +54,4 @@
 //      default -> null;
 //    };
 //  }
-//}
+// }

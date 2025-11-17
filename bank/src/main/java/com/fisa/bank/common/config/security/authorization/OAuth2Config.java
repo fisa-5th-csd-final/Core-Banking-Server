@@ -19,7 +19,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.oidc.OidcClientRegistration;
 import org.springframework.security.oauth2.server.authorization.oidc.converter.OidcClientRegistrationRegisteredClientConverter;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
@@ -59,7 +58,8 @@ public class OAuth2Config {
   /** require_proof_key false 설정 */
   @Bean("OidcClientRegistrationConverter")
   public Converter<OidcClientRegistration, RegisteredClient> clientConverter() {
-    return new OidcClientRegistrationConverter(new OidcClientRegistrationRegisteredClientConverter());
+    return new OidcClientRegistrationConverter(
+        new OidcClientRegistrationRegisteredClientConverter());
   }
 
   // 인증/인가 동의 저장소

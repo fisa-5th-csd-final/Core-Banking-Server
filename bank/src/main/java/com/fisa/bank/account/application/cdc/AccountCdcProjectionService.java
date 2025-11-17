@@ -1,20 +1,21 @@
-//package com.fisa.bank.account.application.cdc;
+// package com.fisa.bank.account.application.cdc;
 //
-//import java.time.Instant;
-//import java.util.Map;
-//import java.util.Optional;
-//import java.util.concurrent.ConcurrentHashMap;
+// import java.time.Instant;
+// import java.util.Map;
+// import java.util.Optional;
+// import java.util.concurrent.ConcurrentHashMap;
 //
-//import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 //
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-//import org.springframework.stereotype.Service;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+// import org.springframework.stereotype.Service;
 //
-//@Slf4j
-//@Service
-//@ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing = true)
+// @Slf4j
+// @Service
+// @ConditionalOnProperty(prefix = "cdc", name = "enabled", havingValue = "true", matchIfMissing =
+// true)
 //// Account 테이블의 CDC Payload를 받아서, 스냅샷을 반영하는 역할
-//public class AccountCdcProjectionService {
+// public class AccountCdcProjectionService {
 //
 //  private final Map<Long, AccountCdcPayload> snapshots = new ConcurrentHashMap<>();
 //
@@ -35,4 +36,4 @@
 //  public Optional<AccountCdcPayload> findCached(Long accountId) {
 //    return Optional.ofNullable(snapshots.get(accountId));
 //  }
-//}
+// }
