@@ -18,7 +18,7 @@ cdc:
       database.server.name: ${CDC_DEBEZIUM_SERVER_NAME:bank-db}
       database.connectionTimeZone: ${CDC_DEBEZIUM_TIMEZONE}
       database.include.list: ${CDC_DEBEZIUM_DATABASE_INCLUDE:core_bank}
-      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE:core_bank.account}
+      table.include.list: ${CDC_DEBEZIUM_TABLE_INCLUDE}
       include.schema.changes: ${CDC_DEBEZIUM_INCLUDE_SCHEMA:false}
       decimal.handling.mode: string
       snapshot.mode: ${CDC_DEBEZIUM_SNAPSHOT_MODE:initial}
