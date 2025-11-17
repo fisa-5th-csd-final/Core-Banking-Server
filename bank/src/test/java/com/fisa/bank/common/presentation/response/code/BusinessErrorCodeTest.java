@@ -2,6 +2,7 @@ package com.fisa.bank.common.presentation.response.code;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fisa.bank.domains.common.presentation.response.code.BusinessErrorCode;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.ClassUtils;
 
-import com.fisa.bank.common.application.exception.BusinessException;
+import com.fisa.bank.domains.common.application.exception.BusinessException;
 
 class BusinessErrorCodeTest {
 

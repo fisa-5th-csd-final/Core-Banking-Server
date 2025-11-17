@@ -2,6 +2,8 @@ package com.fisa.bank.account.persistence.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fisa.bank.domains.account.persistence.entity.Account;
+import com.fisa.bank.domains.account.persistence.entity.AccountTransaction;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -9,12 +11,12 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.fisa.bank.account.persistence.enums.TransactionType;
-import com.fisa.bank.user.persistence.entity.CreditRating;
-import com.fisa.bank.user.persistence.entity.CustomerLevel;
-import com.fisa.bank.user.persistence.entity.User;
-import com.fisa.bank.user.persistence.entity.UserAuth;
-import com.fisa.bank.user.persistence.entity.id.UserId;
+import com.fisa.bank.domains.account.persistence.enums.TransactionType;
+import com.fisa.bank.domains.user.persistence.entity.CreditRating;
+import com.fisa.bank.domains.user.persistence.entity.CustomerLevel;
+import com.fisa.bank.domains.user.persistence.entity.User;
+import com.fisa.bank.domains.user.persistence.entity.UserAuth;
+import com.fisa.bank.domains.user.persistence.entity.id.UserId;
 
 @DisplayName("AccountTransaction 엔티티 테스트")
 class AccountTransactionTest {

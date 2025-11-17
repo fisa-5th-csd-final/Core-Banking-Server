@@ -2,6 +2,7 @@ package com.fisa.bank.account.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fisa.bank.domains.account.application.service.AccountTransactionService;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -17,16 +18,16 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fisa.bank.account.application.dto.request.AccountDepositRequest;
-import com.fisa.bank.account.application.dto.request.AccountWithdrawRequest;
-import com.fisa.bank.account.application.dto.request.TransferRequest;
-import com.fisa.bank.account.application.exception.InsufficientBalanceException;
-import com.fisa.bank.account.persistence.entity.Account;
-import com.fisa.bank.account.persistence.repository.AccountRepository;
-import com.fisa.bank.user.persistence.entity.User;
-import com.fisa.bank.user.persistence.entity.UserAuth;
-import com.fisa.bank.user.persistence.repository.UserAuthRepository;
-import com.fisa.bank.user.persistence.repository.UserRepository;
+import com.fisa.bank.domains.account.application.dto.request.AccountDepositRequest;
+import com.fisa.bank.domains.account.application.dto.request.AccountWithdrawRequest;
+import com.fisa.bank.domains.account.application.dto.request.TransferRequest;
+import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.domains.account.persistence.entity.Account;
+import com.fisa.bank.domains.account.persistence.repository.AccountRepository;
+import com.fisa.bank.domains.user.persistence.entity.User;
+import com.fisa.bank.domains.user.persistence.entity.UserAuth;
+import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
+import com.fisa.bank.domains.user.persistence.repository.UserRepository;
 
 @SpringBootTest(properties = {"bank.code=020"})
 @ActiveProfiles("test")
