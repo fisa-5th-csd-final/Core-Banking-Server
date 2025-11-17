@@ -33,6 +33,7 @@ export CDC_DEBEZIUM_DATABASE_INCLUDE=core_bank
 export CDC_DEBEZIUM_TABLE_INCLUDE=core_bank.account
 export CDC_DEBEZIUM_SNAPSHOT_MODE=initial
 export CDC_DEBEZIUM_TIMEZONE=Asia/Seoul
+export CDC_DEBEZIUM_SERVER_ID=184054 # 다른 복제 클라이언트와 겹치지 않는 고유한 ID
 ```
 
 그 외 커넥터 옵션은 `CDC_DEBEZIUM_*` 환경변수로 1:1 매핑되어 있으니 필요 시 추가로 지정하면 됩니다.
