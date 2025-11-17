@@ -43,7 +43,8 @@ public class CdcKafkaConfig {
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
     props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
-    props.put(JsonSerializer.TYPE_MAPPINGS, "cdcEvent:com.fisa.bank.infrastructure.cdc.event.CdcEvent");
+    props.put(
+        JsonSerializer.TYPE_MAPPINGS, "cdcEvent:com.fisa.bank.infrastructure.cdc.event.CdcEvent");
     return props;
   }
 
