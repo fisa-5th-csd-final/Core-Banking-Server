@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class LoanRepaymentResponse {
 
-    private Long loanLedgerId;
-    private LocalDateTime nextRepaymentDate;
-    private Boolean autoDepositEnabled;
-
+  private Long loanLedgerId;
+  private LocalDateTime nextRepaymentDate;
+  private Boolean autoDepositEnabled;
 }

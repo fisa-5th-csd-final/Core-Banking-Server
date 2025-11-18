@@ -1,6 +1,5 @@
 package com.fisa.bank.loan.application.service;
 
-import com.fisa.bank.loan.application.dto.response.*;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -25,6 +24,7 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
+import com.fisa.bank.loan.application.dto.response.*;
 import com.fisa.bank.loan.application.event.LoanCancelledEvent;
 import com.fisa.bank.loan.application.event.LoanRepaidEvent;
 import com.fisa.bank.loan.application.exception.*;
@@ -192,8 +192,7 @@ public class LoanService {
             earlyRepayInterestRate,
             request.getTerm(),
             account,
-            request.getAutoDepositEnabled()
-        );
+            request.getAutoDepositEnabled());
 
     // 대출 이력성 테이블에 저장 LoanTransaction
     LoanTransaction loanTransaction =
@@ -344,13 +343,12 @@ public class LoanService {
   @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public LoanRepaymentResponse getRepayment(Long loanLedgerId) {
 
-      LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
-      return LoanRepaymentResponse.builder()
-              .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
-              .nextRepaymentDate(loanLedger.getNextRepaymentDate())
-              .autoDepositEnabled(loanLedger.isAutoDepositEnabled())
-              .build();
+    return LoanRepaymentResponse.builder()
+        .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
+        .nextRepaymentDate(loanLedger.getNextRepaymentDate())
+        .autoDepositEnabled(loanLedger.isAutoDepositEnabled())
+        .build();
   }
-
 }

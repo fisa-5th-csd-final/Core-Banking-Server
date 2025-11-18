@@ -109,10 +109,11 @@ public class LoanController {
   }
 
   @GetMapping("/{loanLedgerId}/repayment")
-  public ApiResponse<SuccessBody<LoanRepaymentResponse>> getRepayment(@PathVariable Long loanLedgerId) {
-      log.info("자동 예치 여부 조회");
-      LoanRepaymentResponse response = loanService.getRepayment(loanLedgerId);
+  public ApiResponse<SuccessBody<LoanRepaymentResponse>> getRepayment(
+      @PathVariable Long loanLedgerId) {
+    log.info("자동 예치 여부 조회");
+    LoanRepaymentResponse response = loanService.getRepayment(loanLedgerId);
 
-      return ApiResponseGenerator.success(ResponseCode.GET, response);
+    return ApiResponseGenerator.success(ResponseCode.GET, response);
   }
 }
