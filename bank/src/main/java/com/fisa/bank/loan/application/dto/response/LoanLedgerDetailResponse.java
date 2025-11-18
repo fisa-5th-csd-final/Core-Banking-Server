@@ -3,10 +3,12 @@ package com.fisa.bank.loan.application.dto.response;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.loan.persistence.enums.LoanType;
+import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.loan.persistence.enums.RepaymentType;
 
 @Getter
@@ -20,6 +22,11 @@ public class LoanLedgerDetailResponse {
   private final String accountNumber;
   private final LoanType loanType;
   private final RepaymentType repaymentType;
+  private final Boolean autoDepositEnabled;
+  private final LocalDateTime lastRepaymentDate;
+  private final LocalDateTime createdAt;
+  private final int term;
+  private final RepaymentStatus repaymentStatus;
 
   public LoanLedgerDetailResponse(
       String name,
@@ -28,7 +35,12 @@ public class LoanLedgerDetailResponse {
       LoanType loanType,
       RepaymentType repaymentType,
       BigDecimal monthlyRepayment,
-      String accountNumber) {
+      String accountNumber,
+      Boolean autoDepositEnabled,
+      LocalDateTime lastRepaymentDate,
+      LocalDateTime createdAt,
+      int term,
+      RepaymentStatus repaymentStatus) {
     this.name = name;
     this.principal = principal;
     this.remainPrincipal = remainPrincipal;
@@ -36,6 +48,11 @@ public class LoanLedgerDetailResponse {
     this.repaymentType = repaymentType;
     this.monthlyRepayment = monthlyRepayment;
     this.accountNumber = accountNumber;
+    this.autoDepositEnabled = autoDepositEnabled;
+    this.lastRepaymentDate = lastRepaymentDate;
+    this.createdAt = createdAt;
+    this.term = term;
+    this.repaymentStatus = repaymentStatus;
   }
 
   public static LoanLedgerDetailResponse from(
@@ -47,6 +64,11 @@ public class LoanLedgerDetailResponse {
         loanLedger.getLoanProduct().getType(),
         loanLedger.getRepaymentType(),
         monthlyRepayment.getMonthlyPayment(),
-        loanLedger.getAccount().getAccountNumber());
+        loanLedger.getAccount().getAccountNumber(),
+        loanLedger.isAutoDepositEnabled(),
+        loanLedger.getLastRepaymentDate(),
+        loanLedger.getCreatedAt(),
+        loanLedger.getTerm(),
+        loanLedger.getRepaymentStatus());
   }
 }
