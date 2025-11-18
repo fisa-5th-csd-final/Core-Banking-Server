@@ -11,6 +11,6 @@ public class LoanRepaymentResponse {
 
     private Long loanLedgerId;
     private LocalDateTime nextRepaymentDate;
-    private boolean autoDepositEnabled;
+    private Boolean autoDepositEnabled;
 
 }

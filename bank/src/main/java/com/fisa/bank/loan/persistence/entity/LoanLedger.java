@@ -114,6 +114,7 @@ public class LoanLedger extends BaseEntity {
     this.nextRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
     this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
     this.repaymentStatus = updateLoanLedgerParam.getStatus();
+    this.autoDepositEnabled = updateLoanLedgerParam.getAutoDepositEnabled();
   }
 
   public static LoanLedger createLoanLedger(
