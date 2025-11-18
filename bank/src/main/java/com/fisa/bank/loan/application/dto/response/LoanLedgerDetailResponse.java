@@ -20,6 +20,7 @@ public class LoanLedgerDetailResponse {
   private final String accountNumber;
   private final LoanType loanType;
   private final RepaymentType repaymentType;
+  private final Boolean autoDepositEnabled;
 
   public LoanLedgerDetailResponse(
       String name,
@@ -28,7 +29,8 @@ public class LoanLedgerDetailResponse {
       LoanType loanType,
       RepaymentType repaymentType,
       BigDecimal monthlyRepayment,
-      String accountNumber) {
+      String accountNumber,
+      Boolean autoDepositEnabled) {
     this.name = name;
     this.principal = principal;
     this.remainPrincipal = remainPrincipal;
@@ -36,6 +38,7 @@ public class LoanLedgerDetailResponse {
     this.repaymentType = repaymentType;
     this.monthlyRepayment = monthlyRepayment;
     this.accountNumber = accountNumber;
+    this.autoDepositEnabled = autoDepositEnabled;
   }
 
   public static LoanLedgerDetailResponse from(
@@ -47,6 +50,7 @@ public class LoanLedgerDetailResponse {
         loanLedger.getLoanProduct().getType(),
         loanLedger.getRepaymentType(),
         monthlyRepayment.getMonthlyPayment(),
-        loanLedger.getAccount().getAccountNumber());
+        loanLedger.getAccount().getAccountNumber(),
+        loanLedger.isAutoDepositEnabled());
   }
 }

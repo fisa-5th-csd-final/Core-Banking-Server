@@ -107,4 +107,10 @@ public class LoanController {
 
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
   }
+
+  @GetMapping("/{loanLedgerId}/repayment")
+  public LoanRepaymentResponse getRepayment(@PathVariable Long loanLedgerId) {
+      log.info("자동 예치 여부 조회");
+      return loanService.getRepayment(loanLedgerId);
+  }
 }

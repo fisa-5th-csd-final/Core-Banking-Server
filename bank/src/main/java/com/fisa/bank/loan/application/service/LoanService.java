@@ -1,5 +1,6 @@
 package com.fisa.bank.loan.application.service;
 
+import com.fisa.bank.loan.application.dto.response.*;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -24,13 +25,6 @@ import com.fisa.bank.interest.persistence.entity.InterestRate;
 import com.fisa.bank.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.loan.application.dto.request.LoanProductCreateRequest;
-import com.fisa.bank.loan.application.dto.response.LoanApplyforResponse;
-import com.fisa.bank.loan.application.dto.response.LoanLedgerDetailResponse;
-import com.fisa.bank.loan.application.dto.response.LoanLedgerResponse;
-import com.fisa.bank.loan.application.dto.response.LoanProductCreateResponse;
-import com.fisa.bank.loan.application.dto.response.LoanProductResponse;
-import com.fisa.bank.loan.application.dto.response.LoanTransactionResponse;
-import com.fisa.bank.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.loan.application.event.LoanCancelledEvent;
 import com.fisa.bank.loan.application.event.LoanRepaidEvent;
 import com.fisa.bank.loan.application.exception.*;
@@ -197,7 +191,9 @@ public class LoanService {
             interestType,
             earlyRepayInterestRate,
             request.getTerm(),
-            account);
+            account,
+            request.getAutoDepositEnabled()
+        );
 
     // 대출 이력성 테이블에 저장 LoanTransaction
     LoanTransaction loanTransaction =
@@ -343,4 +339,18 @@ public class LoanService {
     List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }
+
+  @Transactional(readOnly = true)
+  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
+  public LoanRepaymentResponse getRepayment(Long loanLedgerId) {
+
+      LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
+
+      return LoanRepaymentResponse.builder()
+              .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
+              .nextRepaymentDate(loanLedger.getNextRepaymentDate())
+              .autoDepositEnabled(loanLedger.isAutoDepositEnabled())
+              .build();
+  }
+
 }

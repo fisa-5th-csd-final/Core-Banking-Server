@@ -32,4 +32,7 @@ public class LoanApplyForRequest {
 
   @NotBlank(message = "계좌 번호를 입력해주세요")
   private String accountNumber;
+
+  @NotNull(message = "자동 예치 여부를 입력해주세요.")
+  private Boolean autoDepositEnabled;
 }
