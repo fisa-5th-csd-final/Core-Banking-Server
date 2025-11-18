@@ -108,12 +108,12 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
   }
 
-//  @GetMapping("/{loanLedgerId}/repayment")
-//  public ApiResponse<SuccessBody<LoanRepaymentResponse>> getRepayment(
-//      @PathVariable Long loanLedgerId) {
-//    log.info("자동 예치 여부 조회");
-//    LoanRepaymentResponse response = loanService.getRepayment(loanLedgerId);
-//
-//    return ApiResponseGenerator.success(ResponseCode.GET, response);
-//  }
+  //  @GetMapping("/{loanLedgerId}/repayment")
+  //  public ApiResponse<SuccessBody<LoanRepaymentResponse>> getRepayment(
+  //      @PathVariable Long loanLedgerId) {
+  //    log.info("자동 예치 여부 조회");
+  //    LoanRepaymentResponse response = loanService.getRepayment(loanLedgerId);
+  //
+  //    return ApiResponseGenerator.success(ResponseCode.GET, response);
+  //  }
 }

@@ -1,6 +1,5 @@
 package com.fisa.bank.loan.application.dto.response;
 
-import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -9,6 +8,7 @@ import java.time.LocalDateTime;
 import com.fisa.bank.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.loan.persistence.enums.LoanType;
+import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.loan.persistence.enums.RepaymentType;
 
 @Getter
@@ -28,20 +28,19 @@ public class LoanLedgerDetailResponse {
   private final int term;
   private final RepaymentStatus repaymentStatus;
 
-
   public LoanLedgerDetailResponse(
-          String name,
-          BigDecimal principal,
-          BigDecimal remainPrincipal,
-          LoanType loanType,
-          RepaymentType repaymentType,
-          BigDecimal monthlyRepayment,
-          String accountNumber,
-          Boolean autoDepositEnabled,
-          LocalDateTime lastRepaymentDate,
-          LocalDateTime createdAt,
-          int term,
-          RepaymentStatus repaymentStatus) {
+      String name,
+      BigDecimal principal,
+      BigDecimal remainPrincipal,
+      LoanType loanType,
+      RepaymentType repaymentType,
+      BigDecimal monthlyRepayment,
+      String accountNumber,
+      Boolean autoDepositEnabled,
+      LocalDateTime lastRepaymentDate,
+      LocalDateTime createdAt,
+      int term,
+      RepaymentStatus repaymentStatus) {
     this.name = name;
     this.principal = principal;
     this.remainPrincipal = remainPrincipal;
