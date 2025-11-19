@@ -1,9 +1,11 @@
 package com.fisa.bank.domains.user.application.service;
 
+import com.fisa.bank.domains.user.application.event.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigInteger;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import com.fisa.bank.domains.user.persistence.repository.UserRepository;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final ApplicationEventPublisher eventPublisher;
   private final UserRepository userRepository;
   private final UserAuthRepository authRepository;
   private final UserReader userReader;
@@ -46,7 +49,9 @@ public class UserService {
             userAuth);
 
     authRepository.save(userAuth);
-    userRepository.save(user);
+    User saved = userRepository.save(user);
+
+    eventPublisher.publishEvent(new UserCreatedEvent(saved.getUserId()));
 
     return true;
   }
