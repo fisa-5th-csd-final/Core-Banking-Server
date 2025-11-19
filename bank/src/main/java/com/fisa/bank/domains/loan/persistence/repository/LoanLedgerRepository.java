@@ -1,6 +1,8 @@
 package com.fisa.bank.domains.loan.persistence.repository;
 
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +16,7 @@ public interface LoanLedgerRepository extends JpaRepository<LoanLedger, LoanLedg
       UserId userId, LoanProductId loanProductId);
 
   List<LoanLedger> findAllByUser_UserId(UserId userId);
+
+  Optional<LoanLedger> findByLoanLedgerIdAndRepaymentStatusNotIn(
+      LoanLedgerId loanLedgerId, List<RepaymentStatus> statuses);
 }

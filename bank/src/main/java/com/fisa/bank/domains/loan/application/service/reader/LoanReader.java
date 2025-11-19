@@ -1,5 +1,6 @@
 package com.fisa.bank.domains.loan.application.service.reader;
 
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -26,6 +27,9 @@ public class LoanReader {
   private final LoanRepository loanRepository;
   private final LoanLedgerRepository loanLedgerRepository;
 
+  private static final List<RepaymentStatus> EXCLUDED_REPAYMENT_STATUSES =
+      List.of(RepaymentStatus.COMPLETED, RepaymentStatus.TERMINATED);
+
   public Page<LoanProduct> findAllProducts(Pageable pageable) {
     return loanRepository.findAll(pageable);
   }
@@ -37,8 +41,10 @@ public class LoanReader {
   }
 
   public LoanLedger findLoanLedgerById(Long loanLedgerId) {
+
     return loanLedgerRepository
-        .findById(LoanLedgerId.of(loanLedgerId))
+        .findByLoanLedgerIdAndRepaymentStatusNotIn(
+            LoanLedgerId.of(loanLedgerId), EXCLUDED_REPAYMENT_STATUSES)
         .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
   }
 
