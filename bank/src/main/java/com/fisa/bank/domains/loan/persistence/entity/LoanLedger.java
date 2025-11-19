@@ -1,0 +1,166 @@
+package com.fisa.bank.domains.loan.persistence.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.JavaType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.fisa.bank.domains.account.persistence.entity.Account;
+import com.fisa.bank.domains.common.persistence.entity.BaseEntity;
+import com.fisa.bank.domains.loan.application.model.UpdateLoanLedgerParam;
+import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerId;
+import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerIdJavaType;
+import com.fisa.bank.domains.loan.persistence.enums.InterestType;
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentType;
+import com.fisa.bank.domains.user.persistence.entity.User;
+
+/*
+   대출 원장 테이블
+*/
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
+public class LoanLedger extends BaseEntity {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JavaType(LoanLedgerIdJavaType.class)
+  @JdbcTypeCode(SqlTypes.BIGINT)
+  private LoanLedgerId loanLedgerId;
+
+  // LoanLedger 1 : N LoanTransaction
+  @OneToMany(mappedBy = "loanLedger")
+  @Builder.Default
+  private List<LoanTransaction> loanTransactionList = new ArrayList<>();
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "loanProductId", nullable = false)
+  private LoanProduct loanProduct;
+
+  // LoanLedger N : 1 User
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "userId", nullable = false)
+  private User user;
+
+  // 최종 금리
+  @Column(nullable = false)
+  private BigDecimal completedInterest;
+
+  // 원금
+  @Column(nullable = false)
+  private BigDecimal principal;
+
+  // 남은 원금
+  @Column(nullable = false)
+  private BigDecimal remainPrincipal;
+
+  // 상환 타입 - 원리금, 원금, 만기
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private RepaymentType repaymentType;
+
+  // 상환 상태 - 정상, 연체
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private RepaymentStatus repaymentStatus;
+
+  // 금리 유형 - 고정, 변동
+  @Enumerated(EnumType.STRING)
+  @Column(name = "interest_type", nullable = false)
+  private InterestType interestType;
+
+  // 중도 상환 수수료율 - 금리 유형과 대출 유형에 따라 표 참고해서 정하기
+  @Column(nullable = false)
+  private BigDecimal earlyRepayInterestRate;
+
+  // 다음 상환, 마지막 거래 일시, 상환 마감 기한
+  private LocalDateTime nextRepaymentDate;
+  private LocalDateTime lastRepaymentDate;
+
+  @Column(nullable = false)
+  private LocalDateTime loanEndDate;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "account_id")
+  private Account account;
+
+  // 연체 일수
+  @Column(nullable = false)
+  private int overdueCount;
+
+  @Column(nullable = false)
+  private int term;
+
+  // 자동 예치 여부
+  @Column(nullable = false)
+  private boolean autoDepositEnabled;
+
+  public void addLoanTransactionList(LoanTransaction loanTransaction) {
+    loanTransactionList.add(loanTransaction);
+  }
+
+  public void updateLoanLedger(UpdateLoanLedgerParam updateLoanLedgerParam) {
+    this.remainPrincipal = updateLoanLedgerParam.getRemainPrincipal();
+    this.nextRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
+    this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
+    this.repaymentStatus = updateLoanLedgerParam.getStatus();
+  }
+
+  public static LoanLedger createLoanLedger(
+      LoanProduct loanProduct,
+      User user,
+      BigDecimal completedInterest,
+      BigDecimal principal,
+      BigDecimal remainPrincipal,
+      RepaymentType repaymentType,
+      LocalDateTime nextRepaymentDate,
+      LocalDateTime loanEndDate,
+      InterestType interestType,
+      BigDecimal earlyRepayInterestRate,
+      int term,
+      Account account,
+      boolean autoDepositEnabled) {
+    return LoanLedger.builder()
+        .loanProduct(loanProduct)
+        .user(user)
+        .completedInterest(completedInterest)
+        .principal(principal)
+        .remainPrincipal(remainPrincipal)
+        .repaymentType(repaymentType)
+        .repaymentStatus(RepaymentStatus.NORMAL)
+        .nextRepaymentDate(nextRepaymentDate)
+        .loanEndDate(loanEndDate)
+        .overdueCount(0)
+        .interestType(interestType)
+        .earlyRepayInterestRate(earlyRepayInterestRate)
+        .term(term)
+        .account(account)
+        .autoDepositEnabled(autoDepositEnabled)
+        .build();
+  }
+}

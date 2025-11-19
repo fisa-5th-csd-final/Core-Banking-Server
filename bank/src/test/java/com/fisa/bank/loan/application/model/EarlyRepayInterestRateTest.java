@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
-import com.fisa.bank.loan.application.util.EarlyRepayInterestRate;
-import com.fisa.bank.loan.persistence.enums.InterestType;
-import com.fisa.bank.loan.persistence.enums.LoanType;
+import com.fisa.bank.domains.loan.application.util.EarlyRepayInterestRate;
+import com.fisa.bank.domains.loan.persistence.enums.InterestType;
+import com.fisa.bank.domains.loan.persistence.enums.LoanType;
 
 // 중도 상환 수수료 테이블 조회 테스트 코드
 public class EarlyRepayInterestRateTest {

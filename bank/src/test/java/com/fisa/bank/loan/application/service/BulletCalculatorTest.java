@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.fisa.bank.loan.application.model.MonthlyRepayment;
-import com.fisa.bank.loan.application.service.calculator.BulletCalculator;
+import com.fisa.bank.domains.loan.application.model.MonthlyRepayment;
+import com.fisa.bank.domains.loan.application.service.calculator.BulletCalculator;
 
 public class BulletCalculatorTest {
 

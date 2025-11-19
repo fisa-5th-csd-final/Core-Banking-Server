@@ -1,0 +1,17 @@
+package com.fisa.bank.domains.account.application.exception;
+
+import com.fisa.bank.domains.common.application.exception.BusinessException;
+
+public class AccountNotDeletableException extends BusinessException {
+  private static final String ERROR_CODE = "A004";
+  private static final String MESSAGE = "잔액이 0이 아닌 게좌는 삭제할 수 없습니다";
+
+  public AccountNotDeletableException() {
+    super(ERROR_CODE, MESSAGE);
+  }
+
+  // 커스텀 메시지 사용
+  public AccountNotDeletableException(String message) {
+    super(ERROR_CODE, message);
+  }
+}
