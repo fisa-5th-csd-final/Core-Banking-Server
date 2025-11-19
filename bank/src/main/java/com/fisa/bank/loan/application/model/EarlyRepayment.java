@@ -52,7 +52,7 @@ public class EarlyRepayment {
     return remain
         .multiply(rate)
         .multiply(BigDecimal.valueOf(remaining))
-        .divide(java.math.BigDecimal.valueOf(totalDay), 0, RoundingMode.HALF_UP);
+        .divide(BigDecimal.valueOf(totalDay), 0, RoundingMode.HALF_UP);
   }
 
   public static EarlyRepayment create(LoanLedger loanLedger, LocalDateTime now, BigDecimal rate) {
