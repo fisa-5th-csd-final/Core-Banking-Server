@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.fisa.bank.domains.account.application.service.AccountDomainManager;
+import com.fisa.bank.domains.account.application.service.AccountDomainRecoder;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.account.persistence.enums.TransactionType;
 import com.fisa.bank.domains.loan.application.event.LoanCancelledEvent;
@@ -16,7 +16,7 @@ import com.fisa.bank.domains.loan.application.event.LoanRepaidEvent;
 @RequiredArgsConstructor
 public class AccountTransactionListener {
 
-  private final AccountDomainManager accountDomainManager;
+  private final AccountDomainRecoder accountDomainManager;
 
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleLoanRepaidEvent(LoanRepaidEvent event) {

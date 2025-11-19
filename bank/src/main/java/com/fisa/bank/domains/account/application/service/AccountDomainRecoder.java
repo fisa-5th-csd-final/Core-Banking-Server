@@ -17,7 +17,7 @@ import com.fisa.bank.domains.account.persistence.repository.AccountTransactionRe
 */
 @Service
 @RequiredArgsConstructor
-public class AccountDomainManager {
+public class AccountDomainRecoder {
   private final AccountTransactionRepository transactionRepository;
 
   @Transactional

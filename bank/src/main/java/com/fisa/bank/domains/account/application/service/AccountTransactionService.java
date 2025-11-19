@@ -32,7 +32,7 @@ import com.fisa.bank.domains.common.aop.annotation.VerifyOwner;
 public class AccountTransactionService {
 
   private final AccountReader accountReader;
-  private final AccountDomainManager accountDomainManager;
+  private final AccountDomainRecoder accountDomainManager;
   private final CardTransactionRepository cardTransactionRepository;
   private final AccountTransactionRepository accountTransactionRepository;
 
