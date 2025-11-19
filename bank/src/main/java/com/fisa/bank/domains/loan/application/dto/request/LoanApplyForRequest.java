@@ -30,7 +30,6 @@ public class LoanApplyForRequest {
   @Min(value = 1, message = "상환 기간은 최소 1년 이상이어야 합니다.")
   private Integer term;
 
-  @NotBlank(message = "계좌 번호를 입력해주세요")
   private String accountNumber;
 
   @NotNull(message = "자동 예치 여부를 입력해주세요.")

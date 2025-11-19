@@ -68,7 +68,7 @@ public class AccountService {
     Account account = accountReader.getAccountByAccountNumber(accountNumber);
 
     // 급여 계좌인 경우 삭제 불가
-      if(account.isIncome()) throw new AccountNotDeletableException("급여 계좌는 삭제할 수 없습니다.");
+      if(account.isForIncome()) throw new AccountNotDeletableException("급여 계좌는 삭제할 수 없습니다.");
 
     // 잔액이 있는 경우 예외 처리
     if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {

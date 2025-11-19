@@ -1,5 +1,7 @@
 package com.fisa.bank.domains.loan.application.service;
 
+import com.fisa.bank.domains.account.application.service.AccountService;
+import com.fisa.bank.domains.loan.application.exception.LoanApplyDeniedException;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -76,6 +78,7 @@ public class LoanService {
   private final LoanTransactionRepository loanTransactionRepository;
   private final AccountReader accountReader;
   private final CalculatorService calculatorService;
+  private final AccountService accountService;
   private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
   private final ApplicationEventPublisher eventPublisher;
@@ -124,7 +127,18 @@ public class LoanService {
     UserId userId = requesterInfo.getUserId();
     // 유저 정보 추출
     User user = userReader.getUserById(userId.getValue());
-    Account account = accountReader.getAccountByAccountNumber(request.getAccountNumber());
+    String accountNumber = request.getAccountNumber();
+
+      // 계좌 새로 생성
+    if(accountNumber == null) {
+        accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
+    }
+
+    Account account =  accountReader.getAccountByAccountNumber(accountNumber);
+
+    // 급여 계좌로는 대출 가입 불가
+    if(account.isForIncome()) throw new LoanApplyDeniedException();
+
     if (loanReader.existsByUserIdAndLoanProductId(userId.getValue(), loanProductId)) {
       throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
     }
