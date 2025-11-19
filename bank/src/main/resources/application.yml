@@ -13,3 +13,9 @@ spring:
 
 backend:
   endpoint: ${BACKEND_ENDPOINT}
+
+server:
+  servlet:
+    session:
+      cookie:
+        name: BANKSESSION
