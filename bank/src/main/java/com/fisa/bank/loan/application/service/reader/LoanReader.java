@@ -15,6 +15,7 @@ import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
+import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
 import com.fisa.bank.user.persistence.entity.id.UserId;
@@ -25,6 +26,9 @@ import com.fisa.bank.user.persistence.entity.id.UserId;
 public class LoanReader {
   private final LoanRepository loanRepository;
   private final LoanLedgerRepository loanLedgerRepository;
+
+  private static final List<RepaymentStatus> EXCLUDED_REPAYMENT_STATUSES =
+      List.of(RepaymentStatus.COMPLETED, RepaymentStatus.TERMINATED);
 
   public Page<LoanProduct> findAllProducts(Pageable pageable) {
     return loanRepository.findAll(pageable);
@@ -37,8 +41,10 @@ public class LoanReader {
   }
 
   public LoanLedger findLoanLedgerById(Long loanLedgerId) {
+
     return loanLedgerRepository
-        .findById(LoanLedgerId.of(loanLedgerId))
+        .findByLoanLedgerIdAndRepaymentStatusNotIn(
+            LoanLedgerId.of(loanLedgerId), EXCLUDED_REPAYMENT_STATUSES)
         .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
   }
 
