@@ -28,18 +28,15 @@ import com.fisa.bank.domains.user.persistence.entity.User;
 @RequiredArgsConstructor
 public class AccountService {
 
+    private final AccountCreator accountCreator;
   private final AccountRepository accountRepository;
   private final AccountReader accountReader;
-
-  @Value("${bank.code}")
-  private String ourBankCode;
 
   // 계좌 생성 서비스
   @Transactional
   public AccountResponse createAccount(Long userId) {
     User user = accountReader.getUserById(userId);
-    String accountNumber = AccountNumberGenerator.generate();
-    Account account = Account.create(accountNumber, user, ourBankCode, false);
+    Account account = accountCreator.createNonIncomeAccount(user);
 
     Account saved = accountRepository.save(account);
 
