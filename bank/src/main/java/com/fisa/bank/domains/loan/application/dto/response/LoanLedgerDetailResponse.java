@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import com.fisa.bank.domains.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.loan.persistence.enums.LoanType;
-import com.fisa.bank.domains.loan.persistence.enums.RepaymentType;
 import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentType;
 
 @Getter
 public class LoanLedgerDetailResponse {

@@ -106,7 +106,7 @@ public class SecurityFilterChainConfig {
                         "/api/loans/products",
                         "/api/loans/{loanProductId:\\d+}",
                         "/api/interests/{loanProductId:\\d+}",
-                        "/swagger-ui/**",// TODO: Swagger 전용 필터체인으로 분리
+                        "/swagger-ui/**", // TODO: Swagger 전용 필터체인으로 분리
                         "/v3/api-docs/**", // TODO: Swagger 전용 필터체인으로 분리
                         "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
                         )
