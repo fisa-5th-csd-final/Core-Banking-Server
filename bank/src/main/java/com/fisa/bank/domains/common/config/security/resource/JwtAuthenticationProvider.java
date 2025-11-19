@@ -1,6 +1,7 @@
 package com.fisa.bank.domains.common.config.security.resource;
 
-import static com.fisa.bank.domains.common.config.security.jwt.JwtConst.*;
+import static com.fisa.bank.domains.common.config.security.jwt.JwtConst.CLAIM_ROLE;
+import static com.fisa.bank.domains.common.config.security.jwt.JwtConst.CLAIM_USER_ID;
 
 import lombok.extern.slf4j.Slf4j;
 

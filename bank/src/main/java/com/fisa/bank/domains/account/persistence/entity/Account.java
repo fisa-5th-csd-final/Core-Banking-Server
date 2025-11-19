@@ -10,8 +10,24 @@
  */
 package com.fisa.bank.domains.account.persistence.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,7 +38,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
-import com.fisa.bank.domains.account.persistence.entity.id.*;
 import com.fisa.bank.domains.account.persistence.entity.id.AccountId;
 import com.fisa.bank.domains.account.persistence.entity.id.AccountIdJavaType;
 import com.fisa.bank.domains.common.persistence.entity.BaseEntity;

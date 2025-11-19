@@ -1,7 +1,8 @@
 package com.fisa.bank.domains.common.config.security.authorization;
 
 import static com.fisa.bank.domains.common.config.security.authorization.OAuth2Const.OAUTH2_ACCESS_TOKEN;
-import static com.fisa.bank.domains.common.config.security.jwt.JwtConst.*;
+import static com.fisa.bank.domains.common.config.security.jwt.JwtConst.CLAIM_ROLE;
+import static com.fisa.bank.domains.common.config.security.jwt.JwtConst.CLAIM_USER_ID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
