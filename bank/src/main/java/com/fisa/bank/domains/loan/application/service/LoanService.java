@@ -1,6 +1,9 @@
 package com.fisa.bank.domains.loan.application.service;
 
+import com.fisa.bank.domains.account.application.service.AccountCreator;
 import com.fisa.bank.domains.account.application.service.AccountService;
+import com.fisa.bank.domains.account.application.util.AccountNumberGenerator;
+import com.fisa.bank.domains.account.persistence.repository.AccountRepository;
 import com.fisa.bank.domains.loan.application.exception.LoanApplyDeniedException;
 import lombok.RequiredArgsConstructor;
 
@@ -78,12 +81,13 @@ public class LoanService {
   private final LoanTransactionRepository loanTransactionRepository;
   private final AccountReader accountReader;
   private final CalculatorService calculatorService;
-  private final AccountService accountService;
+  private final AccountCreator accountCreator;
   private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
   private final ApplicationEventPublisher eventPublisher;
+    private final AccountRepository accountRepository;
 
-  @Transactional
+    @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
 
     LoanProduct loanProduct =
@@ -131,7 +135,7 @@ public class LoanService {
 
       // 계좌 새로 생성
     if(accountNumber == null) {
-        accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
+        accountNumber = accountRepository.save(accountCreator.createNonIncomeAccount(user)).getAccountNumber();
     }
 
     Account account =  accountReader.getAccountByAccountNumber(accountNumber);
