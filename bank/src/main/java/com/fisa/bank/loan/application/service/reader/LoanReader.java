@@ -27,6 +27,9 @@ public class LoanReader {
   private final LoanRepository loanRepository;
   private final LoanLedgerRepository loanLedgerRepository;
 
+  private static final List<RepaymentStatus> EXCLUDED_REPAYMENT_STATUSES =
+      List.of(RepaymentStatus.COMPLETED, RepaymentStatus.TERMINATED);
+
   public Page<LoanProduct> findAllProducts(Pageable pageable) {
     return loanRepository.findAll(pageable);
   }
@@ -38,10 +41,10 @@ public class LoanReader {
   }
 
   public LoanLedger findLoanLedgerById(Long loanLedgerId) {
-    List<RepaymentStatus> excluded = List.of(RepaymentStatus.COMPLETED, RepaymentStatus.TERMINATED);
 
     return loanLedgerRepository
-        .findByLoanLedgerIdAndRepaymentStatusNotIn(LoanLedgerId.of(loanLedgerId), excluded)
+        .findByLoanLedgerIdAndRepaymentStatusNotIn(
+            LoanLedgerId.of(loanLedgerId), EXCLUDED_REPAYMENT_STATUSES)
         .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
   }
 
