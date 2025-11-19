@@ -61,7 +61,7 @@ public class SecurityFilterChainConfig {
                 auth.requestMatchers("/oauth2/authorize", "/login/**", "/login/oauth2/code/*")
                     .authenticated()
                     .anyRequest()
-                    .permitAll());
+                    .authenticated());
 
     // SAS 기능 활성화(OIDC 포함)
     http.with(
