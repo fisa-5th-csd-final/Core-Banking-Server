@@ -1,5 +1,6 @@
 package com.fisa.bank.domains.loan.application.service;
 
+import com.fisa.bank.domains.loan.application.dto.response.LoanRepaymentResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -210,7 +211,8 @@ public class LoanService {
             interestType,
             earlyRepayInterestRate,
             request.getTerm(),
-            account);
+            account,
+            request.getAutoDepositEnabled());
 
     // 대출 이력성 테이블에 저장 LoanTransaction
     LoanTransaction loanTransaction =
@@ -355,5 +357,18 @@ public class LoanService {
     Long userId = requesterInfo.getUserId().getValue();
     List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
+  }
+
+  @Transactional(readOnly = true)
+  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
+  public LoanRepaymentResponse getRepayment(Long loanLedgerId) {
+
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
+
+    return LoanRepaymentResponse.builder()
+        .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
+        .nextRepaymentDate(loanLedger.getNextRepaymentDate())
+        .autoDepositEnabled(loanLedger.isAutoDepositEnabled())
+        .build();
   }
 }

@@ -101,6 +101,10 @@ public class LoanLedger extends BaseEntity {
   @Column(nullable = false)
   private int term;
 
+  // 자동 예치 여부
+  @Column(nullable = false)
+  private boolean autoDepositEnabled;
+
   public void addLoanTransactionList(LoanTransaction loanTransaction) {
     loanTransactionList.add(loanTransaction);
   }
@@ -110,6 +114,7 @@ public class LoanLedger extends BaseEntity {
     this.nextRepaymentDate = updateLoanLedgerParam.getNextRepaymentDate();
     this.lastRepaymentDate = updateLoanLedgerParam.getLastRepaymentDate();
     this.repaymentStatus = updateLoanLedgerParam.getStatus();
+    this.autoDepositEnabled = updateLoanLedgerParam.getAutoDepositEnabled();
   }
 
   public static LoanLedger createLoanLedger(
@@ -124,7 +129,8 @@ public class LoanLedger extends BaseEntity {
       InterestType interestType,
       BigDecimal earlyRepayInterestRate,
       int term,
-      Account account) {
+      Account account,
+      boolean autoDepositEnabled) {
     return LoanLedger.builder()
         .loanProduct(loanProduct)
         .user(user)
@@ -140,6 +146,7 @@ public class LoanLedger extends BaseEntity {
         .earlyRepayInterestRate(earlyRepayInterestRate)
         .term(term)
         .account(account)
+        .autoDepositEnabled(autoDepositEnabled)
         .build();
   }
 }
