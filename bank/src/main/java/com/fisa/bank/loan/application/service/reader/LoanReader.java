@@ -15,6 +15,7 @@ import com.fisa.bank.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.loan.persistence.entity.id.LoanProductId;
+import com.fisa.bank.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.loan.persistence.repository.LoanLedgerRepository;
 import com.fisa.bank.loan.persistence.repository.LoanRepository;
 import com.fisa.bank.user.persistence.entity.id.UserId;
@@ -37,8 +38,10 @@ public class LoanReader {
   }
 
   public LoanLedger findLoanLedgerById(Long loanLedgerId) {
+    List<RepaymentStatus> excluded = List.of(RepaymentStatus.COMPLETED, RepaymentStatus.TERMINATED);
+
     return loanLedgerRepository
-        .findById(LoanLedgerId.of(loanLedgerId))
+        .findByLoanLedgerIdAndRepaymentStatusNotIn(LoanLedgerId.of(loanLedgerId), excluded)
         .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
   }
 
