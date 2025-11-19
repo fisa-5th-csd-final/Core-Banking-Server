@@ -15,18 +15,15 @@ public class UpdateLoanLedgerParam {
   private LocalDateTime nextRepaymentDate;
   private LocalDateTime lastRepaymentDate;
   private RepaymentStatus status;
-  private Boolean autoDepositEnabled;
 
   public UpdateLoanLedgerParam(
       BigDecimal remainPrincipal,
       LocalDateTime nextRepaymentDate,
       LocalDateTime lastRepaymentDate,
-      RepaymentStatus status,
-      Boolean autoDepositEnabled) {
+      RepaymentStatus status) {
     this.remainPrincipal = remainPrincipal;
     this.nextRepaymentDate = nextRepaymentDate;
     this.lastRepaymentDate = lastRepaymentDate;
     this.status = status;
-    this.autoDepositEnabled = autoDepositEnabled;
   }
 }
