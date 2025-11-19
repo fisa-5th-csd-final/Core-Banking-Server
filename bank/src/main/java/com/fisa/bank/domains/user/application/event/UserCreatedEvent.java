@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.user.application.event;
 
-import com.fisa.bank.domains.user.persistence.entity.id.UserId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserCreatedEvent {
 
-    private final UserId userId;
+    // 이벤트는 외부로 전달해야 할 수도 있으므로 Long
+    private final Long userId;
 
 }

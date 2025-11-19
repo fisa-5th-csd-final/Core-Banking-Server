@@ -51,7 +51,7 @@ public class UserService {
     authRepository.save(userAuth);
     User saved = userRepository.save(user);
 
-    eventPublisher.publishEvent(new UserCreatedEvent(saved.getUserId()));
+    eventPublisher.publishEvent(new UserCreatedEvent(saved.getUserId().getValue()));
 
     return true;
   }
