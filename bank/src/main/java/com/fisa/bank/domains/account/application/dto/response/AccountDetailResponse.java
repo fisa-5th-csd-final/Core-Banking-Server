@@ -12,7 +12,7 @@ public record AccountDetailResponse(
     String bankCode,
     BigDecimal balance,
     LocalDateTime createdAt,
-    boolean isInCome) {
+    boolean isForInCome) {
   public static AccountDetailResponse from(Account account) {
     return new AccountDetailResponse(
         account.getAccountId().getValue(),
@@ -21,6 +21,6 @@ public record AccountDetailResponse(
         account.getBankCode(),
         account.getBalance(),
         account.getCreatedAt(),
-            account.isIncome());
+            account.isForIncome());
   }
 }

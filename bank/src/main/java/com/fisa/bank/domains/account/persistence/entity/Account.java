@@ -70,7 +70,7 @@ public class Account extends BaseEntity {
   private String bankCode;
 
   @Column(nullable = false)
-  private boolean isIncome;
+  private boolean isForIncome;
 
   @OneToOne(fetch = FetchType.LAZY, mappedBy = "account")
   private LoanLedger loanLedger;
@@ -89,7 +89,7 @@ public class Account extends BaseEntity {
         .user(user)
         .bankCode(bankCode)
         .balance(BigDecimal.ZERO)
-        .isIncome(isIncome)
+        .isForIncome(isIncome)
         .build();
   }
 
