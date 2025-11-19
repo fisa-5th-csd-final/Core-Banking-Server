@@ -51,14 +51,17 @@ public class SecurityFilterChainConfig {
 
     //    commonConfiguration(http); // 공통 설정
     http.formLogin(Customizer.withDefaults());
-    http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     http.csrf(AbstractHttpConfigurer::disable);
     // SAS 엔드포인트만 매칭
 
     http.securityMatcher(authorizationServer.getEndpointsMatcher())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/oauth2/authorize").authenticated().anyRequest().permitAll());
+                auth.requestMatchers("/oauth2/authorize", "/login/**", "/login/oauth2/code/*")
+                    .authenticated()
+                    .anyRequest()
+                    .permitAll());
 
     // SAS 기능 활성화(OIDC 포함)
     http.with(
