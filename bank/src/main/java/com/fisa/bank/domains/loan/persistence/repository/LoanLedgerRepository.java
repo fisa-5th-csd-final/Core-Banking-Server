@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.loan.persistence.repository;
 
-import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.domains.loan.persistence.entity.id.LoanProductId;
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.domains.user.persistence.entity.id.UserId;
 
 public interface LoanLedgerRepository extends JpaRepository<LoanLedger, LoanLedgerId> {

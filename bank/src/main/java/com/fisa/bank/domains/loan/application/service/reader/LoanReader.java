@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.loan.application.service.reader;
 
-import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -16,6 +15,7 @@ import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.domains.loan.persistence.entity.id.LoanProductId;
+import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
 import com.fisa.bank.domains.loan.persistence.repository.LoanLedgerRepository;
 import com.fisa.bank.domains.loan.persistence.repository.LoanRepository;
 import com.fisa.bank.domains.user.persistence.entity.id.UserId;
