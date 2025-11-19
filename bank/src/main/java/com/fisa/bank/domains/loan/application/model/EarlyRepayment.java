@@ -3,6 +3,7 @@ package com.fisa.bank.domains.loan.application.model;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +52,7 @@ public class EarlyRepayment {
     return remain
         .multiply(rate)
         .multiply(BigDecimal.valueOf(remaining))
-        .divide(java.math.BigDecimal.valueOf(totalDay));
+        .divide(BigDecimal.valueOf(totalDay), 0, RoundingMode.HALF_UP);
   }
 
   public static EarlyRepayment create(LoanLedger loanLedger, LocalDateTime now, BigDecimal rate) {
