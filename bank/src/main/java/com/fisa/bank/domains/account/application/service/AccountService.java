@@ -39,7 +39,7 @@ public class AccountService {
   public AccountResponse createAccount(Long userId) {
     User user = accountReader.getUserById(userId);
     String accountNumber = AccountNumberGenerator.generate();
-    Account account = Account.create(accountNumber, user, ourBankCode);
+    Account account = Account.create(accountNumber, user, ourBankCode, false);
 
     Account saved = accountRepository.save(account);
 
@@ -66,6 +66,9 @@ public class AccountService {
   @Transactional
   public void deleteAccount(String accountNumber) {
     Account account = accountReader.getAccountByAccountNumber(accountNumber);
+
+    // 급여 계좌인 경우 삭제 불가
+      if(account.isIncome()) throw new AccountNotDeletableException("급여 계좌는 삭제할 수 없습니다.");
 
     // 잔액이 있는 경우 예외 처리
     if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {

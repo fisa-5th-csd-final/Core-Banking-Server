@@ -11,7 +11,8 @@ public record AccountDetailResponse(
     String ownerName,
     String bankCode,
     BigDecimal balance,
-    LocalDateTime createdAt) {
+    LocalDateTime createdAt,
+    boolean isInCome) {
   public static AccountDetailResponse from(Account account) {
     return new AccountDetailResponse(
         account.getAccountId().getValue(),
@@ -19,6 +20,7 @@ public record AccountDetailResponse(
         account.getUser().getName(),
         account.getBankCode(),
         account.getBalance(),
-        account.getCreatedAt());
+        account.getCreatedAt(),
+            account.isIncome());
   }
 }
