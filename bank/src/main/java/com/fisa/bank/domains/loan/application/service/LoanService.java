@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.domains.account.application.service.AccountService;
@@ -128,11 +127,6 @@ public class LoanService {
     // 유저 정보 추출
     User user = userReader.getUserById(userId.getValue());
     String accountNumber = request.getAccountNumber();
-
-    // 계좌 새로 생성
-    if (!StringUtils.hasText(accountNumber))
-      accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
-
     Account account = accountReader.getAccountByAccountNumber(accountNumber);
 
     // 급여 계좌로는 대출 가입 불가
