@@ -32,7 +32,7 @@ import com.fisa.bank.domains.common.aop.annotation.VerifyOwner;
 public class AccountTransactionService {
 
   private final AccountReader accountReader;
-  private final AccountDomainRecorder accountDomainManager;
+  private final AccountDomainRecorder accountDomainRecorder;
   private final CardTransactionRepository cardTransactionRepository;
   private final AccountTransactionRepository accountTransactionRepository;
 
@@ -44,7 +44,7 @@ public class AccountTransactionService {
   public AccountTransactionResponse withdraw(String accountNumber, AccountWithdrawRequest request) {
     Account account = accountReader.getAccountByAccountNumberWithLock(accountNumber);
     var trx =
-        accountDomainManager.record(
+        accountDomainRecorder.record(
             account, request.amount(), TransactionType.ATM_WITHDRAW, false, null);
     return AccountTransactionResponse.from(trx);
   }
@@ -54,7 +54,7 @@ public class AccountTransactionService {
   public AccountTransactionResponse deposit(String accountNumber, AccountDepositRequest request) {
     Account account = accountReader.getAccountByAccountNumberWithLock(accountNumber);
     var trx =
-        accountDomainManager.record(
+        accountDomainRecorder.record(
             account, request.amount(), TransactionType.ATM_DEPOSIT, true, null);
     return AccountTransactionResponse.from(trx);
   }
@@ -74,15 +74,15 @@ public class AccountTransactionService {
       var from = pair.from();
       var to = pair.to();
 
-      accountDomainManager.record(
+      accountDomainRecorder.record(
           from, request.amount(), TransactionType.TRANSFER_SEND, false, to.getAccountNumber());
-      accountDomainManager.record(
+      accountDomainRecorder.record(
           to, request.amount(), TransactionType.TRANSFER_RECEIVE, true, from.getAccountNumber());
 
       return TransferResponse.of(from, to, request.amount());
     } else {
       var from = accountReader.getAccountByAccountNumberWithLock(request.fromAccountNumber());
-      accountDomainManager.record(
+      accountDomainRecorder.record(
           from,
           request.amount(),
           TransactionType.EXTERNAL_TRANSFER_SEND,
@@ -97,7 +97,7 @@ public class AccountTransactionService {
   public CardPaymentResponse payByCard(String accountNumber, CardPaymentRequest request) {
     var account = accountReader.getAccountByAccountNumberWithLock(accountNumber);
 
-    accountDomainManager.record(
+    accountDomainRecorder.record(
         account, request.amount(), TransactionType.CARD_PAYMENT, false, request.storeName());
 
     var cardTrx =
