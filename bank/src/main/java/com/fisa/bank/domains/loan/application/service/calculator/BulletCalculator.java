@@ -57,6 +57,7 @@ public class BulletCalculator implements LoanCalculator {
         principalPayment.setScale(0, RoundingMode.DOWN),
         interestPayment.setScale(0, RoundingMode.DOWN),
         monthlyPayment.setScale(0, RoundingMode.DOWN),
-        remainPrincipal.subtract(principalPayment));
+        remainPrincipal.subtract(principalPayment),
+        nextRepaymentDate);
   }
 }
