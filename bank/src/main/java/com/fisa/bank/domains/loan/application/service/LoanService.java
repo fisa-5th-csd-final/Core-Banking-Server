@@ -31,7 +31,6 @@ import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerDetailRespo
 import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerResponse;
 import com.fisa.bank.domains.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.domains.loan.application.dto.response.LoanProductResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanRepaymentResponse;
 import com.fisa.bank.domains.loan.application.dto.response.LoanTransactionResponse;
 import com.fisa.bank.domains.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.domains.loan.application.event.LoanCancelledEvent;
@@ -138,7 +137,6 @@ public class LoanService {
 
     // 급여 계좌로는 대출 가입 불가
     if (account.isForIncome()) throw new LoanApplyDeniedException();
-
     if (loanReader.existsByUserIdAndLoanProductId(userId.getValue(), loanProductId)) {
       throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
     }
@@ -370,16 +368,11 @@ public class LoanService {
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
-  public LoanRepaymentResponse getRepayment(Long loanLedgerId) {
-
+  public void updateAutoDepositEnabled(Long loanLedgerId, boolean autoDepositEnabled) {
     LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
-    return LoanRepaymentResponse.builder()
-        .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
-        .nextRepaymentDate(loanLedger.getNextRepaymentDate())
-        .autoDepositEnabled(loanLedger.isAutoDepositEnabled())
-        .build();
+    loanLedger.updateAutoDeposit(autoDepositEnabled);
   }
 }

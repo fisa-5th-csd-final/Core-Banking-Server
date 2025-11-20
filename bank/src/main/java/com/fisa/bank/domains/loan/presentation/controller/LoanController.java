@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ import com.fisa.bank.domains.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.domains.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.domains.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.domains.loan.application.dto.request.LoanApplyForRequest;
+import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.domains.loan.application.dto.response.LoanApplyforResponse;
@@ -120,12 +122,12 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
   }
 
-  //  @GetMapping("/{loanLedgerId}/repayment")
-  //  public ApiResponse<SuccessBody<LoanRepaymentResponse>> getRepayment(
-  //      @PathVariable Long loanLedgerId) {
-  //    log.info("자동 예치 여부 조회");
-  //    LoanRepaymentResponse response = loanService.getRepayment(loanLedgerId);
-  //
-  //    return ApiResponseGenerator.success(ResponseCode.GET, response);
-  //  }
+  @PatchMapping("/{loanLedgerId:\\d+}/auto-deposit")
+  public ApiResponse<SuccessBody<Void>> updateAutoDepositEnabled(
+      @PathVariable Long loanLedgerId, @Valid @RequestBody LoanAutoDepositUpdateRequest request) {
+    log.info("자동예치 여부 수정");
+    loanService.updateAutoDepositEnabled(loanLedgerId, request.getAutoDepositEnabled());
+
+    return ApiResponseGenerator.success(ResponseCode.UPDATE);
+  }
 }
