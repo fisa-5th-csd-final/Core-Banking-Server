@@ -7,10 +7,15 @@ services:
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME:-2000}
     ports:
       - "${ZOOKEEPER_CLIENT_PORT:-2181}:2181"
+    networks:
+      - core-bank-internal
 
   kafka:
     image: confluentinc/cp-kafka:7.5.1
     container_name: core-bank-kafka
+    networks:
+      - kafka-net
+      - core-bank-internal
     ports:
       - "${KAFKA_PORT_1:-9092}:9092"
       - "${KAFKA_PORT_2:-29092}:29092"
@@ -46,6 +51,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+    networks:
+      - core-bank-internal
 
   flyway:
     image: flyway/flyway:10
@@ -63,6 +70,8 @@ services:
       mysql:
         condition: service_healthy
     restart: "no"
+    networks:
+      - core-bank-internal
 
   core-bank-server:
     container_name: core-bank-server
@@ -82,6 +91,15 @@ services:
         condition: service_completed_successfully
       kafka:
         condition: service_started
+    networks:
+      - kafka-net
+      - core-bank-internal
 
 volumes:
   mysql-data:
+
+networks:
+  core-bank-internal:
+    driver: bridge
+  kafka-net:
+    external: true
