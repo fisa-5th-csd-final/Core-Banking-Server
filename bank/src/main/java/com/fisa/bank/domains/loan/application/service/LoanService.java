@@ -46,7 +46,6 @@ import com.fisa.bank.domains.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.domains.loan.persistence.entity.LoanTransaction;
 import com.fisa.bank.domains.loan.persistence.entity.PreferInterest;
 import com.fisa.bank.domains.loan.persistence.entity.PreferInterestCompositeKey;
-import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.domains.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.domains.loan.persistence.enums.InterestType;
 import com.fisa.bank.domains.loan.persistence.enums.LoanType;
@@ -353,15 +352,10 @@ public class LoanService {
   }
 
   @Transactional
+  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public void updateAutoDepositEnabled(Long loanLedgerId, boolean autoDepositEnabled) {
-
-    LoanLedger loanLedger =
-        loanLedgerRepository
-            .findById(LoanLedgerId.of(loanLedgerId))
-            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     loanLedger.updateAutoDeposit(autoDepositEnabled);
-
-    // 엔티티 변경 감지로 자동 저장
   }
 }
