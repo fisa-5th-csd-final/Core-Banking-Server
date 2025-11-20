@@ -43,7 +43,7 @@ public class AccountService {
   @Transactional
   public AccountResponse createIncomeAccount(Long userId) {
     User user = accountReader.getUserById(userId);
-    Account account = accountCreator.createIncomeAccount(userId);
+    Account account = accountCreator.createIncomeAccount(user);
 
     return save(account);
   }
