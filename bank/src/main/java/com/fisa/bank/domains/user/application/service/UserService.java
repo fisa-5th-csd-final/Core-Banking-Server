@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.user.application.service;
 
-import com.fisa.bank.domains.user.application.event.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigInteger;
@@ -11,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fisa.bank.domains.user.application.dto.UserCreateRequest;
 import com.fisa.bank.domains.user.application.dto.UserInfoResponse;
+import com.fisa.bank.domains.user.application.event.UserCreatedEvent;
 import com.fisa.bank.domains.user.application.exception.InvalidAuthInfoException;
 import com.fisa.bank.domains.user.application.service.reader.UserReader;
 import com.fisa.bank.domains.user.application.util.PasswordUtil;
@@ -24,7 +24,7 @@ import com.fisa.bank.domains.user.persistence.repository.UserRepository;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final ApplicationEventPublisher eventPublisher;
+  private final ApplicationEventPublisher eventPublisher;
   private final UserRepository userRepository;
   private final UserAuthRepository authRepository;
   private final UserReader userReader;

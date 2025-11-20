@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserCreatedEvent {
 
-    // 이벤트는 외부로 전달해야 할 수도 있으므로 Long
-    private final Long userId;
-
+  // 이벤트는 외부로 전달해야 할 수도 있으므로 Long
+  private final Long userId;
 }

@@ -21,6 +21,6 @@ public record AccountDetailResponse(
         account.getBankCode(),
         account.getBalance(),
         account.getCreatedAt(),
-            account.isForIncome());
+        account.isForIncome());
   }
 }
