@@ -81,11 +81,10 @@ public class LoanService {
   private final LoanTransactionRepository loanTransactionRepository;
   private final AccountReader accountReader;
   private final CalculatorService calculatorService;
-  private final AccountCreator accountCreator;
   private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
   private final ApplicationEventPublisher eventPublisher;
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
     @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -134,9 +133,7 @@ public class LoanService {
     String accountNumber = request.getAccountNumber();
 
       // 계좌 새로 생성
-    if(accountNumber == null) {
-        accountNumber = accountRepository.save(accountCreator.createNonIncomeAccount(user)).getAccountNumber();
-    }
+    if(accountNumber == null) accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
 
     Account account =  accountReader.getAccountByAccountNumber(accountNumber);
 

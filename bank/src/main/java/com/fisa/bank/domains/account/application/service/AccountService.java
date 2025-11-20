@@ -38,10 +38,17 @@ public class AccountService {
     User user = accountReader.getUserById(userId);
     Account account = accountCreator.createNonIncomeAccount(user);
 
-    Account saved = accountRepository.save(account);
-
-    return AccountResponse.from(saved, "계좌가 성공적으로 생성되었습니다.");
+    return save(account);
   }
+
+  // 소득 계좌 생성
+    @Transactional
+    public AccountResponse createIncomeAccount(Long userId){
+      User user = accountReader.getUserById(userId);
+      Account account = accountCreator.createIncomeAccount(userId);
+
+      return save(account);
+    }
 
   // 계좌 상세 조회
   @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
@@ -81,5 +88,9 @@ public class AccountService {
     }
 
     accountRepository.delete(account);
+  }
+
+  private AccountResponse save(Account account){
+      return AccountResponse.from(accountRepository.save(account), "계좌가 성공적으로 생성되었습니다.");
   }
 }
