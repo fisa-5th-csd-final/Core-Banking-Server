@@ -83,7 +83,6 @@ public class LoanService {
   private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
   private final ApplicationEventPublisher eventPublisher;
-  private final AccountService accountService;
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
