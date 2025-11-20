@@ -6,14 +6,14 @@ services:
       ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT:-2181}
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME:-2000}
     ports:
-      - "2181:2181"
+      - "${ZOOKEEPER_PORT:-2181}:2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.5.1
     container_name: core-bank-kafka
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "${KAFKA_PORT_1:-9092}:9092"
+      - "${KAFKA_PORT_2:-29092}:29092"
     environment:
       KAFKA_BROKER_ID: ${KAFKA_BROKER_ID:-1}
       KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper:2181}
@@ -24,6 +24,8 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR:-1}
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR:-1}
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS:-0}
+      KAFKA_PORT_1 : ${KAFKA_PORT_1}
+      KAFKA_PORT_2 : ${KAFKA_PORT_2}
     depends_on:
       - zookeeper
 
@@ -36,7 +38,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-23306}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -70,7 +72,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "${CORE_BANK_PORT:-28080}:8080"
     volumes:
       - ./keys:/app/keys:ro
     depends_on:
