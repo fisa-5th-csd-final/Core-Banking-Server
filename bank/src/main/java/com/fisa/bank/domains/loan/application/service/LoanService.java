@@ -66,6 +66,7 @@ import com.fisa.bank.domains.user.persistence.entity.CreditRating;
 import com.fisa.bank.domains.user.persistence.entity.CustomerLevel;
 import com.fisa.bank.domains.user.persistence.entity.User;
 import com.fisa.bank.domains.user.persistence.entity.id.UserId;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -130,7 +131,7 @@ public class LoanService {
     String accountNumber = request.getAccountNumber();
 
     // 계좌 새로 생성
-    if (accountNumber == null)
+    if (!StringUtils.hasText(accountNumber))
       accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
 
     Account account = accountReader.getAccountByAccountNumber(accountNumber);
