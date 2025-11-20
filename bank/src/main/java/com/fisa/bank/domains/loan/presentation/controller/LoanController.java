@@ -22,7 +22,6 @@ import com.fisa.bank.domains.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.domains.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.domains.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.domains.loan.application.dto.request.LoanApplyForRequest;
-import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.domains.loan.application.dto.response.LoanApplyforResponse;

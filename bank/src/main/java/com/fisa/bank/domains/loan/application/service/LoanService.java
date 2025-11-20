@@ -31,6 +31,7 @@ import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerDetailRespo
 import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerResponse;
 import com.fisa.bank.domains.loan.application.dto.response.LoanProductCreateResponse;
 import com.fisa.bank.domains.loan.application.dto.response.LoanProductResponse;
+import com.fisa.bank.domains.loan.application.dto.response.LoanRepaymentResponse;
 import com.fisa.bank.domains.loan.application.dto.response.LoanTransactionResponse;
 import com.fisa.bank.domains.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.domains.loan.application.event.LoanCancelledEvent;
