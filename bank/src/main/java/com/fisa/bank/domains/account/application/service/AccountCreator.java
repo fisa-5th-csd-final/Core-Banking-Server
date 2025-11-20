@@ -22,19 +22,19 @@ public class AccountCreator {
 
     public Account createIncomeAccount(User user){
         String accountNumber = accountNumberGenerator.generateUnique();
-        return Account.create(accountNumber, user, ourBankCode, false);
+        return Account.create(accountNumber, user, ourBankCode, true);
     }
 
     public Account createNonIncomeAccount(User user){
         String accountNumber = accountNumberGenerator.generateUnique();
-        return Account.create(accountNumber, user, ourBankCode, true);
+        return Account.create(accountNumber, user, ourBankCode, false);
     }
 
     @Transactional(readOnly = true)
     public Account createIncomeAccount(Long userId){
         String accountNumber = accountNumberGenerator.generateUnique();
         User user = userRepository.getReferenceById(UserId.of(userId));
-        return Account.create(accountNumber, user, ourBankCode, false);
+        return Account.create(accountNumber, user, ourBankCode, true);
     }
 
 }
