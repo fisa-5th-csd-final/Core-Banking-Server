@@ -22,6 +22,7 @@ import com.fisa.bank.domains.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.domains.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.domains.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.domains.loan.application.dto.request.LoanApplyForRequest;
+import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.domains.loan.application.dto.response.LoanApplyforResponse;
@@ -123,7 +124,11 @@ public class LoanController {
 
   @PatchMapping("/{loanLedgerId:\\d+}/auto-deposit")
   public ApiResponse<SuccessBody<Void>> updateAutoDepositEnabled(
+<<<<<<< HEAD
       @PathVariable Long loanLedgerId, @Valid @RequestBody LoanAutoDepositUpdateRequest request) {
+=======
+      @PathVariable Long loanLedgerId, @RequestBody LoanAutoDepositUpdateRequest request) {
+>>>>>>> 4231628 ([REFACTOR] spotless 적용)
     log.info("자동예치 여부 수정");
     loanService.updateAutoDepositEnabled(loanLedgerId, request.getAutoDepositEnabled());
 

@@ -54,6 +54,7 @@ import com.fisa.bank.domains.loan.persistence.entity.LoanProduct;
 import com.fisa.bank.domains.loan.persistence.entity.LoanTransaction;
 import com.fisa.bank.domains.loan.persistence.entity.PreferInterest;
 import com.fisa.bank.domains.loan.persistence.entity.PreferInterestCompositeKey;
+import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerId;
 import com.fisa.bank.domains.loan.persistence.entity.id.LoanProductId;
 import com.fisa.bank.domains.loan.persistence.enums.InterestType;
 import com.fisa.bank.domains.loan.persistence.enums.LoanType;
@@ -128,17 +129,7 @@ public class LoanService {
     UserId userId = requesterInfo.getUserId();
     // 유저 정보 추출
     User user = userReader.getUserById(userId.getValue());
-    String accountNumber = request.getAccountNumber();
-
-    // 계좌 새로 생성
-    if (!StringUtils.hasText(accountNumber))
-      accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
-
-    Account account = accountReader.getAccountByAccountNumber(accountNumber);
-
-    // 급여 계좌로는 대출 가입 불가
-    if (account.isForIncome()) throw new LoanApplyDeniedException();
-
+    Account account = accountReader.getAccountByAccountNumber(request.getAccountNumber());
     if (loanReader.existsByUserIdAndLoanProductId(userId.getValue(), loanProductId)) {
       throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
     }
@@ -371,10 +362,23 @@ public class LoanService {
   }
 
   @Transactional
+<<<<<<< HEAD
   @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
   public void updateAutoDepositEnabled(Long loanLedgerId, boolean autoDepositEnabled) {
     LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     loanLedger.updateAutoDeposit(autoDepositEnabled);
+=======
+  public void updateAutoDepositEnabled(Long loanLedgerId, boolean autoDepositEnabled) {
+
+    LoanLedger loanLedger =
+        loanLedgerRepository
+            .findById(LoanLedgerId.of(loanLedgerId))
+            .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
+
+    loanLedger.updateAutoDeposit(autoDepositEnabled);
+
+    // 엔티티 변경 감지로 자동 저장
+>>>>>>> 4231628 ([REFACTOR] spotless 적용)
   }
 }
