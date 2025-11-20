@@ -7,6 +7,8 @@ services:
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME:-2000}
     ports:
       - "2181:2181"
+    networks:
+      - bank-net
 
   kafka:
     image: confluentinc/cp-kafka:7.5.1
@@ -14,6 +16,8 @@ services:
     ports:
       - "9092:9092"
       - "29092:29092"
+    networks:
+      - bank-net
     environment:
       KAFKA_BROKER_ID: ${KAFKA_BROKER_ID:-1}
       KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper:2181}
@@ -36,31 +40,34 @@ services:
     env_file:
       - .env
     ports:
-      - "3306:3306"
+      - "3308:3306"
+    networks:
+      - bank-net
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD}"]
+      test:
+        ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 6
 
-  flyway:
-    image: flyway/flyway:10
-    container_name: core-bank-flyway
-    volumes:
-      - ./bank/src/main/resources/db/migration:/flyway/sql:ro
-    environment:
-      FLYWAY_URL: ${DATABASE_URL}
-      FLYWAY_USER: ${DATABASE_USERNAME}
-      FLYWAY_PASSWORD: ${DATABASE_PASSWORD}
-    command:
-      - -locations=filesystem:/flyway/sql
-      - migrate
-    depends_on:
-      mysql:
-        condition: service_healthy
-    restart: "no"
+  # flyway:
+  #   image: flyway/flyway:10
+  #   container_name: core-bank-flyway
+  #   volumes:
+  #     - ./bank/src/main/resources/db/migration:/flyway/sql:ro
+  #   environment:
+  #     FLYWAY_URL: ${DATABASE_URL}
+  #     FLYWAY_USER: ${DATABASE_USERNAME}
+  #     FLYWAY_PASSWORD: ${DATABASE_PASSWORD}
+  #   command:
+  #     - -locations=filesystem:/flyway/sql
+  #     - migrate
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
+  #   restart: "no"
 
   core-bank-server:
     container_name: core-bank-server
@@ -69,17 +76,52 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      # CDC 반드시 활성화
+      CDC_ENABLED: "true"
+
+      # Debezium 에서 접근할 MySQL 컨테이너명
+      CDC_DEBEZIUM_DB_HOST: "core-bank-mysql"
+      CDC_DEBEZIUM_DB_PORT: "3306"
+
+      # Debezium이 감시할 데이터베이스 이름
+      CDC_DEBEZIUM_DATABASE_INCLUDE: "core_bank"
+
+      # 감시할 테이블 목록 (콤마로 구분)
+      CDC_DEBEZIUM_TABLE_INCLUDE: >
+        core_bank.user,
+        core_bank.account,
+        core_bank.transaction_account,
+        core_bank.transaction_card,
+        core_bank.loan_product,
+        core_bank.loan_ledger,
+        core_bank.loan_transaction
+
+      # Kafka bootstrap servers
+      CDC_KAFKA_BOOTSTRAP_SERVERS: "core-bank-kafka:9092"
+
+      # CDC 이벤트 토픽명
+      CDC_KAFKA_TOPIC: "bank.cdc.changelog"
+
+      # Kafka consumer group
+      CDC_KAFKA_CONSUMER_GROUP: "bank-cdc-consumer"
     ports:
       - "8080:8080"
+    networks:
+      - bank-net
     volumes:
       - ./keys:/app/keys:ro
     depends_on:
       mysql:
         condition: service_healthy
-      flyway:
-        condition: service_completed_successfully
+      # flyway:
+      #   condition: service_completed_successfully
       kafka:
         condition: service_started
 
 volumes:
   mysql-data:
+
+networks:
+  bank-net:
+    name: bank-net
