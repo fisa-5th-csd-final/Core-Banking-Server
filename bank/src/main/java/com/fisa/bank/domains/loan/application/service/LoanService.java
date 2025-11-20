@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
 import com.fisa.bank.domains.account.application.service.AccountService;
@@ -66,7 +67,6 @@ import com.fisa.bank.domains.user.persistence.entity.CreditRating;
 import com.fisa.bank.domains.user.persistence.entity.CustomerLevel;
 import com.fisa.bank.domains.user.persistence.entity.User;
 import com.fisa.bank.domains.user.persistence.entity.id.UserId;
-import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
