@@ -159,9 +159,7 @@ public class SecurityFilterChainConfig {
                         "/api/accounts/{accountNumber}",
                         "/api/loans/{loanLedgerId:\\d+}")
                     .requestMatchers(
-                         HttpMethod.PATCH,
-                         "/api/loans/{loanLedgerId:\\d+}/auto-deposit"
-                    ))
+                        HttpMethod.PATCH, "/api/loans/{loanLedgerId:\\d+}/auto-deposit"))
         .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

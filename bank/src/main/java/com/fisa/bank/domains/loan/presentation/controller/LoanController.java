@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.loan.presentation.controller;
 
-import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import com.fisa.bank.domains.common.presentation.response.ApiResponseGenerator;
 import com.fisa.bank.domains.common.presentation.response.body.SuccessBody;
 import com.fisa.bank.domains.common.presentation.response.code.ResponseCode;
 import com.fisa.bank.domains.loan.application.dto.request.LoanApplyForRequest;
+import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.domains.loan.application.dto.response.LoanApplyforResponse;
@@ -115,15 +115,12 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
   }
 
-    @PatchMapping("/{loanLedgerId:\\d+}/auto-deposit")
-    public ApiResponse<SuccessBody<Void>> updateAutoDepositEnabled(
-            @PathVariable Long loanLedgerId,
-            @RequestBody LoanAutoDepositUpdateRequest request
-    ) {
-        log.info("자동예치 여부 수정");
-        loanService.updateAutoDepositEnabled(loanLedgerId, request.getAutoDepositEnabled());
+  @PatchMapping("/{loanLedgerId:\\d+}/auto-deposit")
+  public ApiResponse<SuccessBody<Void>> updateAutoDepositEnabled(
+      @PathVariable Long loanLedgerId, @RequestBody LoanAutoDepositUpdateRequest request) {
+    log.info("자동예치 여부 수정");
+    loanService.updateAutoDepositEnabled(loanLedgerId, request.getAutoDepositEnabled());
 
-        return ApiResponseGenerator.success(ResponseCode.UPDATE);
-    }
-
+    return ApiResponseGenerator.success(ResponseCode.UPDATE);
+  }
 }

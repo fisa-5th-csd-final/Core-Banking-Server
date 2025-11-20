@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoanAutoDepositUpdateRequest {
-    private Boolean autoDepositEnabled;
+  private Boolean autoDepositEnabled;
 }
-
