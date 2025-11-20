@@ -69,6 +69,9 @@ public class Account extends BaseEntity {
   @Column(nullable = false, length = 3)
   private String bankCode;
 
+  @Column(nullable = false)
+  private boolean isForIncome;
+
   @OneToOne(fetch = FetchType.LAZY, mappedBy = "account")
   private LoanLedger loanLedger;
 
@@ -80,12 +83,13 @@ public class Account extends BaseEntity {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<CardTransaction> cardTransactions = new ArrayList<>();
 
-  public static Account create(String accountNumber, User user, String bankCode) {
+  public static Account create(String accountNumber, User user, String bankCode, boolean isIncome) {
     return Account.builder()
         .accountNumber(accountNumber)
         .user(user)
         .bankCode(bankCode)
         .balance(BigDecimal.ZERO)
+        .isForIncome(isIncome)
         .build();
   }
 
