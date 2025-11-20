@@ -11,8 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.fisa.bank.domains.account.application.exception.InsufficientBalanceException;
+import com.fisa.bank.domains.account.application.service.AccountService;
 import com.fisa.bank.domains.account.application.service.reader.AccountReader;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.common.aop.annotation.DomainType;
@@ -33,7 +35,12 @@ import com.fisa.bank.domains.loan.application.dto.response.LoanTransactionRespon
 import com.fisa.bank.domains.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.domains.loan.application.event.LoanCancelledEvent;
 import com.fisa.bank.domains.loan.application.event.LoanRepaidEvent;
-import com.fisa.bank.domains.loan.application.exception.*;
+import com.fisa.bank.domains.loan.application.exception.DuplicateLoanException;
+import com.fisa.bank.domains.loan.application.exception.InsufficientRepaymentException;
+import com.fisa.bank.domains.loan.application.exception.LoanApplyDeniedException;
+import com.fisa.bank.domains.loan.application.exception.LoanProductNotDeletableException;
+import com.fisa.bank.domains.loan.application.exception.LoanProductNotFoundException;
+import com.fisa.bank.domains.loan.application.exception.PreferInterestNotFoundException;
 import com.fisa.bank.domains.loan.application.model.EarlyRepayment;
 import com.fisa.bank.domains.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.domains.loan.application.model.UpdateLoanLedgerParam;
@@ -74,6 +81,7 @@ public class LoanService {
   private final LoanReader loanReader;
   private final RequesterInfo requesterInfo;
   private final ApplicationEventPublisher eventPublisher;
+  private final AccountService accountService;
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -119,7 +127,17 @@ public class LoanService {
     UserId userId = requesterInfo.getUserId();
     // 유저 정보 추출
     User user = userReader.getUserById(userId.getValue());
-    Account account = accountReader.getAccountByAccountNumber(request.getAccountNumber());
+    String accountNumber = request.getAccountNumber();
+
+    // 계좌 새로 생성
+    if (!StringUtils.hasText(accountNumber))
+      accountNumber = accountService.createAccount(userId.getValue()).accountNumber();
+
+    Account account = accountReader.getAccountByAccountNumber(accountNumber);
+
+    // 급여 계좌로는 대출 가입 불가
+    if (account.isForIncome()) throw new LoanApplyDeniedException();
+
     if (loanReader.existsByUserIdAndLoanProductId(userId.getValue(), loanProductId)) {
       throw new DuplicateLoanException(userId, LoanProductId.of(loanProductId));
     }

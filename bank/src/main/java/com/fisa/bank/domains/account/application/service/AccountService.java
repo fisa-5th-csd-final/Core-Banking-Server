@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,6 @@ import com.fisa.bank.domains.account.application.dto.response.AccountListRespons
 import com.fisa.bank.domains.account.application.dto.response.AccountResponse;
 import com.fisa.bank.domains.account.application.exception.AccountNotDeletableException;
 import com.fisa.bank.domains.account.application.service.reader.AccountReader;
-import com.fisa.bank.domains.account.application.util.AccountNumberGenerator;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.account.persistence.repository.AccountRepository;
 import com.fisa.bank.domains.common.aop.annotation.DomainType;
@@ -28,22 +26,26 @@ import com.fisa.bank.domains.user.persistence.entity.User;
 @RequiredArgsConstructor
 public class AccountService {
 
+  private final AccountCreator accountCreator;
   private final AccountRepository accountRepository;
   private final AccountReader accountReader;
-
-  @Value("${bank.code}")
-  private String ourBankCode;
 
   // 계좌 생성 서비스
   @Transactional
   public AccountResponse createAccount(Long userId) {
     User user = accountReader.getUserById(userId);
-    String accountNumber = AccountNumberGenerator.generate();
-    Account account = Account.create(accountNumber, user, ourBankCode);
+    Account account = accountCreator.createNonIncomeAccount(user);
 
-    Account saved = accountRepository.save(account);
+    return save(account);
+  }
 
-    return AccountResponse.from(saved, "계좌가 성공적으로 생성되었습니다.");
+  // 소득 계좌 생성
+  @Transactional
+  public AccountResponse createIncomeAccount(Long userId) {
+    User user = accountReader.getUserById(userId);
+    Account account = accountCreator.createIncomeAccount(user);
+
+    return save(account);
   }
 
   // 계좌 상세 조회
@@ -67,6 +69,9 @@ public class AccountService {
   public void deleteAccount(String accountNumber) {
     Account account = accountReader.getAccountByAccountNumber(accountNumber);
 
+    // 급여 계좌인 경우 삭제 불가
+    if (account.isForIncome()) throw new AccountNotDeletableException("급여 계좌는 삭제할 수 없습니다.");
+
     // 잔액이 있는 경우 예외 처리
     if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {
       throw new AccountNotDeletableException();
@@ -81,5 +86,9 @@ public class AccountService {
     }
 
     accountRepository.delete(account);
+  }
+
+  private AccountResponse save(Account account) {
+    return AccountResponse.from(accountRepository.save(account), "계좌가 성공적으로 생성되었습니다.");
   }
 }
