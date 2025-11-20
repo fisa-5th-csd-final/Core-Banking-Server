@@ -163,4 +163,9 @@ public class LoanLedger extends BaseEntity {
         .autoDepositEnabled(autoDepositEnabled)
         .build();
   }
+
+    public void updateAutoDeposit(boolean autoDepositEnabled) {
+        this.autoDepositEnabled = autoDepositEnabled;
+    }
+
 }

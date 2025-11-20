@@ -14,6 +14,7 @@ import com.fisa.bank.domains.loan.persistence.enums.RepaymentType;
 @Getter
 public class LoanLedgerDetailResponse {
   // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
+    // 자동예치 여부도 detail 응답에 필요할 것 같음
 
   private final String name;
   private final BigDecimal remainPrincipal;

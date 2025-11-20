@@ -1,5 +1,7 @@
 package com.fisa.bank.domains.loan.application.service;
 
+import com.fisa.bank.domains.loan.application.exception.*;
+import com.fisa.bank.domains.loan.persistence.entity.id.LoanLedgerId;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -34,11 +36,6 @@ import com.fisa.bank.domains.loan.application.dto.response.LoanTransactionRespon
 import com.fisa.bank.domains.loan.application.dto.response.PagedResponse;
 import com.fisa.bank.domains.loan.application.event.LoanCancelledEvent;
 import com.fisa.bank.domains.loan.application.event.LoanRepaidEvent;
-import com.fisa.bank.domains.loan.application.exception.DuplicateLoanException;
-import com.fisa.bank.domains.loan.application.exception.InsufficientRepaymentException;
-import com.fisa.bank.domains.loan.application.exception.LoanProductNotDeletableException;
-import com.fisa.bank.domains.loan.application.exception.LoanProductNotFoundException;
-import com.fisa.bank.domains.loan.application.exception.PreferInterestNotFoundException;
 import com.fisa.bank.domains.loan.application.model.EarlyRepayment;
 import com.fisa.bank.domains.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.domains.loan.application.model.UpdateLoanLedgerParam;
@@ -356,16 +353,15 @@ public class LoanService {
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }
 
-  @Transactional(readOnly = true)
-  @VerifyOwner(domain = DomainType.LOAN, idParam = "loanLedgerId")
-  public LoanRepaymentResponse getRepayment(Long loanLedgerId) {
+    @Transactional
+    public void updateAutoDepositEnabled(Long loanLedgerId, boolean autoDepositEnabled) {
 
-    LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
+        LoanLedger loanLedger = loanLedgerRepository.findById(LoanLedgerId.of(loanLedgerId))
+                .orElseThrow(() -> new LoanLedgerNotFoundException(loanLedgerId));
 
-    return LoanRepaymentResponse.builder()
-        .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
-        .nextRepaymentDate(loanLedger.getNextRepaymentDate())
-        .autoDepositEnabled(loanLedger.isAutoDepositEnabled())
-        .build();
-  }
+        loanLedger.updateAutoDeposit(autoDepositEnabled);
+
+        // 엔티티 변경 감지로 자동 저장
+    }
+
 }
