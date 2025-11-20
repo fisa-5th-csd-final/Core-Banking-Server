@@ -124,11 +124,7 @@ public class LoanController {
 
   @PatchMapping("/{loanLedgerId:\\d+}/auto-deposit")
   public ApiResponse<SuccessBody<Void>> updateAutoDepositEnabled(
-<<<<<<< HEAD
       @PathVariable Long loanLedgerId, @Valid @RequestBody LoanAutoDepositUpdateRequest request) {
-=======
-      @PathVariable Long loanLedgerId, @RequestBody LoanAutoDepositUpdateRequest request) {
->>>>>>> 4231628 ([REFACTOR] spotless 적용)
     log.info("자동예치 여부 수정");
     loanService.updateAutoDepositEnabled(loanLedgerId, request.getAutoDepositEnabled());
 
