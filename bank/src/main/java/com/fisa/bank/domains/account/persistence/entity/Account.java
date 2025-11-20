@@ -83,6 +83,10 @@ public class Account extends BaseEntity {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<CardTransaction> cardTransactions = new ArrayList<>();
 
+  public static Account create(String accountNumber, User user, String bankCode) {
+    return create(accountNumber, user, bankCode, false);
+  }
+
   public static Account create(String accountNumber, User user, String bankCode, boolean isIncome) {
     return Account.builder()
         .accountNumber(accountNumber)
