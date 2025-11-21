@@ -375,6 +375,7 @@ public class LoanService {
 
     // 대출 별 선납 정보를 담을 리스트
     List<PrepaymentInfoResponse> prepaymentInfoResponses = new ArrayList<>();
+
     LocalDateTime now = LocalDateTime.now();
     for (LoanLedger loanLedger : loanLedgers) {
       if (EXCLUDED_REPAYMENT_STATUSES.contains(loanLedger.getRepaymentStatus())) continue;
@@ -389,6 +390,8 @@ public class LoanService {
 
       PrepaymentInfoResponse prepaymentInfoResponse =
           PrepaymentInfoResponse.builder()
+              .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
+              .loanProductName(loanLedger.getLoanProduct().getName())
               .earlyRepayment(earlyRepayment.getEarlyPaidCost())
               .interestDetailResponses(interestDetailResponses)
               .build();
