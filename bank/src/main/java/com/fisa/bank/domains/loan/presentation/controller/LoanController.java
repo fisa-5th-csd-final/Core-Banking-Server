@@ -1,5 +1,6 @@
 package com.fisa.bank.domains.loan.presentation.controller;
 
+import com.fisa.bank.domains.loan.application.service.AutoDepositService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -130,5 +131,12 @@ public class LoanController {
     log.info("선납 정보 조회");
     List<PrepaymentInfoResponse> prepaymentInfos = loanService.getPrepaymentInfos();
     return ApiResponseGenerator.success(ResponseCode.GET, prepaymentInfos);
+  }
+
+  private final AutoDepositService autoDepositService;
+  @PostMapping("/all")
+  public String runAutoDepositAll() {
+      autoDepositService.processAutoDeposits();
+      return "AutoDeposit executed for all scheduled loans";
   }
 }
