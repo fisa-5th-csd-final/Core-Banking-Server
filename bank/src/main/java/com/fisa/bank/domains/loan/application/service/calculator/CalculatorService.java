@@ -38,7 +38,7 @@ public class CalculatorService {
     return calculator.calculate(
         loanLedger.getPrincipal(),
         loanLedger.getRemainPrincipal(),
-        loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP),
+        loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP),
         loanLedger.getTerm() * 12, // 연 -> 개월로 변경
         1, // currentTerm은 실제로 사용되지 않음
         loanLedger.getNextRepaymentDate(),

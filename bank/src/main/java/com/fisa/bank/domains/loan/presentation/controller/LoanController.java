@@ -126,7 +126,7 @@ public class LoanController {
   }
 
   @GetMapping("/prepayment-infos")
-  public ApiResponse<SuccessBody<List<PrepaymentInfoResponse>>> getPrepayment() {
+  public ApiResponse<SuccessBody<List<PrepaymentInfoResponse>>> getPrepaymentInfos() {
     log.info("선납 정보 조회");
     List<PrepaymentInfoResponse> prepaymentInfos = loanService.getPrepaymentInfos();
     return ApiResponseGenerator.success(ResponseCode.GET, prepaymentInfos);

@@ -367,31 +367,30 @@ public class LoanService {
     loanLedger.updateAutoDeposit(autoDepositEnabled);
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public List<PrepaymentInfoResponse> getPrepaymentInfos() {
-    // TODO: 유저 모든 대출 조회
+    // 유저 모든 대출 조회
     Long userId = requesterInfo.getUserId().getValue();
     List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
 
     // 대출 별 선납 정보를 담을 리스트
     List<PrepaymentInfoResponse> prepaymentInfoResponses = new ArrayList<>();
-
+    LocalDateTime now = LocalDateTime.now();
     for (LoanLedger loanLedger : loanLedgers) {
       if (EXCLUDED_REPAYMENT_STATUSES.contains(loanLedger.getRepaymentStatus())) continue;
-      // TODO: 각 대출 별 중도 상환 수수료 계산
+      // 각 대출 별 중도 상환 수수료 계산
       BigDecimal earlyPaidRate = loanLedger.getEarlyRepayInterestRate();
       // 중도 상환 금액 계산
-      EarlyRepayment earlyRepayment =
-          EarlyRepayment.create(loanLedger, LocalDateTime.now(), earlyPaidRate);
+      EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, now, earlyPaidRate);
 
-      // TODO: 각 대출 별 남은 기간의 이자 리스트
+      // 각 대출 별 남은 기간의 이자 리스트
       List<InterestDetailResponse> interestDetailResponses =
           calculatorService.calculateRemainingInterests(loanLedger);
 
       PrepaymentInfoResponse prepaymentInfoResponse =
           PrepaymentInfoResponse.builder()
               .earlyRepayment(earlyRepayment.getEarlyPaidCost())
-              .interestDetailResponse(interestDetailResponses)
+              .interestDetailResponses(interestDetailResponses)
               .build();
 
       prepaymentInfoResponses.add(prepaymentInfoResponse);

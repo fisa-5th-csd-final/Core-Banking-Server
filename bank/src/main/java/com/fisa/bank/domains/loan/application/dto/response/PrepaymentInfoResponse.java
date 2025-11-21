@@ -10,5 +10,5 @@ import java.util.List;
 @Getter
 public class PrepaymentInfoResponse {
   private final BigDecimal earlyRepayment;
-  private final List<InterestDetailResponse> interestDetailResponse;
+  private final List<InterestDetailResponse> interestDetailResponses;
 }
