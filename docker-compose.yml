@@ -6,24 +6,31 @@ services:
       ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT:-2181}
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME:-2000}
     ports:
-      - "2181:2181"
+      - "${ZOOKEEPER_CLIENT_PORT:-2181}:2181"
+    networks:
+      - core-bank-internal
 
   kafka:
     image: confluentinc/cp-kafka:7.5.1
     container_name: core-bank-kafka
+    networks:
+      - kafka-net
+      - core-bank-internal
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "${KAFKA_PORT_1:-9092}:9092"
+      - "${KAFKA_PORT_2:-29092}:29092"
     environment:
       KAFKA_BROKER_ID: ${KAFKA_BROKER_ID:-1}
       KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper:2181}
-      KAFKA_LISTENERS: ${KAFKA_LISTENERS:-PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092}
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:${KAFKA_PORT_1:-9092},PLAINTEXT_HOST://0.0.0.0:${KAFKA_PORT_2:-29092}"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:-PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT}
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:-PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092}
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:${KAFKA_PORT_1:-9092},PLAINTEXT_HOST://localhost:${KAFKA_PORT_2:-29092}"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR:-1}
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR:-1}
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR:-1}
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS:-0}
+      KAFKA_PORT_1 : ${KAFKA_PORT_1}
+      KAFKA_PORT_2 : ${KAFKA_PORT_2}
     depends_on:
       - zookeeper
 
@@ -36,7 +43,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-23306}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -44,6 +51,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+    networks:
+      - core-bank-internal
 
   flyway:
     image: flyway/flyway:10
@@ -61,6 +70,8 @@ services:
       mysql:
         condition: service_healthy
     restart: "no"
+    networks:
+      - core-bank-internal
 
   core-bank-server:
     container_name: core-bank-server
@@ -70,7 +81,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "${CORE_BANK_PORT:-28080}:8080"
     volumes:
       - ./keys:/app/keys:ro
     depends_on:
@@ -80,6 +91,15 @@ services:
         condition: service_completed_successfully
       kafka:
         condition: service_started
+    networks:
+      - kafka-net
+      - core-bank-internal
 
 volumes:
   mysql-data:
+
+networks:
+  core-bank-internal:
+    driver: bridge
+  kafka-net:
+    external: true
