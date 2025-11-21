@@ -59,7 +59,8 @@ public class EqualInstallmentCalculator implements LoanCalculator {
         principalPayment,
         interestPayment,
         monthlyPayment,
-        remainPrincipal.subtract(principalPayment));
+        remainPrincipal.subtract(principalPayment),
+        nextRepaymentDate);
   }
 
   // 이전 코드

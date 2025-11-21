@@ -25,13 +25,7 @@ import com.fisa.bank.domains.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
-import com.fisa.bank.domains.loan.application.dto.response.LoanApplyforResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerDetailResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanProductCreateResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanProductResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanTransactionResponse;
-import com.fisa.bank.domains.loan.application.dto.response.PagedResponse;
+import com.fisa.bank.domains.loan.application.dto.response.*;
 import com.fisa.bank.domains.loan.application.service.LoanService;
 
 @Slf4j
@@ -129,5 +123,12 @@ public class LoanController {
     loanService.updateAutoDepositEnabled(loanLedgerId, request.getAutoDepositEnabled());
 
     return ApiResponseGenerator.success(ResponseCode.UPDATE);
+  }
+
+  @GetMapping("/prepayment-infos")
+  public ApiResponse<SuccessBody<List<PrepaymentInfoResponse>>> getPrepaymentInfos() {
+    log.info("선납 정보 조회");
+    List<PrepaymentInfoResponse> prepaymentInfos = loanService.getPrepaymentInfos();
+    return ApiResponseGenerator.success(ResponseCode.GET, prepaymentInfos);
   }
 }

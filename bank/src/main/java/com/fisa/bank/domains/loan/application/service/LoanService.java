@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,13 +26,7 @@ import com.fisa.bank.domains.interest.persistence.entity.InterestRate;
 import com.fisa.bank.domains.loan.application.dto.request.LoanApplyForRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
-import com.fisa.bank.domains.loan.application.dto.response.LoanApplyforResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerDetailResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanLedgerResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanProductCreateResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanProductResponse;
-import com.fisa.bank.domains.loan.application.dto.response.LoanTransactionResponse;
-import com.fisa.bank.domains.loan.application.dto.response.PagedResponse;
+import com.fisa.bank.domains.loan.application.dto.response.*;
 import com.fisa.bank.domains.loan.application.event.LoanCancelledEvent;
 import com.fisa.bank.domains.loan.application.event.LoanRepaidEvent;
 import com.fisa.bank.domains.loan.application.exception.DuplicateLoanException;
@@ -81,6 +76,8 @@ public class LoanService {
   private final RequesterInfo requesterInfo;
   private final ApplicationEventPublisher eventPublisher;
   private final AccountService accountService;
+  private static final List<RepaymentStatus> EXCLUDED_REPAYMENT_STATUSES =
+      List.of(RepaymentStatus.COMPLETED, RepaymentStatus.TERMINATED);
 
   @Transactional
   public LoanProductCreateResponse createLoanProduct(LoanProductCreateRequest requestDTO) {
@@ -368,5 +365,36 @@ public class LoanService {
     LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
     loanLedger.updateAutoDeposit(autoDepositEnabled);
+  }
+
+  @Transactional(readOnly = true)
+  public List<PrepaymentInfoResponse> getPrepaymentInfos() {
+    // 유저 모든 대출 조회
+    Long userId = requesterInfo.getUserId().getValue();
+    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+
+    // 대출 별 선납 정보를 담을 리스트
+    List<PrepaymentInfoResponse> prepaymentInfoResponses = new ArrayList<>();
+    LocalDateTime now = LocalDateTime.now();
+    for (LoanLedger loanLedger : loanLedgers) {
+      if (EXCLUDED_REPAYMENT_STATUSES.contains(loanLedger.getRepaymentStatus())) continue;
+      // 각 대출 별 중도 상환 수수료 계산
+      BigDecimal earlyPaidRate = loanLedger.getEarlyRepayInterestRate();
+      // 중도 상환 금액 계산
+      EarlyRepayment earlyRepayment = EarlyRepayment.create(loanLedger, now, earlyPaidRate);
+
+      // 각 대출 별 남은 기간의 이자 리스트
+      List<InterestDetailResponse> interestDetailResponses =
+          calculatorService.calculateRemainingInterests(loanLedger);
+
+      PrepaymentInfoResponse prepaymentInfoResponse =
+          PrepaymentInfoResponse.builder()
+              .earlyRepayment(earlyRepayment.getEarlyPaidCost())
+              .interestDetailResponses(interestDetailResponses)
+              .build();
+
+      prepaymentInfoResponses.add(prepaymentInfoResponse);
+    }
+    return prepaymentInfoResponses;
   }
 }
