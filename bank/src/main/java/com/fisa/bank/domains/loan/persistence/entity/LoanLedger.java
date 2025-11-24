@@ -12,11 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -100,7 +96,7 @@ public class LoanLedger extends BaseEntity {
 
   // 다음 상환, 마지막 거래 일시, 상환 마감 기한
   private LocalDateTime nextRepaymentDate;
-  private LocalDateTime lastRepaymentDate;
+  @Setter private LocalDateTime lastRepaymentDate;
 
   @Column(nullable = false)
   private LocalDateTime loanEndDate;

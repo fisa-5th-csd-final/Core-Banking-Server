@@ -214,6 +214,8 @@ public class LoanService {
             account,
             request.getAutoDepositEnabled());
 
+    loanLedger.setLastRepaymentDate(loanLedger.getCreatedAt());
+
     // 대출 이력성 테이블에 저장 LoanTransaction
     LoanTransaction loanTransaction =
         LoanTransactionFactory.createLoan(loanLedger, remainPrincipal, startDate);
