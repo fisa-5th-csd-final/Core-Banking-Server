@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fisa.bank.domains.loan.application.model.MonthlyRepayment;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
@@ -57,14 +58,14 @@ public class LoanLedgerDetailResponse {
   }
 
   public static LoanLedgerDetailResponse from(
-      LoanLedger loanLedger, MonthlyRepayment monthlyRepayment) {
+      LoanLedger loanLedger, List<MonthlyRepayment> monthlyRepayment) {
     return new LoanLedgerDetailResponse(
         loanLedger.getLoanProduct().getName(), // 엔티티 구조에 맞게 수정
         loanLedger.getPrincipal(),
         loanLedger.getRemainPrincipal(),
         loanLedger.getLoanProduct().getType(),
         loanLedger.getRepaymentType(),
-        monthlyRepayment.getMonthlyPayment(),
+        monthlyRepayment.get(monthlyRepayment.size() - 1).getMonthlyPayment(),
         loanLedger.getAccount().getAccountNumber(),
         loanLedger.isAutoDepositEnabled(),
         loanLedger.getLastRepaymentDate(),

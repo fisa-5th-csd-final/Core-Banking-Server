@@ -237,17 +237,42 @@ public class LoanService {
 
     LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
-    MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
+    LocalDateTime now = LocalDateTime.now();
 
+    List<MonthlyRepayment> monthlyRepayments = calculatorService.calculate(loanLedger);
+
+    // 연체월 포함 모든 월 상환금
+    BigDecimal totalRepayment =
+        monthlyRepayments.stream()
+            .map(MonthlyRepayment::getMonthlyPayment)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    // 연체월 포함 모든 월 원금
+    BigDecimal totalPrincipal =
+        monthlyRepayments.stream()
+            .map(MonthlyRepayment::getPrincipalPayment)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    // 연체월 포함 모든 월 이자
+    BigDecimal totalInterest =
+        monthlyRepayments.stream()
+            .map(MonthlyRepayment::getInterestPayment)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    MonthlyRepayment monthlyRepayment =
+        new MonthlyRepayment(
+            loanLedger.getTerm(),
+            totalPrincipal,
+            totalInterest,
+            totalRepayment,
+            loanLedger.getRemainPrincipal().subtract(totalPrincipal),
+            now);
     // 납입 금액이 상환금보다 작은지 확인
-    if (request.getAmount().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
-      throw new InsufficientRepaymentException(
-          request.getAmount(), monthlyRepayment.getMonthlyPayment());
+    if (request.getAmount().compareTo(totalRepayment) < 0) {
+      throw new InsufficientRepaymentException(request.getAmount(), totalRepayment);
     }
 
     Account account = loanLedger.getAccount();
 
-    if (account.getBalance().compareTo(monthlyRepayment.getMonthlyPayment()) < 0) {
+    if (account.getBalance().compareTo(totalRepayment) < 0) {
       throw new InsufficientBalanceException();
     }
 
@@ -259,18 +284,14 @@ public class LoanService {
     loanLedger.updateLoanLedger(
         UpdateLoanLedgerParam.builder()
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
-            .lastRepaymentDate(lastRepaymentDate)
+            .lastRepaymentDate(monthlyRepayment.getRepaymentDate())
             .nextRepaymentDate(nextRepaymentDate)
             .status(loanLedger.getRepaymentStatus())
             .build());
 
     // 이력성 테이블에도 저장
     LoanTransaction loanTransaction =
-        LoanTransactionFactory.createRepay(
-            loanLedger,
-            monthlyRepayment.getMonthlyPayment(),
-            monthlyRepayment,
-            LocalDateTime.now());
+        LoanTransactionFactory.createRepay(loanLedger, totalRepayment, monthlyRepayment, now);
 
     loanTransactionRepository.save(loanTransaction);
 
@@ -350,7 +371,7 @@ public class LoanService {
   public LoanLedgerDetailResponse getLoanLedgerDetail(Long loanLedgerId) {
     LoanLedger loanLedger = loanReader.findLoanLedgerById(loanLedgerId);
 
-    MonthlyRepayment monthlyRepayment = calculatorService.calculate(loanLedger);
+    List<MonthlyRepayment> monthlyRepayment = calculatorService.calculate(loanLedger);
     return LoanLedgerDetailResponse.from(loanLedger, monthlyRepayment);
   }
 

@@ -30,19 +30,53 @@ public class CalculatorService {
     calculators.put(RepaymentType.BULLET, new BulletCalculator());
   }
 
-  public MonthlyRepayment calculate(LoanLedger loanLedger) {
+  public List<MonthlyRepayment> calculate(LoanLedger loanLedger) {
     LoanCalculator calculator = calculators.get(loanLedger.getRepaymentType());
     if (calculator == null) {
       throw new UnknownCalculatorException();
     }
-    return calculator.calculate(
-        loanLedger.getPrincipal(),
-        loanLedger.getRemainPrincipal(),
-        loanLedger.getCompletedInterest().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP),
-        loanLedger.getTerm() * 12, // 연 -> 개월로 변경
-        1, // currentTerm은 실제로 사용되지 않음
-        loanLedger.getNextRepaymentDate(),
-        loanLedger.getLoanEndDate());
+    List<MonthlyRepayment> repayments = new ArrayList<>();
+
+    // 연체월까지 포함해서 계산하기 위해 일시적으로 바뀌는 값들
+    BigDecimal tempRemainPrincipal = loanLedger.getRemainPrincipal();
+    LocalDateTime lastRepaymentDate = loanLedger.getLastRepaymentDate(); // 마지막 상환일
+    LocalDateTime tempNextRepaymentDate = loanLedger.getNextRepaymentDate();
+
+    int monthsOverdue =
+        (int)
+            ChronoUnit.MONTHS.between(
+                lastRepaymentDate.toLocalDate(), tempNextRepaymentDate.toLocalDate());
+    monthsOverdue = Math.max(monthsOverdue, 1); // 최소 1개월
+
+    for (int i = 0; i < monthsOverdue; i++) {
+      MonthlyRepayment monthlyRepayment =
+          calculator.calculate(
+              loanLedger.getPrincipal(),
+              tempRemainPrincipal,
+              loanLedger
+                  .getCompletedInterest()
+                  .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP),
+              loanLedger.getTerm() * 12, // 연 -> 개월로 변경
+              1, // currentTerm은 실제로 사용되지 않음
+              tempNextRepaymentDate,
+              loanLedger.getLoanEndDate());
+
+      repayments.add(monthlyRepayment);
+
+      // 임시 변수 업데이트 (DB는 건드리지 않음)
+      tempRemainPrincipal = monthlyRepayment.getRemainPrincipal();
+      tempNextRepaymentDate = tempNextRepaymentDate.plusMonths(1);
+    }
+
+    // 테스트용 출력 코드
+    for (int i = 0; i < repayments.size(); i++) {
+      MonthlyRepayment m = repayments.get(i);
+      System.out.printf(
+          "Month %d: principal=%s, interest=%s, remainPrincipal=%s%n",
+          i + 1, m.getPrincipalPayment(), m.getInterestPayment(), m.getRemainPrincipal());
+    }
+
+    return repayments;
   }
 
   /**
