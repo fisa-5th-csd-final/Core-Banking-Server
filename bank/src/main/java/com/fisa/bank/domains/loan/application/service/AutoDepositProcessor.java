@@ -55,12 +55,11 @@ public class AutoDepositProcessor {
                     .findFirst()
                     .orElse(null);
 
-            // 급여계좌는 항상 있다고 가정
-//            if (salaryAccount == null) {
-//                log.warn("급여계좌 없음. 연체 처리: userId={}", ledger.getUser().getUserId().getValue());
-//                handleOverdue(ledger);
-//                return;
-//            }
+            if (salaryAccount == null) {
+                log.warn("급여계좌 없음. 연체 처리: userId={}", ledger.getUser().getUserId().getValue());
+                handleOverdue(ledger);
+                return;
+            }
 
             BigDecimal salaryBalance = salaryAccount.getBalance();
 

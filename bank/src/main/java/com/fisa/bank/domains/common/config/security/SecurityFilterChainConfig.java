@@ -144,9 +144,7 @@ public class SecurityFilterChainConfig {
                         "/api/accounts/{accountNumber}/deposit",
                         "/api/accounts/{accountNumber}/pay",
                         "/api/accounts/{accountNumber}/withdraw",
-                        "/api/accounts/transfer",
-
-                            "api/loans/all")
+                        "/api/accounts/transfer")
                     .requestMatchers(
                         HttpMethod.GET,
                         "/api/users/me",
