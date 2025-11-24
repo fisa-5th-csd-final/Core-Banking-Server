@@ -169,7 +169,6 @@ public class LoanLedger extends BaseEntity {
   }
 
   public void increaseOverdueCount() {
-      this.overdueCount += 1;
+    this.overdueCount += 1;
   }
-
 }

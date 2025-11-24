@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.loan.presentation.controller;
 
-import com.fisa.bank.domains.loan.application.service.AutoDepositService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +26,7 @@ import com.fisa.bank.domains.loan.application.dto.request.LoanAutoDepositUpdateR
 import com.fisa.bank.domains.loan.application.dto.request.LoanMonthlyRepayRequest;
 import com.fisa.bank.domains.loan.application.dto.request.LoanProductCreateRequest;
 import com.fisa.bank.domains.loan.application.dto.response.*;
+import com.fisa.bank.domains.loan.application.service.AutoDepositService;
 import com.fisa.bank.domains.loan.application.service.LoanService;
 
 @Slf4j
@@ -134,9 +134,10 @@ public class LoanController {
   }
 
   private final AutoDepositService autoDepositService;
+
   @PostMapping("/all")
   public String runAutoDepositAll() {
-      autoDepositService.processAutoDeposits();
-      return "AutoDeposit executed for all scheduled loans";
+    autoDepositService.processAutoDeposits();
+    return "AutoDeposit executed for all scheduled loans";
   }
 }

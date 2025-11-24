@@ -2,7 +2,6 @@ package com.fisa.bank.domains.loan.application.service.reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -60,7 +59,6 @@ public class LoanReader {
 
   // 자동예치 대상 LoanLedger 조회
   public List<LoanLedger> findAutoDepositTargets() {
-      return loanLedgerRepository.findAutoDepositTargets();
+    return loanLedgerRepository.findAutoDepositTargets();
   }
-
 }
