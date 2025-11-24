@@ -133,11 +133,4 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, prepaymentInfos);
   }
 
-  private final AutoDepositService autoDepositService;
-
-  @PostMapping("/all")
-  public String runAutoDepositAll() {
-    autoDepositService.processAutoDeposits();
-    return "AutoDeposit executed for all scheduled loans";
-  }
 }

@@ -1,6 +1,5 @@
 package com.fisa.bank.domains.loan.application.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +17,7 @@ import com.fisa.bank.domains.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.domains.loan.application.service.calculator.CalculatorService;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -51,13 +51,11 @@ public class AutoDepositProcessor {
       BigDecimal shortage = requiredAmount.subtract(loanBalance);
 
       // 급여계좌 조회
-      Account salaryAccount =
-          accountRepository.findAllByUser(ledger.getUser()).stream()
-              .filter(Account::isForIncome)
-              .findFirst()
-              .orElse(null);
+        Account salaryAccount = accountRepository
+                .findFirstByUserAndIsForIncomeTrue(ledger.getUser())
+                .orElse(null);
 
-      if (salaryAccount == null) {
+        if (salaryAccount == null) {
         log.warn("급여계좌 없음. 연체 처리: userId={}", ledger.getUser().getUserId().getValue());
         handleOverdue(ledger);
         return;

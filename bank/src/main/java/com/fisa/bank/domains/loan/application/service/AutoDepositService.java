@@ -58,7 +58,7 @@ public class AutoDepositService {
                     """;
       jdbc.update(sql, LOCK_KEY);
       return true;
-    } catch (Exception e) {
+    } catch (org.springframework.dao.DataIntegrityViolationException e) {
       return false;
     }
   }
