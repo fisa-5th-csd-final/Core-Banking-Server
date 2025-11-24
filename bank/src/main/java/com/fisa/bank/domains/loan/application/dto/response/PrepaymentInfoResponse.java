@@ -9,6 +9,8 @@ import java.util.List;
 @Builder
 @Getter
 public class PrepaymentInfoResponse {
+  private final Long loanLedgerId;
+  private final String loanProductName;
   private final BigDecimal earlyRepayment;
   private final List<InterestDetailResponse> interestDetailResponses;
 }
