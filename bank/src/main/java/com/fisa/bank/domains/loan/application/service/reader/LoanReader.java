@@ -58,8 +58,9 @@ public class LoanReader {
         UserId.of(userId), LoanProductId.of(loanProductId));
   }
 
+  // 자동예치 대상 LoanLedger 조회
   public List<LoanLedger> findAutoDepositTargets() {
-      return loanLedgerRepository.findAutoDepositTargets(LocalDate.now().atStartOfDay());
+      return loanLedgerRepository.findAutoDepositTargets();
   }
 
 }

@@ -24,11 +24,15 @@ public interface LoanLedgerRepository extends JpaRepository<LoanLedger, LoanLedg
       LoanLedgerId loanLedgerId, List<RepaymentStatus> statuses);
 
     @Query("""
-        SELECT l
-        FROM LoanLedger l
-        WHERE l.autoDepositEnabled = true
-          AND l.nextRepaymentDate <= :today
-          AND l.repaymentStatus = com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus.NORMAL
+    SELECT l
+      FROM LoanLedger l
+     WHERE l.autoDepositEnabled = true
+       AND FUNCTION('DATE', l.nextRepaymentDate) <= CURRENT_DATE       
+       AND l.repaymentStatus IN (
+                           com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus.NORMAL,
+                           com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus.OVERDUE
+                      )
     """)
-    List<LoanLedger> findAutoDepositTargets(@Param("today") LocalDateTime today);
+    List<LoanLedger> findAutoDepositTargets();
+
 }
