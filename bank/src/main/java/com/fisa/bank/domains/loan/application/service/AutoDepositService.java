@@ -21,6 +21,7 @@ public class AutoDepositService {
     // 중복 실행 방지용 LOCK 키
     private static final String LOCK_KEY = "AUTO_DEPOSIT_LOCK";
 
+    // 자동예치 전체 처리 로직
     public void processAutoDeposits() {
 
         if (!acquireLock()) {
@@ -33,18 +34,19 @@ public class AutoDepositService {
 
             log.info("자동예치 대상 {}건 처리 시작", targets.size());
 
+            // 모든 ledger 가져와 하나씩 독립적으로 처리
             for (LoanLedger ledger : targets) {
                 processor.processOne(ledger);
             }
 
             log.info("자동예치 작업 완료");
 
-        } finally {
+        } finally { // lock 해제
             releaseLock();
         }
     }
 
-    /** DB 기반 락 획득 */
+    // DB에 row 삽입: 성공 시 락 획득, 실패 시 중복 실행 방지
     private boolean acquireLock() {
         try {
             String sql = """
@@ -58,7 +60,7 @@ public class AutoDepositService {
         }
     }
 
-    /** 락 해제 */
+    // 락 해제
     private void releaseLock() {
         jdbc.update("DELETE FROM batch_lock WHERE lock_name = ?", LOCK_KEY);
     }
