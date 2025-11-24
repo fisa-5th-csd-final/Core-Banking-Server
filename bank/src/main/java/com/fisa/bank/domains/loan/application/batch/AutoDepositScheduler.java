@@ -21,7 +21,7 @@ public class AutoDepositScheduler {
   public void runAutoDepositBatch() {
     try {
       autoDepositService.processAutoDeposits();
-        log.info("스케줄러 실행됨!");
+      log.info("스케줄러 실행됨!");
     } catch (Exception ex) {
       log.error("자동예치 스케줄러 오류 발생: {}", ex.getMessage(), ex);
     }
