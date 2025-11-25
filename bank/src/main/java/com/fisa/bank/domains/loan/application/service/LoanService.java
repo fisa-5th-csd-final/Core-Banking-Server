@@ -241,21 +241,15 @@ public class LoanService {
 
     List<MonthlyRepayment> monthlyRepayments = calculatorService.calculate(loanLedger);
 
-    // 연체월 포함 모든 월 상환금
-    BigDecimal totalRepayment =
-        monthlyRepayments.stream()
-            .map(MonthlyRepayment::getMonthlyPayment)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-    // 연체월 포함 모든 월 원금
-    BigDecimal totalPrincipal =
-        monthlyRepayments.stream()
-            .map(MonthlyRepayment::getPrincipalPayment)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-    // 연체월 포함 모든 월 이자
-    BigDecimal totalInterest =
-        monthlyRepayments.stream()
-            .map(MonthlyRepayment::getInterestPayment)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    // 연체월 포함 모든 월 상환금, 원금, 이자 합산
+    BigDecimal totalRepayment = BigDecimal.ZERO;
+    BigDecimal totalPrincipal = BigDecimal.ZERO;
+    BigDecimal totalInterest = BigDecimal.ZERO;
+    for (MonthlyRepayment repayment : monthlyRepayments) {
+      totalRepayment = totalRepayment.add(repayment.getMonthlyPayment());
+      totalPrincipal = totalPrincipal.add(repayment.getPrincipalPayment());
+      totalInterest = totalInterest.add(repayment.getInterestPayment());
+    }
 
     MonthlyRepayment monthlyRepayment =
         new MonthlyRepayment(

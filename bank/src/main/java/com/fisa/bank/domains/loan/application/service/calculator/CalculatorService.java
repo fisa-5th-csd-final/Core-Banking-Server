@@ -68,14 +68,6 @@ public class CalculatorService {
       tempNextRepaymentDate = tempNextRepaymentDate.plusMonths(1);
     }
 
-    // 테스트용 출력 코드
-    for (int i = 0; i < repayments.size(); i++) {
-      MonthlyRepayment m = repayments.get(i);
-      System.out.printf(
-          "Month %d: principal=%s, interest=%s, remainPrincipal=%s%n",
-          i + 1, m.getPrincipalPayment(), m.getInterestPayment(), m.getRemainPrincipal());
-    }
-
     return repayments;
   }
 
