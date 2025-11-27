@@ -1,5 +1,16 @@
 package com.fisa.bank.domains.loan.application.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.fisa.bank.domains.account.application.service.AccountDomainRecorder;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.account.persistence.enums.TransactionType;
@@ -9,14 +20,6 @@ import com.fisa.bank.domains.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.domains.loan.application.service.calculator.CalculatorService;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -156,7 +159,9 @@ public class AutoDepositProcessor {
     boolean countedToday = alreadyOverdue && isUpdatedToday(ledger);
 
     LocalDateTime nextRepaymentDate =
-        alreadyOverdue ? ledger.getNextRepaymentDate() : ledger.getNextRepaymentDate().plusMonths(1);
+        alreadyOverdue
+            ? ledger.getNextRepaymentDate()
+            : ledger.getNextRepaymentDate().plusMonths(1);
 
     ledger.updateLoanLedger(
         new UpdateLoanLedgerParam(
