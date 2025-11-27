@@ -417,4 +417,23 @@ public class LoanService {
     }
     return prepaymentInfoResponses;
   }
+
+  @Transactional(readOnly = true)
+  public List<AutoDepositResponse> getAutoDepositSummary() {
+    Long userId = requesterInfo.getUserId().getValue();
+    // UserReader 또는 Reader 계층을 통해 대출 조회
+    // (LoanLedgerRepository 직접 사용 X — 기존 서비스 일관성 유지)
+    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+
+    return loanLedgers.stream()
+        .map(
+            ledger ->
+                AutoDepositResponse.builder()
+                    .loanName(ledger.getLoanProduct().getName())
+                    .accountBalance(
+                        ledger.getAccount() != null ? ledger.getAccount().getBalance() : null)
+                    .autoDepositEnabled(ledger.isAutoDepositEnabled())
+                    .build())
+        .toList();
+  }
 }

@@ -131,4 +131,13 @@ public class LoanController {
     List<PrepaymentInfoResponse> prepaymentInfos = loanService.getPrepaymentInfos();
     return ApiResponseGenerator.success(ResponseCode.GET, prepaymentInfos);
   }
+
+  @GetMapping("/auto-deposit-summary")
+  public ApiResponse<SuccessBody<List<AutoDepositResponse>>> getUserLoanSimpleSummary() {
+    log.info("자동 예치 정보 조회");
+
+    List<AutoDepositResponse> summary = loanService.getAutoDepositSummary();
+
+    return ApiResponseGenerator.success(ResponseCode.GET, summary);
+  }
 }
