@@ -119,7 +119,7 @@ public class AutoDepositProcessor {
     BigDecimal newRemainPrincipal =
         ledger.getRemainPrincipal().subtract(repayment.getPrincipalPayment());
 
-    if (repayment.getRepaymentDate().isBefore(ledger.getNextRepaymentDate())) {
+    if (repayment.getRepaymentDate().toLocalDate().isBefore(ledger.getNextRepaymentDate().toLocalDate())) {
       handleOverdueRepaymentSuccess(ledger, repayment, newRemainPrincipal);
       return;
     }
@@ -135,7 +135,7 @@ public class AutoDepositProcessor {
             newRemainPrincipal,
             ledger.getNextRepaymentDate(),
             repayment.getRepaymentDate(),
-            RepaymentStatus.NORMAL));
+            RepaymentStatus.OVERDUE));
   }
 
   // 정상 회차 상환 성공: 다음 상환일 +1개월, 마지막 상환일은 해당 회차 상환일로 설정
