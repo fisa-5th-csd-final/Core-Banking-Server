@@ -411,9 +411,7 @@ public class LoanService {
         return loanLedgers.stream()
                 .map(ledger -> AutoDepositResponse.builder()
                         .loanName(
-                                ledger.getLoanProduct() != null
-                                        ? ledger.getLoanProduct().getName()
-                                        : null
+                                ledger.getLoanProduct().getName()
                         )
                         .accountBalance(
                                 ledger.getAccount() != null

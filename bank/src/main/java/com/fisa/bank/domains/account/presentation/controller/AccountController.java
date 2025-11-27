@@ -42,7 +42,7 @@ public class AccountController {
   }
 
   @Operation(summary = "계좌 상세 조회", description = "계좌 번호로 계좌의 상세 정보를 조회합니다.")
-  @GetMapping("/{accouxntNumber}")
+  @GetMapping("/{accountNumber}")
   public ApiResponse<SuccessBody<AccountDetailResponse>> getAccountDetail(
       @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber) {
     AccountDetailResponse response = accountService.getAccountDetail(accountNumber);
