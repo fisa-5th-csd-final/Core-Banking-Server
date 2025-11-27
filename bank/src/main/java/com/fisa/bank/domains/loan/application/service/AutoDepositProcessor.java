@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,50 +34,61 @@ public class AutoDepositProcessor {
   public void processOne(LoanLedger ledger) {
 
     try {
-      // 이번 달 필요한 총 상환 금액 = 원금 + 이자
-      MonthlyRepayment repayment = calculatorService.calculate(ledger);
-      BigDecimal requiredAmount = repayment.getMonthlyPayment();
+      // 연체분을 포함한 월별 상환 목록(0번이 가장 오래된 회차)
+      List<MonthlyRepayment> repayments = calculatorService.calculate(ledger);
+      if (repayments.isEmpty()) {
+        return;
+      }
 
       Account loanAccount = ledger.getAccount();
-      BigDecimal loanBalance = loanAccount.getBalance();
+      Account salaryAccount = null;
 
-      // 대출계좌 잔액으로 충분한 경우
-      if (loanBalance.compareTo(requiredAmount) >= 0) {
-        withdraw(loanAccount, requiredAmount);
-        handleRepaymentSuccess(ledger, repayment);
-        return;
-      }
+      for (MonthlyRepayment repayment : repayments) {
 
-      // 잔액 부족한 경우: 부족분 계산
-      BigDecimal shortage = requiredAmount.subtract(loanBalance);
+        BigDecimal requiredAmount = repayment.getMonthlyPayment();
+        BigDecimal loanBalance = loanAccount.getBalance();
 
-      // 급여계좌 조회
-      Account salaryAccount =
-          accountRepository.findFirstByUserAndIsForIncomeTrue(ledger.getUser()).orElse(null);
+        // 대출계좌 잔액으로 충분한 경우
+        if (loanBalance.compareTo(requiredAmount) >= 0) {
+          withdraw(loanAccount, requiredAmount);
+          handleRepaymentSuccess(ledger, repayment);
+          continue;
+        }
 
-      if (salaryAccount == null) {
-        log.warn("급여계좌 없음. 연체 처리: userId={}", ledger.getUser().getUserId().getValue());
+        // 잔액 부족한 경우: 부족분 계산
+        BigDecimal shortage = requiredAmount.subtract(loanBalance);
+
+        // 급여계좌 조회(한 번만 조회 후 재사용)
+        if (salaryAccount == null) {
+          salaryAccount =
+              accountRepository.findFirstByUserAndIsForIncomeTrue(ledger.getUser()).orElse(null);
+        }
+
+        if (salaryAccount == null) {
+          log.warn("급여계좌 없음. 연체 처리: userId={}", ledger.getUser().getUserId().getValue());
+          handleOverdue(ledger);
+          break;
+        }
+
+        BigDecimal salaryBalance = salaryAccount.getBalance();
+
+        // 급여계좌로 부족분 충당 가능한 경우
+        if (salaryBalance.compareTo(shortage) >= 0) {
+
+          // 급여계좌에서 대출계좌로 부족분 이체
+          transfer(salaryAccount, loanAccount, shortage);
+
+          // 대출계좌에서 전체 출금
+          withdraw(loanAccount, requiredAmount);
+
+          handleRepaymentSuccess(ledger, repayment);
+          continue;
+        }
+
+        // 급여계좌에도 돈 없는 경우: 연체 처리 후 종료
         handleOverdue(ledger);
-        return;
+        break;
       }
-
-      BigDecimal salaryBalance = salaryAccount.getBalance();
-
-      // 급여계좌로 부족분 충당 가능한 경우
-      if (salaryBalance.compareTo(shortage) >= 0) {
-
-        // 급여계좌에서 대출계좌로 부족분 이체
-        transfer(salaryAccount, loanAccount, shortage);
-
-        // 대출계좌에서 전체 출금
-        withdraw(loanAccount, requiredAmount);
-
-        handleRepaymentSuccess(ledger, repayment);
-        return;
-      }
-
-      // 급여계좌에도 돈 없는 경우: 연체
-      handleOverdue(ledger);
 
     } catch (Exception ex) {
       log.error(
@@ -107,11 +119,33 @@ public class AutoDepositProcessor {
     BigDecimal newRemainPrincipal =
         ledger.getRemainPrincipal().subtract(repayment.getPrincipalPayment());
 
+    if (repayment.getRepaymentDate().isBefore(ledger.getNextRepaymentDate())) {
+      handleOverdueRepaymentSuccess(ledger, repayment, newRemainPrincipal);
+      return;
+    }
+
+    handleNormalRepaymentSuccess(ledger, repayment, newRemainPrincipal);
+  }
+
+  // 연체 회차 상환 성공: 다음 상환일은 유지, 마지막 상환일은 해당 회차 상환일로 설정
+  private void handleOverdueRepaymentSuccess(
+      LoanLedger ledger, MonthlyRepayment repayment, BigDecimal newRemainPrincipal) {
+    ledger.updateLoanLedger(
+        new UpdateLoanLedgerParam(
+            newRemainPrincipal,
+            ledger.getNextRepaymentDate(),
+            repayment.getRepaymentDate(),
+            RepaymentStatus.NORMAL));
+  }
+
+  // 정상 회차 상환 성공: 다음 상환일 +1개월, 마지막 상환일은 해당 회차 상환일로 설정
+  private void handleNormalRepaymentSuccess(
+      LoanLedger ledger, MonthlyRepayment repayment, BigDecimal newRemainPrincipal) {
     ledger.updateLoanLedger(
         new UpdateLoanLedgerParam(
             newRemainPrincipal,
             ledger.getNextRepaymentDate().plusMonths(1),
-            LocalDateTime.now(),
+            repayment.getRepaymentDate(),
             RepaymentStatus.NORMAL));
   }
 
