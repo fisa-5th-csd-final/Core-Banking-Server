@@ -1,10 +1,10 @@
 package com.fisa.bank.domains.loan.application.service;
 
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -154,7 +154,9 @@ public class AutoDepositProcessor {
     boolean alreadyOverdue = ledger.getRepaymentStatus() == RepaymentStatus.OVERDUE;
 
     LocalDateTime nextRepaymentDate =
-        alreadyOverdue ? ledger.getNextRepaymentDate() : ledger.getNextRepaymentDate().plusMonths(1);
+        alreadyOverdue
+            ? ledger.getNextRepaymentDate()
+            : ledger.getNextRepaymentDate().plusMonths(1);
 
     ledger.updateLoanLedger(
         new UpdateLoanLedgerParam(
