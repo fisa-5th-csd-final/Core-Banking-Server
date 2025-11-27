@@ -1,16 +1,5 @@
 package com.fisa.bank.domains.loan.application.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fisa.bank.domains.account.application.service.AccountDomainRecorder;
 import com.fisa.bank.domains.account.persistence.entity.Account;
 import com.fisa.bank.domains.account.persistence.enums.TransactionType;
@@ -20,6 +9,14 @@ import com.fisa.bank.domains.loan.application.model.UpdateLoanLedgerParam;
 import com.fisa.bank.domains.loan.application.service.calculator.CalculatorService;
 import com.fisa.bank.domains.loan.persistence.entity.LoanLedger;
 import com.fisa.bank.domains.loan.persistence.enums.RepaymentStatus;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -156,18 +153,25 @@ public class AutoDepositProcessor {
   // 연체 처리(OVERDUE 상태로 변경)
   private void handleOverdue(LoanLedger ledger) {
     boolean alreadyOverdue = ledger.getRepaymentStatus() == RepaymentStatus.OVERDUE;
+    boolean countedToday = alreadyOverdue && isUpdatedToday(ledger);
 
     LocalDateTime nextRepaymentDate =
-        alreadyOverdue
-            ? ledger.getNextRepaymentDate()
-            : ledger.getNextRepaymentDate().plusMonths(1);
+        alreadyOverdue ? ledger.getNextRepaymentDate() : ledger.getNextRepaymentDate().plusMonths(1);
 
     ledger.updateLoanLedger(
         new UpdateLoanLedgerParam(
-            ledger.getRemainPrincipal(), // 상환 안했으니 원금 변화 없음
+            ledger.getRemainPrincipal(),
             nextRepaymentDate,
             ledger.getLastRepaymentDate(),
             RepaymentStatus.OVERDUE));
-    ledger.increaseOverdueCount();
+
+    if (!countedToday) {
+      ledger.increaseOverdueCount();
+    }
+  }
+
+  private boolean isUpdatedToday(LoanLedger ledger) {
+    LocalDateTime updatedAt = ledger.getUpdatedAt();
+    return updatedAt != null && updatedAt.toLocalDate().isEqual(LocalDate.now());
   }
 }
