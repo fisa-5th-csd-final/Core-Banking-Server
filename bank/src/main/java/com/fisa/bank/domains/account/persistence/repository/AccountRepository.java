@@ -38,4 +38,6 @@ public interface AccountRepository extends JpaRepository<Account, AccountId> {
                 order by a.accountNumber asc
             """)
   List<Account> lockTwoAccountsByNumbers(@Param("numbers") List<String> numbers);
+
+  Optional<Account> findFirstByUserAndIsForIncomeTrue(User user);
 }
