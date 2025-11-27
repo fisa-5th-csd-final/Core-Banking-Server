@@ -1,5 +1,7 @@
 package com.fisa.bank.domains.common.persistence.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,7 +9,12 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass // 필터 정의
 // @FilterDef(
 //        name = "deletedFilter", // 정의할 필터 이름
@@ -21,17 +28,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseEntity {
 
-  // TODO: Auditing Listener 적용
-
+  @CreatedDate
+  @Column(updatable = false)
   private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+
+  @LastModifiedDate private LocalDateTime updatedAt;
   private LocalDateTime deletedAt;
 
-  public BaseEntity() {
-    this.createdAt = LocalDateTime.now();
-    this.updatedAt = LocalDateTime.now();
-    this.deletedAt = null;
-  }
+  public BaseEntity() {}
 
   public void delete() {
     this.deletedAt = LocalDateTime.now();
