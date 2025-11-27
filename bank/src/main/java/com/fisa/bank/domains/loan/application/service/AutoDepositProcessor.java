@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -119,7 +120,10 @@ public class AutoDepositProcessor {
     BigDecimal newRemainPrincipal =
         ledger.getRemainPrincipal().subtract(repayment.getPrincipalPayment());
 
-    if (repayment.getRepaymentDate().toLocalDate().isBefore(ledger.getNextRepaymentDate().toLocalDate())) {
+    LocalDate repaymentDate = repayment.getRepaymentDate().toLocalDate();
+    LocalDate nextRepaymentDate = ledger.getNextRepaymentDate().toLocalDate();
+
+    if (repaymentDate.isBefore(nextRepaymentDate)) {
       handleOverdueRepaymentSuccess(ledger, repayment, newRemainPrincipal);
       return;
     }
