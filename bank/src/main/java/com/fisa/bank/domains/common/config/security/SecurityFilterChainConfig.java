@@ -154,7 +154,8 @@ public class SecurityFilterChainConfig {
                         "/api/loans",
                         "/api/loans/ledger/{loanLedgerId:\\d+}",
                         "/api/loans/ledgers",
-                        "/api/loans/prepayment-infos")
+                        "/api/loans/prepayment-infos",
+                        "/api/loans/auto-deposit-summary")
                     .requestMatchers(
                         HttpMethod.DELETE,
                         "/api/accounts/{accountNumber}",
