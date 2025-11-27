@@ -1,5 +1,6 @@
 package com.fisa.bank.domains.loan.application.service;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -150,10 +151,15 @@ public class AutoDepositProcessor {
 
   // 연체 처리(OVERDUE 상태로 변경)
   private void handleOverdue(LoanLedger ledger) {
+    boolean alreadyOverdue = ledger.getRepaymentStatus() == RepaymentStatus.OVERDUE;
+
+    LocalDateTime nextRepaymentDate =
+        alreadyOverdue ? ledger.getNextRepaymentDate() : ledger.getNextRepaymentDate().plusMonths(1);
+
     ledger.updateLoanLedger(
         new UpdateLoanLedgerParam(
             ledger.getRemainPrincipal(), // 상환 안했으니 원금 변화 없음
-            ledger.getNextRepaymentDate().plusMonths(1), // 상환일 다음 달로 똑같이 넘어감
+            nextRepaymentDate,
             ledger.getLastRepaymentDate(),
             RepaymentStatus.OVERDUE));
     ledger.increaseOverdueCount();
