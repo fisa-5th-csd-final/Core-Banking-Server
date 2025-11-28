@@ -370,6 +370,20 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
+  public List<LoanLedgerDetailResponse> getLoanLedgerDetails() {
+    Long userId = requesterInfo.getUserId().getValue();
+    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+
+    return loanLedgers.stream()
+        .map(
+            loanLedger -> {
+              List<MonthlyRepayment> monthlyRepayments = calculatorService.calculate(loanLedger);
+              return LoanLedgerDetailResponse.from(loanLedger, monthlyRepayments);
+            })
+        .toList();
+  }
+
+  @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedgers() {
     Long userId = requesterInfo.getUserId().getValue();
     List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);

@@ -20,3 +20,6 @@ server:
       cookie:
         name: BANKSESSION
   forward-headers-strategy: framework
+logging:
+  level:
+    root: DEBUG
