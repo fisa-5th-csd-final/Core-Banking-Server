@@ -276,8 +276,6 @@ public class LoanService {
     LocalDateTime nextRepaymentDate = lastRepaymentDate.plusMonths(1);
     RepaymentStatus repaymentStatus = loanLedger.getRepaymentStatus();
 
-    System.out.println("totalPrincipal = " + totalPrincipal);
-    System.out.println("loanLedger.getRemainPrincipal() = " + loanLedger.getRemainPrincipal());
     // 만약 이번 상환일이 마지막 상환일이라면 다음 상환일 null로 처리
     // 대출 상태 COMPLETED도 변경
     if (totalPrincipal.compareTo(loanLedger.getRemainPrincipal()) == 0) {
