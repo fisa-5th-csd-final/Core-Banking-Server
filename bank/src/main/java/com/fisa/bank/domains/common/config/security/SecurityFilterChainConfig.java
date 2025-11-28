@@ -111,7 +111,9 @@ public class SecurityFilterChainConfig {
                         "/api/interests/{loanProductId:\\d+}",
                         "/swagger-ui/**", // TODO: Swagger 전용 필터체인으로 분리
                         "/v3/api-docs/**", // TODO: Swagger 전용 필터체인으로 분리
-                        "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
+                        "/swagger-resources/**", // TODO: Swagger 전용 필터체인으로 분리
+                        "/admin/login",
+                        "/admin/**"
                         )
                     .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
                     .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
@@ -162,8 +164,15 @@ public class SecurityFilterChainConfig {
                         "/api/accounts/{accountNumber}",
                         "/api/loans/{loanLedgerId:\\d+}")
                     .requestMatchers(
-                        HttpMethod.PATCH, "/api/loans/{loanLedgerId:\\d+}/auto-deposit"))
-        .authorizeHttpRequests(request -> request.anyRequest().authenticated());
+                        HttpMethod.PATCH, "/api/loans/{loanLedgerId:\\d+}/auto-deposit")
+                    .requestMatchers("/api/admin/**"))
+        .authorizeHttpRequests(
+            request ->
+                request
+                    .requestMatchers("/api/admin/**")
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));

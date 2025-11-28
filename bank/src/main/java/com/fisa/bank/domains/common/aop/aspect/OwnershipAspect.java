@@ -9,6 +9,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.fisa.bank.domains.account.application.exception.AccessDeniedException;
@@ -32,6 +34,10 @@ public class OwnershipAspect {
 
   @Before("@annotation(verifyOwner)")
   public void verifyOwnership(JoinPoint joinPoint, VerifyOwner verifyOwner) {
+    if (isAdmin()) {
+      return; // ADMIN은 소유권 검사를 건너뜀
+    }
+
     Object idValue = extractParamValue(joinPoint, verifyOwner.idParam());
 
     switch (verifyOwner.domain()) {
@@ -57,6 +63,15 @@ public class OwnershipAspect {
         }
       }
     }
+  }
+
+  private boolean isAdmin() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || authentication.getAuthorities() == null) {
+      return false;
+    }
+    return authentication.getAuthorities().stream()
+        .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
   }
 
   private Object extractParamValue(JoinPoint joinPoint, String paramName) {
