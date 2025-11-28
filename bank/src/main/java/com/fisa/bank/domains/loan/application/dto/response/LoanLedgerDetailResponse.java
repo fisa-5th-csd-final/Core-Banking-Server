@@ -79,8 +79,12 @@ public class LoanLedgerDetailResponse {
         loanLedger.getCompletedInterest(),
         loanLedger.getLoanProduct().getType(),
         loanLedger.getRepaymentType(),
-        monthlyRepayment.get(monthlyRepayment.size() - 1).getMonthlyPayment(),
-        monthlyRepayment.get(monthlyRepayment.size() - 1).getInterestPayment(),
+        monthlyRepayment.isEmpty()
+            ? BigDecimal.ZERO
+            : monthlyRepayment.get(monthlyRepayment.size() - 1).getMonthlyPayment(),
+        monthlyRepayment.isEmpty()
+            ? BigDecimal.ZERO
+            : monthlyRepayment.get(monthlyRepayment.size() - 1).getInterestPayment(),
         loanLedger.getAccount().getAccountNumber(),
         loanLedger.isAutoDepositEnabled(),
         loanLedger.getNextRepaymentDate(),
