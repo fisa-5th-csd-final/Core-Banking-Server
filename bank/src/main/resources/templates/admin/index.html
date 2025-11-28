@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 포털</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --panel: rgba(255, 255, 255, 0.86);
+      --accent: #0d6efd;
+      --accent-2: #00b7ff;
+      --text: #0a2540;
+      --muted: #425466;
+      --border: #d8e3f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Pretendard', 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at 15% 20%, rgba(0, 183, 255, 0.15), transparent 25%),
+        radial-gradient(circle at 80% 10%, rgba(13, 110, 253, 0.16), transparent 26%),
+        linear-gradient(180deg, #f7fbff, #f1f6ff 40%, #f7fbff 70%);
+      color: var(--text);
+    }
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 32px 28px 40px;
+      background: linear-gradient(135deg, #e6f1ff 0%, #f9fdff 70%);
+      border-bottom: 1px solid var(--border);
+    }
+    header:after {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: -140px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 183, 255, 0.25) 0%, rgba(13, 110, 253, 0.05) 70%);
+      filter: blur(12px);
+    }
+    h1 { margin: 0 0 10px; letter-spacing: -0.02em; }
+    p { margin: 4px 0; color: var(--muted); }
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      padding: 26px;
+    }
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 18px 40px rgba(12, 70, 156, 0.08);
+      transition: transform 140ms ease, box-shadow 140ms ease;
+      backdrop-filter: blur(4px);
+    }
+    .card:before {
+      content: '';
+      position: absolute;
+      right: -40px;
+      bottom: -60px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(0, 183, 255, 0.14), transparent 60%);
+      transform: rotate(15deg);
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 22px 48px rgba(12, 70, 156, 0.12); }
+    a.button,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      box-shadow: 0 10px 24px rgba(13, 110, 253, 0.25);
+      border: none;
+      cursor: pointer;
+    }
+    .token-box { max-width: 520px; margin-top: 16px; }
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+    input {
+      width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border);
+      font-size: 14px; background: #fff;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>관리자 포털</h1>
+    <p>로그인 후 기능 페이지로 이동하세요. (ADMIN 권한 계정 필요)</p>
+    <div class="token-box">
+      <a class="button" style="width:100%; justify-content:center;" href="/admin/login">로그인 페이지로 이동</a>
+      <button class="button" style="width:100%; justify-content:center; background:#fff;color:#0a2540;border:1px solid var(--border);box-shadow:none;margin-top:10px;" onclick="logout()">로그아웃</button>
+      <p id="login-status" style="margin-top:8px; color: var(--muted);"></p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h3>계좌 관리</h3>
+      <p>계좌 생성, 조회, 입출금, 송금, 카드 결제를 처리합니다.</p>
+      <a class="button" href="/admin/accounts">이동</a>
+    </div>
+    <div class="card">
+      <h3>대출 관리</h3>
+      <p>사용자 대출 가입, 상환/해지, 대출 목록 조회를 처리합니다.</p>
+      <a class="button" href="/admin/loans">이동</a>
+    </div>
+    <div class="card">
+      <h3>상품 관리</h3>
+      <p>대출 상품을 생성하고 상품 목록을 확인합니다.</p>
+      <a class="button" href="/admin/products">이동</a>
+    </div>
+  </div>
+
+  <script>
+    const loginStatus = document.getElementById('login-status');
+    const saved = localStorage.getItem('admin_token');
+    if (!saved || !hasAdminRole(saved)) {
+      loginStatus.textContent = '로그인이 필요하거나 ADMIN 권한이 없습니다. 로그인 페이지로 이동합니다.';
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_refresh_token');
+      setTimeout(() => (window.location.href = '/admin/login'), 700);
+    } else {
+      loginStatus.textContent = '로그인 상태가 확인되었습니다. 메뉴를 선택하세요.';
+    }
+
+    function logout() {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_refresh_token');
+      loginStatus.textContent = '로그아웃되었습니다. 로그인 페이지로 이동합니다.';
+      setTimeout(() => (window.location.href = '/admin/login'), 400);
+    }
+
+    function hasAdminRole(token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        const roles = payload.role || payload.roles || [];
+        return Array.isArray(roles) && roles.includes('ROLE_ADMIN');
+      } catch (_) {
+        return false;
+      }
+    }
+  </script>
+</body>
+</html>
