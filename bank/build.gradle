@@ -51,8 +51,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	// CDC / Kafka
 	implementation 'org.springframework.kafka:spring-kafka'
-	implementation 'io.debezium:debezium-embedded:2.7.3.Final'
-	implementation 'io.debezium:debezium-connector-mysql:2.7.3.Final'
+	implementation('io.debezium:debezium-embedded:2.7.3.Final') {
+		exclude group: 'io.swagger.core.v3', module: 'swagger-annotations'
+	}
+	implementation('io.debezium:debezium-connector-mysql:2.7.3.Final') {
+		exclude group: 'io.swagger.core.v3', module: 'swagger-annotations'
+	}
 }
 
 spotless {
