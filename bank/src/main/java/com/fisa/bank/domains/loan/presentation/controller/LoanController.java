@@ -116,6 +116,14 @@ public class LoanController {
     return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetail);
   }
 
+  @GetMapping("/ledgers/details")
+  public ApiResponse<SuccessBody<List<LoanLedgerDetailResponse>>> getLoanLedgerDetails() {
+    log.info("모든 대출 세부 정보 조회");
+    List<LoanLedgerDetailResponse> loanLedgerDetails = loanService.getLoanLedgerDetails();
+
+    return ApiResponseGenerator.success(ResponseCode.GET, loanLedgerDetails);
+  }
+
   @PatchMapping("/{loanLedgerId:\\d+}/auto-deposit")
   public ApiResponse<SuccessBody<Void>> updateAutoDepositEnabled(
       @PathVariable Long loanLedgerId, @Valid @RequestBody LoanAutoDepositUpdateRequest request) {
