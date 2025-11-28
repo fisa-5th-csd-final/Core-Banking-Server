@@ -275,6 +275,11 @@ public class LoanService {
     LocalDateTime lastRepaymentDate = loanLedger.getNextRepaymentDate();
     LocalDateTime nextRepaymentDate = lastRepaymentDate.plusMonths(1);
 
+    // 만약 이번 상환일이 마지막 상환일이라면 다음 상환일 null로 처리
+    if (lastRepaymentDate.toLocalDate().equals(loanLedger.getLoanEndDate().toLocalDate())) {
+      nextRepaymentDate = null;
+    }
+
     loanLedger.updateLoanLedger(
         UpdateLoanLedgerParam.builder()
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
