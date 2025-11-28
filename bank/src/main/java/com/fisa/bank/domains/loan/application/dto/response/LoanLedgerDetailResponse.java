@@ -17,6 +17,7 @@ public class LoanLedgerDetailResponse {
   // 대출 이름, 남은 원금, 원금, 월 상환액, 상환 계좌, 대출 유형, 상환 방식 응답
   // 자동예치 여부도 detail 응답에 필요할 것 같음
 
+  private final Long loanLedgerId;
   private final String name;
   private final BigDecimal remainPrincipal;
   private final BigDecimal principal;
@@ -32,6 +33,7 @@ public class LoanLedgerDetailResponse {
   private final RepaymentStatus repaymentStatus;
 
   public LoanLedgerDetailResponse(
+      Long loanLedgerId,
       String name,
       BigDecimal principal,
       BigDecimal remainPrincipal,
@@ -45,6 +47,7 @@ public class LoanLedgerDetailResponse {
       LocalDateTime createdAt,
       int term,
       RepaymentStatus repaymentStatus) {
+    this.loanLedgerId = loanLedgerId;
     this.name = name;
     this.principal = principal;
     this.remainPrincipal = remainPrincipal;
@@ -63,6 +66,7 @@ public class LoanLedgerDetailResponse {
   public static LoanLedgerDetailResponse from(
       LoanLedger loanLedger, List<MonthlyRepayment> monthlyRepayment) {
     return new LoanLedgerDetailResponse(
+        loanLedger.getLoanLedgerId().getValue(),
         loanLedger.getLoanProduct().getName(), // 엔티티 구조에 맞게 수정
         loanLedger.getPrincipal(),
         loanLedger.getRemainPrincipal(),
