@@ -23,10 +23,12 @@ public class LoanLedgerDetailResponse {
   private final BigDecimal principal;
   private final BigDecimal monthlyRepayment;
   private final BigDecimal interestPayment;
+  private final BigDecimal completedInterest;
   private final String accountNumber;
   private final LoanType loanType;
   private final RepaymentType repaymentType;
   private final Boolean autoDepositEnabled;
+  private final LocalDateTime nextRepaymentDate;
   private final LocalDateTime lastRepaymentDate;
   private final LocalDateTime nextRepaymentDate;
   private final LocalDateTime createdAt;
@@ -38,12 +40,14 @@ public class LoanLedgerDetailResponse {
       String name,
       BigDecimal principal,
       BigDecimal remainPrincipal,
+      BigDecimal completedInterest,
       LoanType loanType,
       RepaymentType repaymentType,
       BigDecimal monthlyRepayment,
       BigDecimal interestPayment,
       String accountNumber,
       Boolean autoDepositEnabled,
+      LocalDateTime nextRepaymentDate,
       LocalDateTime lastRepaymentDate,
       LocalDateTime nextRepaymentDate,
       LocalDateTime createdAt,
@@ -53,12 +57,14 @@ public class LoanLedgerDetailResponse {
     this.name = name;
     this.principal = principal;
     this.remainPrincipal = remainPrincipal;
+    this.completedInterest = completedInterest;
     this.loanType = loanType;
     this.repaymentType = repaymentType;
     this.monthlyRepayment = monthlyRepayment;
     this.interestPayment = interestPayment;
     this.accountNumber = accountNumber;
     this.autoDepositEnabled = autoDepositEnabled;
+    this.nextRepaymentDate = nextRepaymentDate;
     this.lastRepaymentDate = lastRepaymentDate;
     this.nextRepaymentDate = nextRepaymentDate;
     this.createdAt = createdAt;
@@ -73,12 +79,18 @@ public class LoanLedgerDetailResponse {
         loanLedger.getLoanProduct().getName(), // 엔티티 구조에 맞게 수정
         loanLedger.getPrincipal(),
         loanLedger.getRemainPrincipal(),
+        loanLedger.getCompletedInterest(),
         loanLedger.getLoanProduct().getType(),
         loanLedger.getRepaymentType(),
-        monthlyRepayment.get(monthlyRepayment.size() - 1).getMonthlyPayment(),
-        monthlyRepayment.get(monthlyRepayment.size() - 1).getInterestPayment(),
+        monthlyRepayment.isEmpty()
+            ? BigDecimal.ZERO
+            : monthlyRepayment.get(monthlyRepayment.size() - 1).getMonthlyPayment(),
+        monthlyRepayment.isEmpty()
+            ? BigDecimal.ZERO
+            : monthlyRepayment.get(monthlyRepayment.size() - 1).getInterestPayment(),
         loanLedger.getAccount().getAccountNumber(),
         loanLedger.isAutoDepositEnabled(),
+        loanLedger.getNextRepaymentDate(),
         loanLedger.getLastRepaymentDate(),
         loanLedger.getNextRepaymentDate(),
         loanLedger.getCreatedAt(),
