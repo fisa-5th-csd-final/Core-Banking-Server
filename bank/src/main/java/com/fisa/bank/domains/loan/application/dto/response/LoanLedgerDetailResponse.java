@@ -30,7 +30,6 @@ public class LoanLedgerDetailResponse {
   private final Boolean autoDepositEnabled;
   private final LocalDateTime nextRepaymentDate;
   private final LocalDateTime lastRepaymentDate;
-  private final LocalDateTime nextRepaymentDate;
   private final LocalDateTime createdAt;
   private final int term;
   private final RepaymentStatus repaymentStatus;
@@ -49,7 +48,6 @@ public class LoanLedgerDetailResponse {
       Boolean autoDepositEnabled,
       LocalDateTime nextRepaymentDate,
       LocalDateTime lastRepaymentDate,
-      LocalDateTime nextRepaymentDate,
       LocalDateTime createdAt,
       int term,
       RepaymentStatus repaymentStatus) {
@@ -66,7 +64,6 @@ public class LoanLedgerDetailResponse {
     this.autoDepositEnabled = autoDepositEnabled;
     this.nextRepaymentDate = nextRepaymentDate;
     this.lastRepaymentDate = lastRepaymentDate;
-    this.nextRepaymentDate = nextRepaymentDate;
     this.createdAt = createdAt;
     this.term = term;
     this.repaymentStatus = repaymentStatus;
@@ -92,7 +89,6 @@ public class LoanLedgerDetailResponse {
         loanLedger.isAutoDepositEnabled(),
         loanLedger.getNextRepaymentDate(),
         loanLedger.getLastRepaymentDate(),
-        loanLedger.getNextRepaymentDate(),
         loanLedger.getCreatedAt(),
         loanLedger.getTerm(),
         loanLedger.getRepaymentStatus());
