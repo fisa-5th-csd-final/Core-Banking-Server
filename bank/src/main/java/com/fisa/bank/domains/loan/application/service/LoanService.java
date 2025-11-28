@@ -274,10 +274,15 @@ public class LoanService {
     // 남은 원금, 다음 상환일, 마지막 상환 날짜 업데이트
     LocalDateTime lastRepaymentDate = loanLedger.getNextRepaymentDate();
     LocalDateTime nextRepaymentDate = lastRepaymentDate.plusMonths(1);
+    RepaymentStatus repaymentStatus = loanLedger.getRepaymentStatus();
 
+    System.out.println("totalPrincipal = " + totalPrincipal);
+    System.out.println("loanLedger.getRemainPrincipal() = " + loanLedger.getRemainPrincipal());
     // 만약 이번 상환일이 마지막 상환일이라면 다음 상환일 null로 처리
-    if (lastRepaymentDate.toLocalDate().equals(loanLedger.getLoanEndDate().toLocalDate())) {
+    // 대출 상태 COMPLETED도 변경
+    if (totalPrincipal.compareTo(loanLedger.getRemainPrincipal()) == 0) {
       nextRepaymentDate = null;
+      repaymentStatus = RepaymentStatus.COMPLETED;
     }
 
     loanLedger.updateLoanLedger(
@@ -285,7 +290,7 @@ public class LoanService {
             .remainPrincipal(monthlyRepayment.getRemainPrincipal())
             .lastRepaymentDate(monthlyRepayment.getRepaymentDate())
             .nextRepaymentDate(nextRepaymentDate)
-            .status(loanLedger.getRepaymentStatus())
+            .status(repaymentStatus)
             .build());
 
     // 이력성 테이블에도 저장
