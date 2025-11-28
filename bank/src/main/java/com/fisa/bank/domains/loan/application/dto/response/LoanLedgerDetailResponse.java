@@ -21,6 +21,7 @@ public class LoanLedgerDetailResponse {
   private final BigDecimal remainPrincipal;
   private final BigDecimal principal;
   private final BigDecimal monthlyRepayment;
+  private final BigDecimal interestPayment;
   private final String accountNumber;
   private final LoanType loanType;
   private final RepaymentType repaymentType;
@@ -37,6 +38,7 @@ public class LoanLedgerDetailResponse {
       LoanType loanType,
       RepaymentType repaymentType,
       BigDecimal monthlyRepayment,
+      BigDecimal interestPayment,
       String accountNumber,
       Boolean autoDepositEnabled,
       LocalDateTime lastRepaymentDate,
@@ -49,6 +51,7 @@ public class LoanLedgerDetailResponse {
     this.loanType = loanType;
     this.repaymentType = repaymentType;
     this.monthlyRepayment = monthlyRepayment;
+    this.interestPayment = interestPayment;
     this.accountNumber = accountNumber;
     this.autoDepositEnabled = autoDepositEnabled;
     this.lastRepaymentDate = lastRepaymentDate;
@@ -66,6 +69,7 @@ public class LoanLedgerDetailResponse {
         loanLedger.getLoanProduct().getType(),
         loanLedger.getRepaymentType(),
         monthlyRepayment.get(monthlyRepayment.size() - 1).getMonthlyPayment(),
+        monthlyRepayment.get(monthlyRepayment.size() - 1).getInterestPayment(),
         loanLedger.getAccount().getAccountNumber(),
         loanLedger.isAutoDepositEnabled(),
         loanLedger.getLastRepaymentDate(),

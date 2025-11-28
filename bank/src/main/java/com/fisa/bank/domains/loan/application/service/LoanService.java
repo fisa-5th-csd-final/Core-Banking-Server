@@ -376,10 +376,8 @@ public class LoanService {
 
     return loanLedgers.stream()
         .map(
-            loanLedger -> {
-              List<MonthlyRepayment> monthlyRepayments = calculatorService.calculate(loanLedger);
-              return LoanLedgerDetailResponse.from(loanLedger, monthlyRepayments);
-            })
+            loanLedger ->
+                LoanLedgerDetailResponse.from(loanLedger, calculatorService.calculate(loanLedger)))
         .toList();
   }
 

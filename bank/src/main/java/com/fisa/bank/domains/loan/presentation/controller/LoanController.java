@@ -117,7 +117,7 @@ public class LoanController {
   }
 
   @GetMapping("/ledgers/details")
-  public ApiResponse<SuccessBody<List<LoanLedgerDetailResponse>>> getLoanDetails() {
+  public ApiResponse<SuccessBody<List<LoanLedgerDetailResponse>>> getLoanLedgerDetails() {
     log.info("모든 대출 세부 정보 조회");
     List<LoanLedgerDetailResponse> loanLedgerDetails = loanService.getLoanLedgerDetails();
 

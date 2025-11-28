@@ -3,6 +3,7 @@ package com.fisa.bank.domains.loan.persistence.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,6 +17,7 @@ public interface LoanLedgerRepository extends JpaRepository<LoanLedger, LoanLedg
   boolean existsByUser_UserIdAndLoanProduct_LoanProductId(
       UserId userId, LoanProductId loanProductId);
 
+  @EntityGraph(attributePaths = {"loanProduct", "account"})
   List<LoanLedger> findAllByUser_UserId(UserId userId);
 
   Optional<LoanLedger> findByLoanLedgerIdAndRepaymentStatusNotIn(
