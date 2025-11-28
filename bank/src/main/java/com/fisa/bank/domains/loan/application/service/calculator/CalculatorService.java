@@ -39,8 +39,17 @@ public class CalculatorService {
 
     // 연체월까지 포함해서 계산하기 위해 일시적으로 바뀌는 값들
     BigDecimal tempRemainPrincipal = loanLedger.getRemainPrincipal();
-    LocalDateTime lastRepaymentDate = loanLedger.getLastRepaymentDate(); // 마지막 상환일
+    // 마지막 상환일이 없을 때(첫 회차 미납 상태)는 다음 상환일을 기준으로 한 달 전을 가정한다
+    LocalDateTime lastRepaymentDate = loanLedger.getLastRepaymentDate();
     LocalDateTime tempNextRepaymentDate = loanLedger.getNextRepaymentDate();
+
+    if (tempNextRepaymentDate == null) {
+      return repayments; // 상환 일정이 없으면 빈 리스트 반환
+    }
+
+    if (lastRepaymentDate == null) {
+      lastRepaymentDate = tempNextRepaymentDate.minusMonths(1);
+    }
 
     int monthsOverdue =
         (int)
