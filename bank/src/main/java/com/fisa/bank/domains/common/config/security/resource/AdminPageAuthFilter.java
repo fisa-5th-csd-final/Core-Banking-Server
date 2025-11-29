@@ -51,8 +51,7 @@ public class AdminPageAuthFilter extends OncePerRequestFilter {
       }
         // 로그인 페이지가 아닌 경우, 로그인 페이지로 리다이렉트
       log.debug("인증되지 않은 관리자 페이지 접근, 리다이렉트 : /admin/login");
-      response.setStatus(HttpStatus.FOUND.value());
-      response.setHeader("Location", "/admin/login");
+      response.sendRedirect("/admin/login");
       return;
     }
 
@@ -60,8 +59,7 @@ public class AdminPageAuthFilter extends OncePerRequestFilter {
       // 로그인 페이지로 접속하려고 하는 경우
     if (isLoginPage) {
       // 이미 인증된 상태에서 /admin/login 접근 시 메인으로 이동
-      response.setStatus(HttpStatus.FOUND.value());
-      response.setHeader("Location", "/admin");
+      response.sendRedirect("/admin");
       return;
     }
 
