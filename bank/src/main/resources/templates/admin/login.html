@@ -92,6 +92,11 @@
 
   <script>
     const status = document.getElementById('status');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        login();
+      }
+    });
 
     // 클라이언트에서는 로그인 유무 판별 없이 사용자가 로그인 시도하도록 둔다.
 
