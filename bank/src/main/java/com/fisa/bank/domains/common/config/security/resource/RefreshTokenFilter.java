@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,22 +42,24 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
   private final UserJwtGenerator userJwtGenerator;
   private final UserAuthRepository userAuthRepository;
   private final ObjectMapper objectMapper;
+  private final RequestMatcher matcher;
 
   public RefreshTokenFilter(
       JwtDecoder jwtDecoder,
       UserJwtGenerator userJwtGenerator,
       UserAuthRepository userAuthRepository,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      RequestMatcher matcher) {
     this.jwtDecoder = jwtDecoder;
     this.userJwtGenerator = userJwtGenerator;
     this.userAuthRepository = userAuthRepository;
     this.objectMapper = objectMapper;
+    this.matcher = matcher;
   }
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    return !"/api/token/refresh".equals(request.getRequestURI())
-        || !"POST".equalsIgnoreCase(request.getMethod());
+    return !matcher.matches(request);
   }
 
   @Override

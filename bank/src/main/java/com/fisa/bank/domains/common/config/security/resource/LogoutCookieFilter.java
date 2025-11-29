@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fisa.bank.domains.common.presentation.util.CookieUtils;
@@ -17,10 +18,15 @@ import com.fisa.bank.domains.common.presentation.util.CookieUtils;
  */
 public class LogoutCookieFilter extends OncePerRequestFilter {
 
+  private final RequestMatcher matcher;
+
+  public LogoutCookieFilter(RequestMatcher matcher) {
+    this.matcher = matcher;
+  }
+
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    return !"/api/logout".equals(request.getRequestURI())
-        || !"POST".equalsIgnoreCase(request.getMethod());
+    return !matcher.matches(request);
   }
 
   @Override

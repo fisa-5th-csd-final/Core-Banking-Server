@@ -30,6 +30,7 @@ import com.fisa.bank.domains.common.config.security.resource.RequiredAuthenticat
 import com.fisa.bank.domains.common.config.security.resource.UnknownEndPointFilter;
 import com.fisa.bank.domains.common.config.security.resource.LogoutCookieFilter;
 import com.fisa.bank.domains.common.config.security.resource.RefreshTokenFilter;
+import com.fisa.bank.domains.common.config.security.resource.AdminPageAuthFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ import com.fisa.bank.domains.common.config.security.resource.RefreshTokenFilter;
 public class SecurityFilterChainConfig {
 
   private final RequiredAuthenticationEntryPoint requiredAuthenticationEntryPoint;
-
+  private final AdminPageAuthFilter adminPageAuthFilter;
   @Bean
   @Order(1)
   // Authorization Server 필터 체인 설정
@@ -194,6 +195,7 @@ public class SecurityFilterChainConfig {
                     .hasRole("ADMIN"));
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(adminPageAuthFilter, UsernamePasswordAuthenticationFilter.class);
     http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
     return http.build();
