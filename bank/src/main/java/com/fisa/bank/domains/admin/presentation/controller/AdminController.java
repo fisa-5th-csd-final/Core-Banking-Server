@@ -136,7 +136,7 @@ public class AdminController {
   @Operation(summary = "관리자: 대출 상환", description = "특정 대출을 상환 처리합니다.")
   @PostMapping("/loans/{loanLedgerId}/repayment")
   public ApiResponse<SuccessBody<LoanTransactionResponse>> repayLoan(
-      @PathVariable Long loanLedgerId, @RequestBody LoanMonthlyRepayRequest request) {
+      @PathVariable Long loanLedgerId, @RequestBody @Valid LoanMonthlyRepayRequest request) {
     LoanTransactionResponse response = loanService.repayMonthlyLoan(loanLedgerId, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
