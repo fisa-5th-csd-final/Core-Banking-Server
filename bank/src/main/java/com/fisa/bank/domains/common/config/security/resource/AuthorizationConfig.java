@@ -173,7 +173,7 @@ public class AuthorizationConfig {
   }
 
     @Bean
-    public FilterRegistrationBean<RefreshTokenFilter> logoutCookieFilterFilterRegistrationBean(
+    public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterFilterRegistrationBean(
             RefreshTokenFilter refreshTokenFilter){
         FilterRegistrationBean<RefreshTokenFilter> registrationBean =
                 new FilterRegistrationBean<>(refreshTokenFilter);
