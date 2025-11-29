@@ -164,21 +164,21 @@ public class AuthorizationConfig {
   }
 
   @Bean
-    public FilterRegistrationBean<LogoutCookieFilter> logoutCookieFilterFilterRegistrationBean(
-            LogoutCookieFilter logoutCookieFilter){
-      FilterRegistrationBean<LogoutCookieFilter> registrationBean =
-              new FilterRegistrationBean<>(logoutCookieFilter);
-      registrationBean.setEnabled(false); // 서블릿 필터에서 제거
-      return registrationBean;
+  public FilterRegistrationBean<LogoutCookieFilter> logoutCookieFilterRegistrationBean(
+      LogoutCookieFilter logoutCookieFilter) {
+    FilterRegistrationBean<LogoutCookieFilter> registrationBean =
+        new FilterRegistrationBean<>(logoutCookieFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
   }
 
-    @Bean
-    public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterFilterRegistrationBean(
-            RefreshTokenFilter refreshTokenFilter){
-        FilterRegistrationBean<RefreshTokenFilter> registrationBean =
-                new FilterRegistrationBean<>(refreshTokenFilter);
-        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
-        return registrationBean;
-    }
+  @Bean
+  public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterRegistrationBean(
+      RefreshTokenFilter refreshTokenFilter) {
+    FilterRegistrationBean<RefreshTokenFilter> registrationBean =
+        new FilterRegistrationBean<>(refreshTokenFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
 
 }
