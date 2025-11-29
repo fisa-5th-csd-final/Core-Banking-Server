@@ -138,7 +138,8 @@ public class AuthorizationConfig {
   @Bean
   public AdminPageAuthFilter adminPageAuthFilter() {
     RequestMatcher matcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/**");
-    return new AdminPageAuthFilter(matcher);
+    RequestMatcher loginMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/login");
+    return new AdminPageAuthFilter(matcher, loginMatcher);
   }
 
   /** jwt 인증필터 서블릿 필터에서 제외 */

@@ -22,13 +22,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AdminPageAuthFilter extends OncePerRequestFilter {
 
   private final RequestMatcher matcher;
+  private final RequestMatcher loginMatcher;
 
-  public AdminPageAuthFilter(RequestMatcher matcher) {
+  public AdminPageAuthFilter(RequestMatcher matcher, RequestMatcher loginMatcher) {
     this.matcher = matcher;
+    this.loginMatcher = loginMatcher;
   }
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    if (loginMatcher.matches(request)) {
+      return true; // 로그인 페이지는 통과
+    }
     return !matcher.matches(request);
   }
 
