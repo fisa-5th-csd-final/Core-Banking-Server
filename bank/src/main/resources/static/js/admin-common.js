@@ -20,26 +20,13 @@
     }
   }
 
-  function getToken() {
-    const saved = localStorage.getItem('admin_token');
-    if (typeof tokenInput !== 'undefined' && tokenInput) {
-      tokenInput.value = saved || '';
-    }
-    return saved;
-  }
-
   async function callApi(method, url, body) {
-    const token = getToken();
-    if (!token) {
-      setResult('토큰이 없습니다. 로그인 후 다시 시도하세요.');
-      return null;
-    }
     const init = {
       method,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
     };
     if (body) init.body = JSON.stringify(body);
     const res = await fetch(url, init);
@@ -55,23 +42,14 @@
   }
 
   function ensureAdminOrRedirect() {
-    const saved = localStorage.getItem('admin_token');
-    if (!saved || !hasAdminRole(saved)) {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      window.location.href = '/admin/login';
-      return false;
-    }
-    if (typeof tokenInput !== 'undefined' && tokenInput) {
-      tokenInput.value = saved;
-    }
-    return true;
+    // 클라이언트에서 로그인 여부를 판별하지 않고, 호출 시 401이면 서버 응답에 따름
+    return Promise.resolve(true);
   }
 
   function logoutAndRedirect() {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_refresh_token');
-    window.location.href = '/admin/login';
+    fetch('/api/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+      window.location.href = '/admin/login';
+    });
   }
 
   window.adminCommon = {

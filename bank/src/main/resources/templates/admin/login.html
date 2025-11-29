@@ -93,11 +93,7 @@
   <script>
     const status = document.getElementById('status');
 
-    // 이미 ADMIN 토큰이 있으면 메인으로 보냄
-    const saved = localStorage.getItem('admin_token');
-    if (saved && hasAdminRole(saved)) {
-      window.location.href = '/admin';
-    }
+    // 클라이언트에서는 로그인 유무 판별 없이 사용자가 로그인 시도하도록 둔다.
 
     async function login() {
       const loginId = document.getElementById('loginId').value.trim();
@@ -112,29 +108,32 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ loginId, password }),
         });
+        if (!res.ok) {
+          status.textContent = '로그인 실패: ' + res.status;
+          return;
+        }
+        // 토큰은 쿠키로 처리하므로 바디 저장 없이 바로 이동
         const text = await res.text();
-        const json = JSON.parse(text);
-        if (json && json.access_token) {
-          if (!hasAdminRole(json.access_token)) {
+        try {
+          const json = JSON.parse(text);
+          if (json && json.access_token && !hasAdminRole(json.access_token)) {
             status.textContent = '로그인 실패: 관리자가 아닙니다.';
             return;
           }
-          localStorage.setItem('admin_token', json.access_token);
-          localStorage.setItem('admin_refresh_token', json.refresh_token ?? '');
-          status.textContent = '로그인 성공! 잠시 후 이동합니다...';
-          setTimeout(() => (window.location.href = '/admin'), 500);
-        } else {
-          status.textContent = '로그인 실패: 토큰을 받지 못했습니다.';
+        } catch (_) {
+          // 바디 파싱 실패 시에도 쿠키만으로 진행
         }
+        status.textContent = '로그인 성공! 잠시 후 이동합니다...';
+        setTimeout(() => (window.location.href = '/admin'), 500);
       } catch (e) {
         status.textContent = '로그인 실패: ' + e;
       }
     }
 
     function logout() {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      status.textContent = '로그아웃되었습니다. 다시 로그인하세요.';
+      fetch('/api/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+        status.textContent = '로그아웃되었습니다. 다시 로그인하세요.';
+      });
     }
 
     function hasAdminRole(token) {

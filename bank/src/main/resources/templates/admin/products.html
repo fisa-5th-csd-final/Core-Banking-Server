@@ -74,9 +74,12 @@
     const { callApi, extractPayload, ensureAdminOrRedirect, logoutAndRedirect } = window.adminCommon;
     const state = { products: [] };
 
-    if (!ensureAdminOrRedirect()) return;
-
-    document.addEventListener('DOMContentLoaded', loadProducts);
+    document.addEventListener('DOMContentLoaded', () => {
+      ensureAdminOrRedirect().then(ok => {
+        if (!ok) return;
+        loadProducts();
+      });
+    });
 
     async function createProduct() {
       const name = document.getElementById('prod-name').value;

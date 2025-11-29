@@ -111,8 +111,6 @@
         window.adminCommon;
     const state = { products: [], accounts: [], users: [], selectedUserId: null };
 
-    if (!ensureAdminOrRedirect()) return;
-
     document.addEventListener('DOMContentLoaded', () => {
       loadProducts();
       renderAccountOptions();

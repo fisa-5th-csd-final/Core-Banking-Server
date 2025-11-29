@@ -124,7 +124,10 @@
         window.adminCommon;
     const state = { accounts: [], users: [], selectedUserId: null };
 
-    if (!ensureAdminOrRedirect()) return;
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchUsers();
+      renderAccountOptions();
+    });
 
     function renderAccountOptions() {
       const selects = ['txn-account-select','from-account-select','pay-account-select'];
@@ -205,9 +208,6 @@
       renderUsers();
       fetchAccounts();
     }
-
-    // 초기 로드 시 사용자 목록 불러오기
-    document.addEventListener('DOMContentLoaded', fetchUsers);
 
     async function deposit() {
       const account = document.getElementById('txn-account-select').value;
