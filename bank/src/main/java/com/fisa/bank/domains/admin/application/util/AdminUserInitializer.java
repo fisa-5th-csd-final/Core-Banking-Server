@@ -54,9 +54,9 @@ public class AdminUserInitializer implements CommandLineRunner {
       return; // 이미 존재하면 아무 것도 하지 않음
     }
 
-    String rawPassword = adminSeedPassword == null || adminSeedPassword.isBlank()
-        ? DEFAULT_PASSWORD
-        : adminSeedPassword.trim();
+      String rawPassword = adminSeedPassword.isBlank()
+              ? DEFAULT_PASSWORD
+              : adminSeedPassword.trim();
     String encodedPassword = passwordEncoder.encode(rawPassword);
 
     UserAuth adminAuth = UserAuth.createAdmin(DEFAULT_LOGIN_ID, encodedPassword);
