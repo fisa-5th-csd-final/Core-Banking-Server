@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.fisa.bank.domains.admin.application.dto.AdminUserSummaryResponse;
 import com.fisa.bank.domains.user.persistence.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminUserService {
@@ -16,6 +17,7 @@ public class AdminUserService {
     this.userRepository = userRepository;
   }
 
+  @Transactional(readOnly = true)
   public List<AdminUserSummaryResponse> getUsers() {
     return userRepository.findAll().stream()
         .map(
