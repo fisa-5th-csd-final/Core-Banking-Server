@@ -22,6 +22,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fisa.bank.domains.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.domains.common.config.security.resource.RefreshTokenFilter;
+import com.fisa.bank.domains.common.config.security.resource.LogoutCookieFilter;
 import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 
 // OAuth2.0 Authorization Server 를 설정하는 Config
@@ -118,6 +120,20 @@ public class AuthorizationConfig {
     return new JwtAuthenticationProvider(jwtDecoder);
   }
 
+  @Bean
+  public RefreshTokenFilter refreshTokenFilter(
+      JwtDecoder jwtDecoder,
+      UserJwtGenerator userJwtGenerator,
+      UserAuthRepository userAuthRepository,
+      ObjectMapper objectMapper) {
+    return new RefreshTokenFilter(jwtDecoder, userJwtGenerator, userAuthRepository, objectMapper);
+  }
+
+  @Bean
+  public LogoutCookieFilter logoutCookieFilter() {
+    return new LogoutCookieFilter();
+  }
+
   /** jwt 인증필터 서블릿 필터에서 제외 */
   @Bean
   public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(
@@ -146,4 +162,23 @@ public class AuthorizationConfig {
     registrationBean.setEnabled(false); // 서블릿 필터에서 제거
     return registrationBean;
   }
+
+  @Bean
+    public FilterRegistrationBean<LogoutCookieFilter> logoutCookieFilterFilterRegistrationBean(
+            LogoutCookieFilter logoutCookieFilter){
+      FilterRegistrationBean<LogoutCookieFilter> registrationBean =
+              new FilterRegistrationBean<>(logoutCookieFilter);
+      registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+      return registrationBean;
+  }
+
+    @Bean
+    public FilterRegistrationBean<RefreshTokenFilter> logoutCookieFilterFilterRegistrationBean(
+            RefreshTokenFilter refreshTokenFilter){
+        FilterRegistrationBean<RefreshTokenFilter> registrationBean =
+                new FilterRegistrationBean<>(refreshTokenFilter);
+        registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+        return registrationBean;
+    }
+
 }
