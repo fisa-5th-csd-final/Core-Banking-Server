@@ -121,6 +121,17 @@ public class LoanService {
   @VerifyOwner(domain = DomainType.ACCOUNT, idParam = "accountNumber")
   public LoanApplyforResponse applyForLoan(LoanApplyForRequest request, Long loanProductId) {
     UserId userId = requesterInfo.getUserId();
+    return applyForLoanInternal(userId, request, loanProductId);
+  }
+
+  @Transactional
+  public LoanApplyforResponse applyForLoanAsAdmin(
+      Long targetUserId, LoanApplyForRequest request, Long loanProductId) {
+    return applyForLoanInternal(UserId.of(targetUserId), request, loanProductId);
+  }
+
+  private LoanApplyforResponse applyForLoanInternal(
+      UserId userId, LoanApplyForRequest request, Long loanProductId) {
     // 유저 정보 추출
     User user = userReader.getUserById(userId.getValue());
     String accountNumber = request.getAccountNumber();
@@ -392,6 +403,12 @@ public class LoanService {
   @Transactional(readOnly = true)
   public List<LoanLedgerResponse> getMyLoanLedgers() {
     Long userId = requesterInfo.getUserId().getValue();
+    List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
+    return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<LoanLedgerResponse> getLoanLedgersByUser(Long userId) {
     List<LoanLedger> loanLedgers = loanReader.findAllByUserId(userId);
     return loanLedgers.stream().map(LoanLedgerResponse::from).toList();
   }

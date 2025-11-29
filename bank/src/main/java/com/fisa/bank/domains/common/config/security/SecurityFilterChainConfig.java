@@ -26,6 +26,9 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
+import com.fisa.bank.domains.common.config.security.resource.AdminPageAuthFilter;
+import com.fisa.bank.domains.common.config.security.resource.LogoutCookieFilter;
+import com.fisa.bank.domains.common.config.security.resource.RefreshTokenFilter;
 import com.fisa.bank.domains.common.config.security.resource.RequiredAuthenticationEntryPoint;
 import com.fisa.bank.domains.common.config.security.resource.UnknownEndPointFilter;
 
@@ -97,7 +100,10 @@ public class SecurityFilterChainConfig {
   @Order(2)
   // [일반 사용자용] 인증이 필요하지 않은 엔드포인트
   public SecurityFilterChain unAuthenticated(
-      HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter)
+      HttpSecurity http,
+      @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter,
+      LogoutCookieFilter logoutCookieFilter,
+      RefreshTokenFilter refreshTokenFilter)
       throws Exception {
     commonConfiguration(http);
 
@@ -109,15 +115,22 @@ public class SecurityFilterChainConfig {
                         "/api/loans/products",
                         "/api/loans/{loanProductId:\\d+}",
                         "/api/interests/{loanProductId:\\d+}",
-                        "/swagger-ui/**", // TODO: Swagger 전용 필터체인으로 분리
-                        "/v3/api-docs/**", // TODO: Swagger 전용 필터체인으로 분리
-                        "/swagger-resources/**" // TODO: Swagger 전용 필터체인으로 분리
-                        )
-                    .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/loans",
+                        "/api/login",
+                        "/api/users",
+                        "/api/token/refresh",
+                        "/api/logout")
                     .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
-        .authorizeHttpRequests(request -> request.anyRequest().permitAll());
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
+    http.addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(logoutCookieFilter, UsernamePasswordAuthenticationFilter.class);
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
     return http.build();
@@ -125,6 +138,61 @@ public class SecurityFilterChainConfig {
 
   @Bean
   @Order(3)
+  // [관리자용] 관리자 전용 엔드포인트 시큐리티 필터체인
+  public SecurityFilterChain admin(
+      HttpSecurity http,
+      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter,
+      AdminPageAuthFilter adminPageAuthFilter)
+      throws Exception {
+
+    commonConfiguration(http);
+
+    http.securityMatchers(
+            matcher ->
+                matcher
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/admin",
+                        "/admin/login",
+                        "/admin/accounts",
+                        "/admin/loans",
+                        "/admin/products",
+                        "/js/**")
+                    .requestMatchers(
+                        HttpMethod.POST, "/admin/accounts", "/admin/loans", "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.PUT, "/admin/accounts", "/admin/loans", "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.DELETE, "/admin/accounts", "/admin/loans", "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/admin/users",
+                        "/api/admin/users/*/accounts",
+                        "/api/admin/users/*/loans",
+                        "/api/admin/loans/*")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/admin/users/*/accounts",
+                        "/api/admin/accounts/*/withdraw",
+                        "/api/admin/accounts/*/deposit",
+                        "/api/admin/accounts/transfer",
+                        "/api/admin/accounts/*/pay",
+                        "/api/admin/users/*/loans/*",
+                        "/api/admin/loans/*/repayment")
+                    .requestMatchers(
+                        HttpMethod.DELETE, "/api/admin/accounts/*", "/api/admin/loans/*"))
+        .authorizeHttpRequests(
+            auth -> auth.requestMatchers("/admin/login").permitAll().anyRequest().hasRole("ADMIN"));
+
+    http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(adminPageAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));
+    http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
+
+  @Bean
+  @Order(4)
   // [일반 사용자용] 인증이 필요한 엔드포인트 시큐리티 필터체인
   public SecurityFilterChain authenticated(
       HttpSecurity http,
@@ -173,7 +241,7 @@ public class SecurityFilterChainConfig {
 
   /** 시큐리티 기본 로그인 및 에러 리다이렉트 필터체인 */
   @Bean
-  @Order(4)
+  @Order(5)
   public SecurityFilterChain loginFilterChain(
       HttpSecurity http,
       @Qualifier("UsernamePasswordAuthenticationProvider")
@@ -193,7 +261,7 @@ public class SecurityFilterChainConfig {
   }
 
   @Bean
-  @Order(5)
+  @Order(6)
   public SecurityFilterChain unknownFilterChain(
       HttpSecurity httpSecurity, UnknownEndPointFilter unknownEndPointFilter) throws Exception {
     httpSecurity.securityMatcher("/**");

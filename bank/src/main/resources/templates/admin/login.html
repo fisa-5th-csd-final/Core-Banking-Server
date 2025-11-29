@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 로그인</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --panel: rgba(255, 255, 255, 0.9);
+      --accent: #0d6efd;
+      --accent-2: #00b7ff;
+      --text: #0a2540;
+      --muted: #425466;
+      --border: #d8e3f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Pretendard', 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(0, 183, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(13, 110, 253, 0.12), transparent 30%),
+        linear-gradient(180deg, #f7fbff, #eef5ff 45%, #f7fbff 80%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 48px rgba(12, 70, 156, 0.12);
+      backdrop-filter: blur(6px);
+      overflow: hidden;
+    }
+    .card:before {
+      content: '';
+      position: absolute;
+      right: -60px;
+      bottom: -80px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(0, 183, 255, 0.18), transparent 60%);
+    }
+    h1 { margin: 0 0 10px; letter-spacing: -0.02em; }
+    p { margin: 0 0 14px; color: var(--muted); }
+    label { display: block; margin: 10px 0 6px; font-size: 13px; color: var(--muted); }
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      background: #fff;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .button {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      box-shadow: 0 14px 30px rgba(13, 110, 253, 0.22);
+      cursor: pointer;
+    }
+    .status { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>관리자 로그인</h1>
+    <p>ADMIN 권한 계정으로 로그인하세요.</p>
+    <label for="loginId">Login ID</label>
+    <input id="loginId" type="text" placeholder="admin" />
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="••••••" />
+    <button class="button" onclick="login()">로그인</button>
+    <button class="button" style="background:#fff;color:#0a2540;border:1px solid var(--border);box-shadow:none;margin-top:10px;" onclick="logout()">로그아웃</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        login();
+      }
+    });
+
+    // 클라이언트에서는 로그인 유무 판별 없이 사용자가 로그인 시도하도록 둔다.
+
+    async function login() {
+      const loginId = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('password').value.trim();
+      if (!loginId || !password) {
+        status.textContent = '아이디와 비밀번호를 입력하세요.';
+        return;
+      }
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ loginId, password }),
+        });
+        if (!res.ok) {
+          status.textContent = '로그인 실패: ' + res.status;
+          return;
+        }
+        // 토큰은 쿠키로 처리하므로 바디 저장 없이 바로 이동
+        const text = await res.text();
+        try {
+          const json = JSON.parse(text);
+          if (json && json.access_token && !hasAdminRole(json.access_token)) {
+            status.textContent = '로그인 실패: 관리자가 아닙니다.';
+            return;
+          }
+        } catch (_) {
+          // 바디 파싱 실패 시에도 쿠키만으로 진행
+        }
+        status.textContent = '로그인 성공! 잠시 후 이동합니다...';
+        setTimeout(() => (window.location.href = '/admin'), 500);
+      } catch (e) {
+        status.textContent = '로그인 실패: ' + e;
+      }
+    }
+
+    function logout() {
+      fetch('/api/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+        status.textContent = '로그아웃되었습니다. 다시 로그인하세요.';
+      });
+    }
+
+    function hasAdminRole(token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        const roles = payload.role || payload.roles || [];
+        return Array.isArray(roles) && roles.includes('ROLE_ADMIN');
+      } catch (_) {
+        return false;
+      }
+    }
+  </script>
+</body>
+</html>

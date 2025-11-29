@@ -118,6 +118,34 @@ public class AuthorizationConfig {
     return new JwtAuthenticationProvider(jwtDecoder);
   }
 
+  @Bean
+  public RefreshTokenFilter refreshTokenFilter(
+      JwtDecoder jwtDecoder,
+      UserJwtGenerator userJwtGenerator,
+      UserAuthRepository userAuthRepository,
+      ObjectMapper objectMapper) {
+    RequestMatcher matcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/token/refresh");
+    return new RefreshTokenFilter(
+        jwtDecoder, userJwtGenerator, userAuthRepository, objectMapper, matcher);
+  }
+
+  @Bean
+  public LogoutCookieFilter logoutCookieFilter() {
+    RequestMatcher matcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/logout");
+    return new LogoutCookieFilter(matcher);
+  }
+
+  @Bean
+  public AdminPageAuthFilter adminPageAuthFilter() {
+    RequestMatcher matcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/**");
+    RequestMatcher loginMatcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/login");
+    return new AdminPageAuthFilter(matcher, loginMatcher);
+  }
+
   /** jwt 인증필터 서블릿 필터에서 제외 */
   @Bean
   public FilterRegistrationBean<AuthenticationFilter> jwtFilterRegistrationBean(
@@ -144,6 +172,33 @@ public class AuthorizationConfig {
     FilterRegistrationBean<UnknownEndPointFilter> registrationBean =
         new FilterRegistrationBean<>(unknownEndPointFilter);
     registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean<LogoutCookieFilter> logoutCookieFilterRegistrationBean(
+      LogoutCookieFilter logoutCookieFilter) {
+    FilterRegistrationBean<LogoutCookieFilter> registrationBean =
+        new FilterRegistrationBean<>(logoutCookieFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean<RefreshTokenFilter> refreshTokenFilterRegistrationBean(
+      RefreshTokenFilter refreshTokenFilter) {
+    FilterRegistrationBean<RefreshTokenFilter> registrationBean =
+        new FilterRegistrationBean<>(refreshTokenFilter);
+    registrationBean.setEnabled(false); // 서블릿 필터에서 제거
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean<AdminPageAuthFilter> adminPageAuthFilterFilterRegistrationBean(
+      AdminPageAuthFilter adminPageAuthFilter) {
+    FilterRegistrationBean<AdminPageAuthFilter> registrationBean =
+        new FilterRegistrationBean<>(adminPageAuthFilter);
+    registrationBean.setEnabled(false);
     return registrationBean;
   }
 }

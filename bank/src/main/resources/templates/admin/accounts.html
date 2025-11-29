@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>계좌 관리 | 관리자</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --panel: rgba(255, 255, 255, 0.9);
+      --accent: #0d6efd;
+      --accent-2: #00b7ff;
+      --text: #0a2540;
+      --muted: #425466;
+      --border: #d8e3f2;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Pretendard', 'Segoe UI', sans-serif; background: radial-gradient(circle at 20% 20%, rgba(0, 183, 255, 0.12), transparent 28%), radial-gradient(circle at 80% 0%, rgba(13, 110, 253, 0.12), transparent 30%), linear-gradient(180deg, #f7fbff, #eef5ff 45%, #f7fbff 80%); color: var(--text); }
+    header { position: relative; overflow: hidden; padding: 26px; background: linear-gradient(135deg, #e5f1ff, #f9fdff); border-bottom: 1px solid var(--border); }
+    header:after { content:''; position:absolute; right:-120px; top:-140px; width:320px; height:320px; border-radius:50%; background: radial-gradient(circle, rgba(0,183,255,0.22), transparent 60%); filter: blur(10px); }
+    h1 { margin: 0 0 6px; letter-spacing:-0.02em; }
+    p { margin: 0; color: var(--muted); }
+    .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); padding: 22px; }
+    .card { position:relative; overflow:hidden; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 16px 36px rgba(12, 70, 156, 0.08); backdrop-filter: blur(4px); }
+    .card:before { content:''; position:absolute; right:-40px; bottom:-50px; width:150px; height:150px; background: radial-gradient(circle, rgba(0,183,255,0.16), transparent 60%); }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
+    input, select { width: 100%; padding: 11px; border-radius: 12px; border: 1px solid var(--border); font-size: 14px; background:#fff; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); }
+    button { margin-top: 12px; width: 100%; padding: 11px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 12px 26px rgba(13,110,253,0.22); letter-spacing:-0.01em; }
+    .ghost { background:#fff; color: var(--text); border:1px solid var(--border); box-shadow:none; }
+    .row { display: flex; gap: 10px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .pill { padding: 6px 10px; border-radius: 18px; border: 1px solid var(--border); background: #f8fbff; }
+    .result { background: #0f172a; color: #e5e7eb; border-radius: 12px; padding: 14px; margin: 20px; min-height: 160px; white-space: pre-wrap; font-family: 'JetBrains Mono','SFMono-Regular', monospace; box-shadow: 0 16px 32px rgba(0,0,0,0.08); }
+    .link-back { color: var(--accent); text-decoration: none; font-weight: 800; }
+    .user-list { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:10px; margin-top:10px; }
+    .user-card { padding: 12px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer; transition: border-color 120ms ease, box-shadow 120ms ease; }
+    .user-card:hover { border-color: var(--accent); box-shadow: 0 8px 20px rgba(13,110,253,0.12); }
+    .user-card.active { border-color: var(--accent); box-shadow: 0 8px 20px rgba(13,110,253,0.16); background: #e7f2ff; }
+    .user-name { font-weight:700; }
+    .user-sub { color: var(--muted); font-size: 13px; margin-top:4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="link-back" href="/admin">← 관리자 홈</a>
+    <h1>계좌 관리</h1>
+    <p>ADMIN 로그인 후 이동한 페이지입니다. 토큰이 없으면 홈으로 이동합니다.</p>
+    <div style="max-width:520px; margin-top: 10px;">
+      <label for="token">Access Token (읽기 전용)</label>
+      <input id="token" type="text" readonly />
+      <button style="margin-top:10px; padding:10px; border-radius:10px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer;" onclick="logoutAndRedirect()">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h3>계좌 생성</h3>
+      <label>선택된 사용자</label>
+      <div id="selected-user" style="padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff; min-height:36px;">사용자를 선택하세요.</div>
+      <label style="display:flex; align-items:center; gap:8px; margin-top:12px;">
+        <input id="income" type="checkbox" style="width:auto;" /> 급여 계좌로 생성
+      </label>
+      <button onclick="createAccount()">계좌 생성</button>
+    </div>
+
+    <div class="card">
+      <h3>사용자 선택</h3>
+      <div class="user-list" id="user-list"></div>
+      <button class="ghost" onclick="fetchUsers()">목록 새로고침</button>
+      <div class="hint">사용자를 클릭하면 해당 사용자의 계좌가 로드됩니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>계좌 목록</h3>
+      <div id="account-pills" class="pill-row"></div>
+    </div>
+
+    <div class="card">
+      <h3>입금 / 출금</h3>
+      <label>계좌 선택</label>
+      <select id="txn-account-select"></select>
+      <label>금액</label>
+      <input id="txn-amount" type="number" />
+      <div class="row">
+        <button onclick="deposit()">입금</button>
+        <button onclick="withdraw()">출금</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>송금</h3>
+      <label>보내는 계좌</label>
+      <select id="from-account-select"></select>
+      <label>받는 계좌 번호</label>
+      <input id="to-account" type="text" />
+      <label>받는 은행 코드</label>
+      <input id="to-bank" type="text" value="001" />
+      <label>금액</label>
+      <input id="transfer-amount" type="number" />
+      <button onclick="transfer()">송금</button>
+    </div>
+
+    <div class="card">
+      <h3>카드 결제</h3>
+      <label>결제 계좌</label>
+      <select id="pay-account-select"></select>
+      <label>금액</label>
+      <input id="pay-amount" type="number" />
+      <label>가맹점</label>
+      <input id="pay-store" type="text" placeholder="STORE" />
+      <label>카테고리</label>
+      <input id="pay-category" type="text" placeholder="FOOD" />
+      <button onclick="pay()">결제 처리</button>
+    </div>
+  </div>
+
+  <div class="result" id="result">응답이 여기에 표시됩니다.</div>
+
+  <script src="/js/admin-common.js"></script>
+  <script>
+    const resultBox = document.getElementById('result');
+    const tokenInput = document.getElementById('token');
+    const { callApi, extractPayload, hasAdminRole, ensureAdminOrRedirect, logoutAndRedirect } =
+        window.adminCommon;
+    const state = { accounts: [], users: [], selectedUserId: null };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchUsers();
+      renderAccountOptions();
+    });
+
+    function renderAccountOptions() {
+      const selects = ['txn-account-select','from-account-select','pay-account-select'];
+      selects.forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '';
+        const ph = document.createElement('option'); ph.value = ''; ph.textContent = '계좌 선택'; sel.appendChild(ph);
+        state.accounts.forEach(a => {
+          const opt = document.createElement('option');
+          const num = a.accountNumber ?? a.account_number;
+          opt.value = num;
+          opt.textContent = `${num} (잔액: ${a.balance ?? '-'})`;
+          sel.appendChild(opt);
+        });
+      });
+      const pills = document.getElementById('account-pills');
+      pills.innerHTML = '';
+      state.accounts.forEach(a => {
+        const pill = document.createElement('div'); pill.className = 'pill'; pill.textContent = `${a.accountNumber ?? a.account_number} · 잔액 ${a.balance ?? '-'}`; pills.appendChild(pill);
+      });
+    }
+
+    function renderUsers() {
+      const wrap = document.getElementById('user-list');
+      wrap.innerHTML = '';
+      state.users.forEach(u => {
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        if (state.selectedUserId === u.userId) card.classList.add('active');
+        card.onclick = () => selectUser(u.userId);
+
+        const name = document.createElement('div');
+        name.className = 'user-name';
+        name.textContent = `${u.name} (#${u.userId})`;
+        const sub = document.createElement('div');
+        sub.className = 'user-sub';
+        sub.textContent = `loginId: ${u.loginId}`;
+
+        card.appendChild(name);
+        card.appendChild(sub);
+        wrap.appendChild(card);
+      });
+      const sel = document.getElementById('selected-user');
+      if (state.selectedUserId) {
+        const user = state.users.find(u => u.userId === state.selectedUserId);
+        sel.textContent = user ? `${user.name} (#${user.userId}) / ${user.loginId}` : '선택됨';
+      } else {
+        sel.textContent = '사용자를 선택하세요.';
+      }
+    }
+
+    async function createAccount() {
+      const userId = state.selectedUserId;
+      if (!userId) return alert('사용자를 먼저 선택하세요.');
+      const income = document.getElementById('income').checked;
+      await callApi('POST', `/api/admin/users/${userId}/accounts?income=${income}`, null);
+    }
+
+    async function fetchAccounts() {
+      const userId = state.selectedUserId;
+      if (!userId) return alert('사용자를 먼저 선택하세요.');
+      const json = await callApi('GET', `/api/admin/users/${userId}/accounts`);
+      const payload = extractPayload(json);
+      if (Array.isArray(payload)) { state.accounts = payload; renderAccountOptions(); }
+    }
+
+    async function fetchUsers() {
+      const json = await callApi('GET', '/api/admin/users');
+      const payload = extractPayload(json);
+      if (Array.isArray(payload)) {
+        state.users = payload;
+        renderUsers();
+      }
+    }
+
+    function selectUser(userId) {
+      state.selectedUserId = userId;
+      renderUsers();
+      fetchAccounts();
+    }
+
+    async function deposit() {
+      const account = document.getElementById('txn-account-select').value;
+      const amount = Number(document.getElementById('txn-amount').value);
+      if (!account) return resultBox.textContent = '계좌를 선택하세요.';
+      await callApi('POST', `/api/admin/accounts/${account}/deposit`, { amount });
+    }
+
+    async function withdraw() {
+      const account = document.getElementById('txn-account-select').value;
+      const amount = Number(document.getElementById('txn-amount').value);
+      if (!account) return resultBox.textContent = '계좌를 선택하세요.';
+      await callApi('POST', `/api/admin/accounts/${account}/withdraw`, { amount });
+    }
+
+    async function transfer() {
+      const fromAccountNumber = document.getElementById('from-account-select').value;
+      const toAccountNumber = document.getElementById('to-account').value;
+      const toBankCode = document.getElementById('to-bank').value;
+      const amount = Number(document.getElementById('transfer-amount').value);
+      if (!fromAccountNumber) return resultBox.textContent = '보내는 계좌를 선택하세요.';
+      await callApi('POST', '/api/admin/accounts/transfer', { fromAccountNumber, toAccountNumber, toBankCode, amount });
+    }
+
+    async function pay() {
+      const accountNumber = document.getElementById('pay-account-select').value;
+      const amount = Number(document.getElementById('pay-amount').value);
+      const storeName = document.getElementById('pay-store').value;
+      const category = document.getElementById('pay-category').value;
+      if (!accountNumber) return resultBox.textContent = '결제 계좌를 선택하세요.';
+      await callApi('POST', `/api/admin/accounts/${accountNumber}/pay`, { amount, storeName, category });
+    }
+
+    renderAccountOptions();
+  </script>
+</body>
+</html>

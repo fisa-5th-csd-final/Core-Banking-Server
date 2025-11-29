@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대출 관리 | 관리자</title>
+  <style>
+    :root { --bg:#f4f9ff; --panel:rgba(255,255,255,0.9); --accent:#0d6efd; --accent-2:#00b7ff; --text:#0a2540; --muted:#425466; --border:#d8e3f2; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Pretendard','Segoe UI',sans-serif; background:radial-gradient(circle at 18% 22%, rgba(0,183,255,0.12), transparent 28%), radial-gradient(circle at 78% 6%, rgba(13,110,253,0.12), transparent 30%), linear-gradient(180deg, #f7fbff, #eef5ff 45%, #f7fbff 80%); color:var(--text); }
+    header { position:relative; overflow:hidden; padding:24px; background:linear-gradient(135deg, #e5f1ff, #f9fdff); border-bottom:1px solid var(--border); }
+    header:after { content:''; position:absolute; right:-120px; top:-140px; width:320px; height:320px; border-radius:50%; background: radial-gradient(circle, rgba(0,183,255,0.22), transparent 60%); filter: blur(10px); }
+    h1 { margin:0 0 6px; letter-spacing:-0.02em; }
+    p { margin:0; color:var(--muted); }
+    .grid { display:grid; gap:18px; grid-template-columns: repeat(auto-fit,minmax(340px,1fr)); padding:22px; }
+    .card { position:relative; overflow:hidden; background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 16px 36px rgba(12,70,156,0.08); backdrop-filter: blur(4px); }
+    .card:before { content:''; position:absolute; right:-40px; bottom:-50px; width:150px; height:150px; background: radial-gradient(circle, rgba(0,183,255,0.16), transparent 60%); }
+    label { display:block; font-size:13px; color:var(--muted); margin:8px 0 4px; }
+    input, select { width:100%; padding:11px; border-radius:12px; border:1px solid var(--border); font-size:14px; background:#fff; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); }
+    button { margin-top:12px; width:100%; padding:11px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:12px; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(13,110,253,0.22); letter-spacing:-0.01em; }
+    .pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .pill { padding:6px 10px; border-radius:18px; border:1px solid var(--border); background:#f8fbff; }
+    .result { background:#0f172a; color:#e5e7eb; border-radius:12px; padding:14px; margin:20px; min-height:160px; white-space:pre-wrap; font-family:'JetBrains Mono','SFMono-Regular',monospace; box-shadow:0 16px 32px rgba(0,0,0,0.08); }
+    .link-back { color: var(--accent); text-decoration: none; font-weight: 800; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="link-back" href="/admin">← 관리자 홈</a>
+    <h1>대출 관리</h1>
+    <p>ADMIN 로그인 후 접근 가능합니다. 토큰이 없으면 홈으로 이동합니다.</p>
+    <div style="max-width:520px; margin-top: 10px;">
+      <label for="token">Access Token (읽기 전용)</label>
+      <input id="token" type="text" readonly />
+      <button style="margin-top:10px; padding:10px; border-radius:10px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer;" onclick="logoutAndRedirect()">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h3>사용자 선택</h3>
+      <button onclick="fetchUsers()">사용자 목록 불러오기</button>
+      <div id="user-pills" class="pill-row" style="margin-top:8px;"></div>
+      <div class="hint">사용자를 선택하면 계좌와 대출 작업 대상이 됩니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>대출 상품 선택</h3>
+      <label>대출 상품</label>
+      <select id="loan-product-select"></select>
+      <button onclick="loadProducts()">상품 목록 새로고침</button>
+      <div id="product-list" class="pill-row"></div>
+    </div>
+
+    <div class="card">
+      <h3>대출 가입</h3>
+      <label>사용자 (선택됨)</label>
+      <div id="selected-user" style="padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff; min-height:36px;">사용자를 선택하세요.</div>
+      <label>대출 상품</label>
+      <select id="loan-product-select-join"></select>
+      <label>대출 계좌</label>
+      <select id="loan-account-select"></select>
+      <label>원금</label>
+      <input id="loan-principal" type="number" />
+      <label>금리 유형</label>
+      <select id="loan-interest">
+        <option value="FIXED">FIXED</option>
+        <option value="VARIABLE">VARIABLE</option>
+      </select>
+      <label>상환 방법</label>
+      <select id="loan-repayment">
+        <option value="EQUAL_INSTALLMENT">EQUAL_INSTALLMENT</option>
+        <option value="EQUAL_PRINCIPAL">EQUAL_PRINCIPAL</option>
+        <option value="BULLET">BULLET</option>
+      </select>
+      <label>상환 기간(년)</label>
+      <input id="loan-term" type="number" />
+      <label>자동 예치 여부</label>
+      <select id="loan-auto">
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
+      <button onclick="applyLoan()">대출 가입</button>
+    </div>
+
+    <div class="card">
+      <h3>대출 상환 / 해지</h3>
+      <label>대출 원장 ID</label>
+      <input id="ledger-id" type="number" />
+      <label>상환 금액</label>
+      <input id="repay-amount" type="number" />
+      <button onclick="repayLoan()">상환</button>
+      <button onclick="cancelLoan()">해지</button>
+    </div>
+
+    <div class="card">
+      <h3>사용자 대출 목록</h3>
+      <label>사용자 ID</label>
+      <input id="loan-list-user" type="number" />
+      <button onclick="fetchLoans()">조회</button>
+    </div>
+  </div>
+
+  <div class="result" id="result">응답이 여기에 표시됩니다.</div>
+
+  <script src="/js/admin-common.js"></script>
+  <script>
+    const resultBox = document.getElementById('result');
+    const tokenInput = document.getElementById('token');
+    const { callApi, extractPayload, hasAdminRole, ensureAdminOrRedirect, logoutAndRedirect } =
+        window.adminCommon;
+    const state = { products: [], accounts: [], users: [], selectedUserId: null };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+      renderAccountOptions();
+      fetchUsers();
+    });
+
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/loans/products?size=50');
+        const json = await res.json();
+        const payload = extractPayload(json);
+        state.products = payload?.content ?? payload ?? [];
+        renderProducts();
+      } catch (e) { resultBox.textContent = '대출 상품 조회 실패: ' + e; }
+    }
+
+    function renderProducts() {
+      const select = document.getElementById('loan-product-select');
+      const selectJoin = document.getElementById('loan-product-select-join');
+      const list = document.getElementById('product-list');
+      select.innerHTML = ''; selectJoin.innerHTML = ''; list.innerHTML = '';
+      state.products.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.loanProductId ?? p.id ?? p.loanProductId;
+        option.textContent = `${p.name ?? '상품'} (#${option.value})`;
+        select.appendChild(option.cloneNode(true));
+        selectJoin.appendChild(option);
+        const pill = document.createElement('div'); pill.className='pill'; pill.textContent = `${p.name ?? '상품'} · ${p.type ?? ''}`; list.appendChild(pill);
+      });
+    }
+
+    function renderAccountOptions() {
+      const sel = document.getElementById('loan-account-select');
+      sel.innerHTML = '';
+      const ph = document.createElement('option'); ph.value=''; ph.textContent='계좌 선택'; sel.appendChild(ph);
+      state.accounts.forEach(a => {
+        const opt = document.createElement('option');
+        const num = a.accountNumber ?? a.account_number;
+        opt.value = num; opt.textContent = `${num} (잔액: ${a.balance ?? '-'})`;
+        sel.appendChild(opt);
+      });
+      const pills = document.getElementById('account-pills'); pills.innerHTML='';
+      state.accounts.forEach(a => { const pill = document.createElement('div'); pill.className='pill'; pill.textContent = `${a.accountNumber ?? a.account_number} · 잔액 ${a.balance ?? '-'}`; pills.appendChild(pill); });
+    }
+
+    function renderUsers() {
+      const wrap = document.getElementById('user-pills');
+      wrap.innerHTML = '';
+      state.users.forEach(u => {
+        const pill = document.createElement('div');
+        pill.className = 'pill';
+        pill.style.cursor = 'pointer';
+        pill.textContent = `${u.name} (#${u.userId}) / ${u.loginId}`;
+        pill.onclick = () => selectUser(u.userId);
+        if (state.selectedUserId === u.userId) {
+          pill.style.background = '#e7f2ff';
+          pill.style.borderColor = '#0d6efd';
+        }
+        wrap.appendChild(pill);
+      });
+      const selected = document.getElementById('selected-user');
+      if (state.selectedUserId) {
+        const user = state.users.find(u => u.userId === state.selectedUserId);
+        selected.textContent = user ? `${user.name} (#${user.userId}) / ${user.loginId}` : '선택됨';
+      } else {
+        selected.textContent = '사용자를 선택하세요.';
+      }
+    }
+
+    function selectUser(userId) {
+      state.selectedUserId = userId;
+      renderUsers();
+      fetchAccounts();
+    }
+
+    async function fetchAccounts() {
+      const userId = state.selectedUserId;
+      if (!userId) return;
+      const json = await callApi('GET', `/api/admin/users/${userId}/accounts`);
+      const payload = extractPayload(json);
+      if (Array.isArray(payload)) { state.accounts = payload; renderAccountOptions(); }
+    }
+
+    async function fetchUsers() {
+      const json = await callApi('GET', '/api/admin/users');
+      const payload = extractPayload(json);
+      if (Array.isArray(payload)) {
+        state.users = payload;
+        renderUsers();
+      }
+    }
+
+    async function applyLoan() {
+      const userId = state.selectedUserId;
+      const loanProductId = document.getElementById('loan-product-select-join').value;
+      const accountNumber = document.getElementById('loan-account-select').value;
+      const principal = Number(document.getElementById('loan-principal').value);
+      const interestType = document.getElementById('loan-interest').value;
+      const repaymentType = document.getElementById('loan-repayment').value;
+      const term = Number(document.getElementById('loan-term').value);
+      const autoDepositEnabled = document.getElementById('loan-auto').value === 'true';
+      if (!userId) return resultBox.textContent = '사용자를 선택하세요.';
+      if (!loanProductId || !accountNumber) return resultBox.textContent = '대출 상품과 계좌를 선택하세요.';
+      await callApi('POST', `/api/admin/users/${userId}/loans/${loanProductId}`, { principal, interestType, repaymentType, term, accountNumber, autoDepositEnabled });
+    }
+
+    async function repayLoan() {
+      const loanLedgerId = document.getElementById('ledger-id').value;
+      const amount = Number(document.getElementById('repay-amount').value);
+      await callApi('POST', `/api/admin/loans/${loanLedgerId}/repayment`, { amount });
+    }
+
+    async function cancelLoan() {
+      const loanLedgerId = document.getElementById('ledger-id').value;
+      await callApi('DELETE', `/api/admin/loans/${loanLedgerId}`);
+    }
+
+    async function fetchLoans() {
+      const userId = state.selectedUserId;
+      if (!userId) return resultBox.textContent = '사용자를 선택하세요.';
+      await callApi('GET', `/api/admin/users/${userId}/loans`);
+    }
+  </script>
+</body>
+</html>

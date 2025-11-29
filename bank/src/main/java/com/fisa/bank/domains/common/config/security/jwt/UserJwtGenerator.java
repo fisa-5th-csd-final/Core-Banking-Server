@@ -34,10 +34,11 @@ public class UserJwtGenerator {
 
   public Jwt createAccessToken(Long userId, Collection<? extends GrantedAuthority> authorities) {
     ZonedDateTime now = LocalDateTime.now().atZone(KST);
+    var roles = authorities.stream().map(GrantedAuthority::getAuthority).toList();
     JwtClaimsSet claimsSet =
         JwtClaimsSet.builder()
             .claim(CLAIM_USER_ID, userId)
-            .claim(CLAIM_ROLE, authorities)
+            .claim(CLAIM_ROLE, roles)
             .issuer(CLAIM_ISSUER)
             .issuedAt(now.toInstant())
             .expiresAt(now.toInstant().plus(jwtProperties.getAccessTokenExpiration()))
