@@ -129,31 +129,15 @@
 
   <script>
     const loginStatus = document.getElementById('login-status');
-    const saved = localStorage.getItem('admin_token');
-    if (!saved || !hasAdminRole(saved)) {
-      loginStatus.textContent = '로그인이 필요하거나 ADMIN 권한이 없습니다. 로그인 페이지로 이동합니다.';
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      setTimeout(() => (window.location.href = '/admin/login'), 700);
-    } else {
-      loginStatus.textContent = '로그인 상태가 확인되었습니다. 메뉴를 선택하세요.';
-    }
+
+    // 클라이언트에서 토큰을 판별하지 않고, 로그인 페이지에서 쿠키 발급 후 메뉴를 사용하도록 안내
+    loginStatus.textContent = '로그인 후 메뉴를 선택하세요.';
 
     function logout() {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      loginStatus.textContent = '로그아웃되었습니다. 로그인 페이지로 이동합니다.';
-      setTimeout(() => (window.location.href = '/admin/login'), 400);
-    }
-
-    function hasAdminRole(token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-        const roles = payload.role || payload.roles || [];
-        return Array.isArray(roles) && roles.includes('ROLE_ADMIN');
-      } catch (_) {
-        return false;
-      }
+      fetch('/api/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+        loginStatus.textContent = '로그아웃되었습니다. 로그인 페이지로 이동합니다.';
+        setTimeout(() => (window.location.href = '/admin/login'), 400);
+      });
     }
   </script>
 </body>
