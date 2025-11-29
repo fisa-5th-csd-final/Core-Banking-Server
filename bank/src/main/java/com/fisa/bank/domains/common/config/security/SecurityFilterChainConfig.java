@@ -38,7 +38,7 @@ import com.fisa.bank.domains.common.config.security.resource.AdminPageAuthFilter
 public class SecurityFilterChainConfig {
 
   private final RequiredAuthenticationEntryPoint requiredAuthenticationEntryPoint;
-  private final AdminPageAuthFilter adminPageAuthFilter;
+
   @Bean
   @Order(1)
   // Authorization Server 필터 체인 설정
@@ -139,7 +139,8 @@ public class SecurityFilterChainConfig {
   // [관리자용] 관리자 전용 엔드포인트 시큐리티 필터체인
   public SecurityFilterChain admin(
       HttpSecurity http,
-      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
+      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter,
+      AdminPageAuthFilter adminPageAuthFilter)
       throws Exception {
 
     commonConfiguration(http);
