@@ -19,7 +19,7 @@ public class AdminUserService {
 
   @Transactional(readOnly = true)
   public List<AdminUserSummaryResponse> getUsers() {
-    return userRepository.findAll().stream()
+    return userRepository.findAllNonAdmin().stream()
         .map(
             user ->
                 new AdminUserSummaryResponse(
