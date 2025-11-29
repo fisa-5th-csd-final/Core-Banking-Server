@@ -31,9 +31,6 @@ public class AdminPageAuthFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    if (loginMatcher.matches(request)) {
-      return true; // 로그인 페이지는 통과
-    }
     return !matcher.matches(request);
   }
 
@@ -43,10 +40,28 @@ public class AdminPageAuthFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    boolean isLoginPage = loginMatcher.matches(request);
+
+    // 인증이 안된 경우
     if (authentication == null || !authentication.isAuthenticated()) {
-      log.debug("Unauthenticated admin page access, redirecting to /admin/login");
+        // 로그인 페이지일 경우
+      if (isLoginPage) {
+        filterChain.doFilter(request, response); // 필터 통과
+        return;
+      }
+        // 로그인 페이지가 아닌 경우, 로그인 페이지로 리다이렉트
+      log.debug("인증되지 않은 관리자 페이지 접근, 리다이렉트 : /admin/login");
       response.setStatus(HttpStatus.FOUND.value());
       response.setHeader("Location", "/admin/login");
+      return;
+    }
+
+    // 인증된 경우
+      // 로그인 페이지로 접속하려고 하는 경우
+    if (isLoginPage) {
+      // 이미 인증된 상태에서 /admin/login 접근 시 메인으로 이동
+      response.setStatus(HttpStatus.FOUND.value());
+      response.setHeader("Location", "/admin");
       return;
     }
 
