@@ -76,6 +76,6 @@ public class AdminUserInitializer implements CommandLineRunner {
     // 먼저 인증 엔티티를 저장한 뒤 User를 저장
     userAuthRepository.save(adminAuth);
     userRepository.save(adminUser);
-    log.info("Seeded admin account with loginId='{}'", DEFAULT_LOGIN_ID);
+    log.info("관리자 계정을 생성했습니다. loginId='{}'", DEFAULT_LOGIN_ID);
   }
 }
