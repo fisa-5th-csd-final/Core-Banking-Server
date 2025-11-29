@@ -109,14 +109,12 @@ public class SecurityFilterChainConfig {
                         "/api/loans/products",
                         "/api/loans/{loanProductId:\\d+}",
                         "/api/interests/{loanProductId:\\d+}",
-                        "/swagger-ui/**", // TODO: Swagger 전용 필터체인으로 분리
-                        "/v3/api-docs/**", // TODO: Swagger 전용 필터체인으로 분리
-                        "/swagger-resources/**", // TODO: Swagger 전용 필터체인으로 분리
-                        "/admin/login",
-                        "/admin/**")
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**")
                     .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
                     .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
-        .authorizeHttpRequests(request -> request.anyRequest().permitAll());
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
@@ -126,6 +124,37 @@ public class SecurityFilterChainConfig {
 
   @Bean
   @Order(3)
+  // [관리자용] 관리자 전용 엔드포인트 시큐리티 필터체인
+  public SecurityFilterChain admin(
+      HttpSecurity http,
+      @Qualifier("authenticatedFilter") AuthenticationFilter authenticationFilter)
+      throws Exception {
+
+    commonConfiguration(http);
+
+    http.securityMatchers(
+            matcher ->
+                matcher
+                    .requestMatchers(
+                        HttpMethod.GET, "/admin/**")
+                    .requestMatchers("/admin/login")
+                    .requestMatchers("/api/admin/**"))
+        .authorizeHttpRequests(
+            auth ->
+                auth
+                    .requestMatchers("/admin/login")
+                    .permitAll()
+                    .anyRequest()
+                    .hasRole("ADMIN"));
+
+    http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));
+    http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
+
+  @Bean
+  @Order(4)
   // [일반 사용자용] 인증이 필요한 엔드포인트 시큐리티 필터체인
   public SecurityFilterChain authenticated(
       HttpSecurity http,
@@ -163,15 +192,9 @@ public class SecurityFilterChainConfig {
                         "/api/accounts/{accountNumber}",
                         "/api/loans/{loanLedgerId:\\d+}")
                     .requestMatchers(
-                        HttpMethod.PATCH, "/api/loans/{loanLedgerId:\\d+}/auto-deposit")
-                    .requestMatchers("/api/admin/**"))
+                        HttpMethod.PATCH, "/api/loans/{loanLedgerId:\\d+}/auto-deposit"))
         .authorizeHttpRequests(
-            request ->
-                request
-                    .requestMatchers("/api/admin/**")
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .authenticated());
+            request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));
@@ -181,7 +204,7 @@ public class SecurityFilterChainConfig {
 
   /** 시큐리티 기본 로그인 및 에러 리다이렉트 필터체인 */
   @Bean
-  @Order(4)
+  @Order(5)
   public SecurityFilterChain loginFilterChain(
       HttpSecurity http,
       @Qualifier("UsernamePasswordAuthenticationProvider")
@@ -201,7 +224,7 @@ public class SecurityFilterChainConfig {
   }
 
   @Bean
-  @Order(5)
+  @Order(6)
   public SecurityFilterChain unknownFilterChain(
       HttpSecurity httpSecurity, UnknownEndPointFilter unknownEndPointFilter) throws Exception {
     httpSecurity.securityMatcher("/**");
