@@ -156,7 +156,8 @@ public class SecurityFilterChainConfig {
                         "/admin/login",
                         "/admin/accounts",
                         "/admin/loans",
-                        "/admin/products")
+                        "/admin/products",
+                        "/js/**")
                     .requestMatchers(
                         HttpMethod.POST, "/admin/accounts", "/admin/loans", "/admin/products")
                     .requestMatchers(
