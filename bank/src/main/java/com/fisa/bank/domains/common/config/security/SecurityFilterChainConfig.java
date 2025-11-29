@@ -136,9 +136,44 @@ public class SecurityFilterChainConfig {
             matcher ->
                 matcher
                     .requestMatchers(
-                        HttpMethod.GET, "/admin/**")
-                    .requestMatchers("/admin/login")
-                    .requestMatchers("/api/admin/**"))
+                        HttpMethod.GET,
+                        "/admin",
+                        "/admin/login",
+                        "/admin/accounts",
+                        "/admin/loans",
+                        "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/admin/accounts",
+                        "/admin/loans",
+                        "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.PUT,
+                        "/admin/accounts",
+                        "/admin/loans",
+                        "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/admin/accounts",
+                        "/admin/loans",
+                        "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/admin/users",
+                        "/api/admin/users/*/accounts",
+                        "/api/admin/users/*/loans",
+                        "/api/admin/loans/*")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/admin/users/*/accounts",
+                        "/api/admin/accounts/*/withdraw",
+                        "/api/admin/accounts/*/deposit",
+                        "/api/admin/accounts/transfer",
+                        "/api/admin/accounts/*/pay",
+                        "/api/admin/users/*/loans/*",
+                        "/api/admin/loans/*/repayment")
+                    .requestMatchers(
+                        HttpMethod.DELETE, "/api/admin/accounts/*", "/api/admin/loans/*"))
         .authorizeHttpRequests(
             auth ->
                 auth
