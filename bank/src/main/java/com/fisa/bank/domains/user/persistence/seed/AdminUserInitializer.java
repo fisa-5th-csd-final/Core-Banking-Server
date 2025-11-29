@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,14 +36,17 @@ public class AdminUserInitializer implements CommandLineRunner {
   private final UserAuthRepository userAuthRepository;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final String adminSeedPassword;
 
   public AdminUserInitializer(
       UserAuthRepository userAuthRepository,
       UserRepository userRepository,
-      @Qualifier("BcryptPasswordEncoder") PasswordEncoder passwordEncoder) {
+      @Qualifier("BcryptPasswordEncoder") PasswordEncoder passwordEncoder,
+      @Value("${admin.seed.password:Admin123!}") String adminSeedPassword) {
     this.userAuthRepository = userAuthRepository;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.adminSeedPassword = adminSeedPassword;
   }
 
   @Override
@@ -52,8 +56,9 @@ public class AdminUserInitializer implements CommandLineRunner {
       return; // 이미 존재하면 아무 것도 하지 않음
     }
 
-    String rawPassword =
-        System.getenv().getOrDefault("ADMIN_SEED_PASSWORD", DEFAULT_PASSWORD).trim();
+    String rawPassword = adminSeedPassword == null || adminSeedPassword.isBlank()
+        ? DEFAULT_PASSWORD
+        : adminSeedPassword.trim();
     String encodedPassword = passwordEncoder.encode(rawPassword);
 
     UserAuth adminAuth = UserAuth.createAdmin(DEFAULT_LOGIN_ID, encodedPassword);
