@@ -12,7 +12,8 @@ public final class CookieUtils {
 
   private CookieUtils() {}
 
-  public static void addTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+  public static void addTokenCookies(
+      HttpServletResponse response, String accessToken, String refreshToken) {
     addCookie(response, COOKIE_ACCESS_TOKEN, accessToken, true);
     addCookie(response, COOKIE_REFRESH_TOKEN, refreshToken, true);
   }
@@ -22,7 +23,8 @@ public final class CookieUtils {
     addCookie(response, COOKIE_REFRESH_TOKEN, "", true, 0);
   }
 
-  private static void addCookie(HttpServletResponse response, String name, String value, boolean httpOnly) {
+  private static void addCookie(
+      HttpServletResponse response, String name, String value, boolean httpOnly) {
     addCookie(response, name, value, httpOnly, -1);
   }
 

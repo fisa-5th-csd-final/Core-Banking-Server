@@ -1,13 +1,8 @@
 package com.fisa.bank.domains.admin.application.util;
 
-import com.fisa.bank.domains.user.persistence.entity.CreditRating;
-import com.fisa.bank.domains.user.persistence.entity.CustomerLevel;
-import com.fisa.bank.domains.user.persistence.entity.User;
-import com.fisa.bank.domains.user.persistence.entity.UserAuth;
-import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
-import com.fisa.bank.domains.user.persistence.repository.UserRepository;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +12,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fisa.bank.domains.user.persistence.entity.CreditRating;
+import com.fisa.bank.domains.user.persistence.entity.CustomerLevel;
+import com.fisa.bank.domains.user.persistence.entity.User;
+import com.fisa.bank.domains.user.persistence.entity.UserAuth;
+import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
+import com.fisa.bank.domains.user.persistence.repository.UserRepository;
 
 /**
  * 애플리케이션 구동 시 관리자 계정을 보장하는 시드 러너.
@@ -54,9 +56,7 @@ public class AdminUserInitializer implements CommandLineRunner {
       return; // 이미 존재하면 아무 것도 하지 않음
     }
 
-      String rawPassword = adminSeedPassword.isBlank()
-              ? DEFAULT_PASSWORD
-              : adminSeedPassword.trim();
+    String rawPassword = adminSeedPassword.isBlank() ? DEFAULT_PASSWORD : adminSeedPassword.trim();
     String encodedPassword = passwordEncoder.encode(rawPassword);
 
     UserAuth adminAuth = UserAuth.createAdmin(DEFAULT_LOGIN_ID, encodedPassword);

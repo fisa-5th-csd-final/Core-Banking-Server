@@ -34,7 +34,8 @@ import com.fisa.bank.domains.user.persistence.enums.UserRole;
 import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 
 /**
- * Refresh Token 재발급 필터. /api/token/refresh (POST) 에서 Authorization Bearer 또는 refresh_token 쿠키로 토큰을 받아 검증 후 새 토큰을 반환한다.
+ * Refresh Token 재발급 필터. /api/token/refresh (POST) 에서 Authorization Bearer 또는 refresh_token 쿠키로 토큰을
+ * 받아 검증 후 새 토큰을 반환한다.
  */
 public class RefreshTokenFilter extends OncePerRequestFilter {
 
@@ -97,7 +98,9 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       response
           .getWriter()
-          .write(objectMapper.writeValueAsString(Map.of("access_token", newAccess, "refresh_token", newRefresh)));
+          .write(
+              objectMapper.writeValueAsString(
+                  Map.of("access_token", newAccess, "refresh_token", newRefresh)));
     } catch (Exception e) {
       writeError(response, HttpStatus.UNAUTHORIZED, "Invalid refresh token");
     }
@@ -106,7 +109,8 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
   private Collection<? extends GrantedAuthority> toAuthorities(UserRole role) {
     if (role == null) return List.of();
     return switch (role) {
-      case ADMIN -> List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+      case ADMIN -> List.of(
+          new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
       case USER -> List.of(new SimpleGrantedAuthority("ROLE_USER"));
     };
   }

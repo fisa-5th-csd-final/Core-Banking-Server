@@ -8,16 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * /admin 페이지(HTML) 접근 시 인증이 없으면 /admin/login 으로 리다이렉트하는 필터.
- * (API는 기존 체인에서 401 처리)
- */
+/** /admin 페이지(HTML) 접근 시 인증이 없으면 /admin/login 으로 리다이렉트하는 필터. (API는 기존 체인에서 401 처리) */
 @Slf4j
 public class AdminPageAuthFilter extends OncePerRequestFilter {
 
@@ -44,19 +40,19 @@ public class AdminPageAuthFilter extends OncePerRequestFilter {
 
     // 인증이 안된 경우
     if (authentication == null || !authentication.isAuthenticated()) {
-        // 로그인 페이지일 경우
+      // 로그인 페이지일 경우
       if (isLoginPage) {
         filterChain.doFilter(request, response); // 필터 통과
         return;
       }
-        // 로그인 페이지가 아닌 경우, 로그인 페이지로 리다이렉트
+      // 로그인 페이지가 아닌 경우, 로그인 페이지로 리다이렉트
       log.debug("인증되지 않은 관리자 페이지 접근, 리다이렉트 : /admin/login");
       response.sendRedirect("/admin/login");
       return;
     }
 
     // 인증된 경우
-      // 로그인 페이지로 접속하려고 하는 경우
+    // 로그인 페이지로 접속하려고 하는 경우
     if (isLoginPage) {
       // 이미 인증된 상태에서 /admin/login 접근 시 메인으로 이동
       response.sendRedirect("/admin");

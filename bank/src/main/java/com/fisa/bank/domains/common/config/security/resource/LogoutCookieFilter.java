@@ -13,9 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fisa.bank.domains.common.presentation.util.CookieUtils;
 
-/**
- * /api/logout (POST) 요청 시 토큰 쿠키를 제거하는 필터.
- */
+/** /api/logout (POST) 요청 시 토큰 쿠키를 제거하는 필터. */
 public class LogoutCookieFilter extends OncePerRequestFilter {
 
   private final RequestMatcher matcher;

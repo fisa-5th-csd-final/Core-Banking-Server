@@ -26,11 +26,11 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
-import com.fisa.bank.domains.common.config.security.resource.RequiredAuthenticationEntryPoint;
-import com.fisa.bank.domains.common.config.security.resource.UnknownEndPointFilter;
+import com.fisa.bank.domains.common.config.security.resource.AdminPageAuthFilter;
 import com.fisa.bank.domains.common.config.security.resource.LogoutCookieFilter;
 import com.fisa.bank.domains.common.config.security.resource.RefreshTokenFilter;
-import com.fisa.bank.domains.common.config.security.resource.AdminPageAuthFilter;
+import com.fisa.bank.domains.common.config.security.resource.RequiredAuthenticationEntryPoint;
+import com.fisa.bank.domains.common.config.security.resource.UnknownEndPointFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -100,8 +100,10 @@ public class SecurityFilterChainConfig {
   @Order(2)
   // [일반 사용자용] 인증이 필요하지 않은 엔드포인트
   public SecurityFilterChain unAuthenticated(
-      HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter,
-      LogoutCookieFilter logoutCookieFilter, RefreshTokenFilter refreshTokenFilter)
+      HttpSecurity http,
+      @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter,
+      LogoutCookieFilter logoutCookieFilter,
+      RefreshTokenFilter refreshTokenFilter)
       throws Exception {
     commonConfiguration(http);
 
@@ -148,20 +150,38 @@ public class SecurityFilterChainConfig {
     http.securityMatchers(
             matcher ->
                 matcher
-                    .requestMatchers(HttpMethod.GET, "/admin", "/admin/login", "/admin/accounts", "/admin/loans", "/admin/products")
-                    .requestMatchers(HttpMethod.POST, "/admin/accounts", "/admin/loans", "/admin/products")
-                    .requestMatchers(HttpMethod.PUT, "/admin/accounts", "/admin/loans", "/admin/products")
-                    .requestMatchers(HttpMethod.DELETE, "/admin/accounts", "/admin/loans", "/admin/products")
-                    .requestMatchers(HttpMethod.GET, "/api/admin/users", "/api/admin/users/*/accounts", "/api/admin/users/*/loans", "/api/admin/loans/*")
-                    .requestMatchers(HttpMethod.POST, "/api/admin/users/*/accounts", "/api/admin/accounts/*/withdraw", "/api/admin/accounts/*/deposit", "/api/admin/accounts/transfer", "/api/admin/accounts/*/pay", "/api/admin/users/*/loans/*", "/api/admin/loans/*/repayment")
-                    .requestMatchers(HttpMethod.DELETE, "/api/admin/accounts/*", "/api/admin/loans/*"))
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/admin",
+                        "/admin/login",
+                        "/admin/accounts",
+                        "/admin/loans",
+                        "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.POST, "/admin/accounts", "/admin/loans", "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.PUT, "/admin/accounts", "/admin/loans", "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.DELETE, "/admin/accounts", "/admin/loans", "/admin/products")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/admin/users",
+                        "/api/admin/users/*/accounts",
+                        "/api/admin/users/*/loans",
+                        "/api/admin/loans/*")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/admin/users/*/accounts",
+                        "/api/admin/accounts/*/withdraw",
+                        "/api/admin/accounts/*/deposit",
+                        "/api/admin/accounts/transfer",
+                        "/api/admin/accounts/*/pay",
+                        "/api/admin/users/*/loans/*",
+                        "/api/admin/loans/*/repayment")
+                    .requestMatchers(
+                        HttpMethod.DELETE, "/api/admin/accounts/*", "/api/admin/loans/*"))
         .authorizeHttpRequests(
-            auth ->
-                auth
-                    .requestMatchers("/admin/login")
-                    .permitAll()
-                    .anyRequest()
-                    .hasRole("ADMIN"));
+            auth -> auth.requestMatchers("/admin/login").permitAll().anyRequest().hasRole("ADMIN"));
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(adminPageAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -210,8 +230,7 @@ public class SecurityFilterChainConfig {
                         "/api/loans/{loanLedgerId:\\d+}")
                     .requestMatchers(
                         HttpMethod.PATCH, "/api/loans/{loanLedgerId:\\d+}/auto-deposit"))
-        .authorizeHttpRequests(
-            request -> request.anyRequest().authenticated());
+        .authorizeHttpRequests(request -> request.anyRequest().authenticated());
 
     http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     http.exceptionHandling(ex -> ex.authenticationEntryPoint(requiredAuthenticationEntryPoint));

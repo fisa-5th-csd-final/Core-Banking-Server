@@ -1,8 +1,5 @@
 package com.fisa.bank.domains.common.config.security.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fisa.bank.domains.common.config.security.jwt.UserJwtGenerator;
-import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +19,10 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisa.bank.domains.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 
 // OAuth2.0 Authorization Server 를 설정하는 Config
 @Profile({"local", "dev", "prod"})
@@ -125,7 +126,8 @@ public class AuthorizationConfig {
       ObjectMapper objectMapper) {
     RequestMatcher matcher =
         PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/token/refresh");
-    return new RefreshTokenFilter(jwtDecoder, userJwtGenerator, userAuthRepository, objectMapper, matcher);
+    return new RefreshTokenFilter(
+        jwtDecoder, userJwtGenerator, userAuthRepository, objectMapper, matcher);
   }
 
   @Bean
@@ -137,8 +139,10 @@ public class AuthorizationConfig {
 
   @Bean
   public AdminPageAuthFilter adminPageAuthFilter() {
-    RequestMatcher matcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/**");
-    RequestMatcher loginMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/login");
+    RequestMatcher matcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/**");
+    RequestMatcher loginMatcher =
+        PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/admin/login");
     return new AdminPageAuthFilter(matcher, loginMatcher);
   }
 
@@ -190,13 +194,11 @@ public class AuthorizationConfig {
   }
 
   @Bean
-    public FilterRegistrationBean<AdminPageAuthFilter> adminPageAuthFilterFilterRegistrationBean(
-            AdminPageAuthFilter adminPageAuthFilter
-  ){
-      FilterRegistrationBean<AdminPageAuthFilter> registrationBean =
-              new FilterRegistrationBean<>(adminPageAuthFilter);
-      registrationBean.setEnabled(false);
-      return registrationBean;
+  public FilterRegistrationBean<AdminPageAuthFilter> adminPageAuthFilterFilterRegistrationBean(
+      AdminPageAuthFilter adminPageAuthFilter) {
+    FilterRegistrationBean<AdminPageAuthFilter> registrationBean =
+        new FilterRegistrationBean<>(adminPageAuthFilter);
+    registrationBean.setEnabled(false);
+    return registrationBean;
   }
-
 }
