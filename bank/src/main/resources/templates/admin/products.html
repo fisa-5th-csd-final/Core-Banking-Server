@@ -37,7 +37,7 @@
     <div style="max-width:520px; margin-top: 10px;">
       <label for="token">Access Token (읽기 전용)</label>
       <input id="token" type="text" readonly />
-      <button style="margin-top:10px; padding:10px; border-radius:10px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer;" onclick="logout()">로그아웃</button>
+      <button style="margin-top:10px; padding:10px; border-radius:10px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer;" onclick="logoutAndRedirect()">로그아웃</button>
     </div>
   </header>
 
@@ -67,56 +67,16 @@
 
   <div class="result" id="result">응답이 여기에 표시됩니다.</div>
 
+  <script src="/js/admin-common.js"></script>
   <script>
     const resultBox = document.getElementById('result');
     const tokenInput = document.getElementById('token');
+    const { callApi, extractPayload, ensureAdminOrRedirect, logoutAndRedirect } = window.adminCommon;
     const state = { products: [] };
 
-    const saved = localStorage.getItem('admin_token');
-    if (!saved || !hasAdminRole(saved)) {
-      alert('ADMIN 권한이 필요합니다.');
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      location.href = '/admin/login';
-    } else {
-      tokenInput.value = saved;
-    }
+    if (!ensureAdminOrRedirect()) return;
 
     document.addEventListener('DOMContentLoaded', loadProducts);
-
-    function extractPayload(json) {
-      if (!json || typeof json !== 'object') return null;
-      return json?.data?.body?.data ?? json?.data?.data ?? json?.data ?? json?.result ?? json;
-    }
-
-    async function callApi(method, url, body) {
-      const token = tokenInput.value.trim();
-      if (!token) { resultBox.textContent = '토큰을 입력하세요.'; return null; }
-      const init = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
-      if (body) init.body = JSON.stringify(body);
-      const res = await fetch(url, init);
-      const text = await res.text();
-      let parsed = null;
-      try { parsed = JSON.parse(text); resultBox.textContent = JSON.stringify(parsed, null, 2); }
-      catch (_) { resultBox.textContent = text; }
-      return parsed ?? text;
-    }
-
-    function logout() {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      location.href = '/admin/login';
-    }
-
-    function hasAdminRole(token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-        const roles = payload.role || payload.roles || [];
-        return Array.isArray(roles) && roles.includes('ROLE_ADMIN');
-      } catch (_) {
-        return false;
-      }
-    }
 
     async function createProduct() {
       const name = document.getElementById('prod-name').value;
