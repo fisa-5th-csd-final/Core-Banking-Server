@@ -63,9 +63,7 @@ public class AdminController {
   public ApiResponse<SuccessBody<AccountResponse>> createAccountForUser(
       @PathVariable Long userId, @RequestParam(defaultValue = "false") boolean income) {
     AccountResponse response =
-        income
-            ? accountService.createIncomeAccount(userId)
-            : accountService.createAccount(userId);
+        income ? accountService.createIncomeAccount(userId) : accountService.createAccount(userId);
     return ApiResponseGenerator.success(ResponseCode.CREATE, response);
   }
 
@@ -88,7 +86,8 @@ public class AdminController {
   @PostMapping("/accounts/{accountNumber}/withdraw")
   public ApiResponse<SuccessBody<AccountTransactionResponse>> withdraw(
       @PathVariable String accountNumber, @Valid @RequestBody AccountWithdrawRequest request) {
-    AccountTransactionResponse response = accountTransactionService.withdraw(accountNumber, request);
+    AccountTransactionResponse response =
+        accountTransactionService.withdraw(accountNumber, request);
     return ApiResponseGenerator.success(ResponseCode.UPDATE, response);
   }
 

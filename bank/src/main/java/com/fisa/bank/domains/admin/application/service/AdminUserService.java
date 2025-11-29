@@ -18,8 +18,10 @@ public class AdminUserService {
 
   public List<AdminUserSummaryResponse> getUsers() {
     return userRepository.findAll().stream()
-        .map(user -> new AdminUserSummaryResponse(user.getUserId().getValue(), user.getName(), user.getUserAuth().getLoginId()))
+        .map(
+            user ->
+                new AdminUserSummaryResponse(
+                    user.getUserId().getValue(), user.getName(), user.getUserAuth().getLoginId()))
         .toList();
   }
 }
-

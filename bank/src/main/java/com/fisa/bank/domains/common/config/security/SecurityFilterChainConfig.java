@@ -113,8 +113,7 @@ public class SecurityFilterChainConfig {
                         "/v3/api-docs/**", // TODO: Swagger 전용 필터체인으로 분리
                         "/swagger-resources/**", // TODO: Swagger 전용 필터체인으로 분리
                         "/admin/login",
-                        "/admin/**"
-                        )
+                        "/admin/**")
                     .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
                     .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());

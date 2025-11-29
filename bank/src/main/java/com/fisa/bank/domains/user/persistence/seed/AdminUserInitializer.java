@@ -10,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fisa.bank.domains.user.persistence.entity.CreditRating;
 import com.fisa.bank.domains.user.persistence.entity.CustomerLevel;
@@ -17,7 +18,6 @@ import com.fisa.bank.domains.user.persistence.entity.User;
 import com.fisa.bank.domains.user.persistence.entity.UserAuth;
 import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 import com.fisa.bank.domains.user.persistence.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 애플리케이션 구동 시 관리자 계정을 보장하는 시드 러너.

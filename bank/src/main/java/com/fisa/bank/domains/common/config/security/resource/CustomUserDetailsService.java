@@ -41,7 +41,8 @@ public class CustomUserDetailsService implements UserDetailsService {
       return List.of();
     }
     return switch (role) {
-      case ADMIN -> List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+      case ADMIN -> List.of(
+          new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
       case USER -> List.of(new SimpleGrantedAuthority("ROLE_USER"));
     };
   }
