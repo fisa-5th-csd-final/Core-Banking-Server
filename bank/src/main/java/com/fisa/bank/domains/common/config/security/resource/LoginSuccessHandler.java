@@ -26,6 +26,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fisa.bank.domains.common.config.security.jwt.UserJwtGenerator;
+import com.fisa.bank.domains.common.presentation.util.CookieUtils;
 import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 
 /** 로그인 성공 핸들러 스프링 시큐리티에 의해, 사용자 인증이 성공하면 Authentication 객체를 Jwt 토큰으로 인코딩하여 ResponseBody에 담는다. */
@@ -55,6 +56,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
         String accessToken = jwtGenerator.createAccessToken(userId, authorities).getTokenValue();
         String refreshToken = jwtGenerator.createRefreshToken(userId).getTokenValue();
+
+        CookieUtils.addTokenCookies(response, accessToken, refreshToken);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

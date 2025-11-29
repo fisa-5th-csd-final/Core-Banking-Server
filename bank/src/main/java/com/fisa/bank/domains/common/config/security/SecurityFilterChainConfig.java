@@ -28,6 +28,8 @@ import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
 import com.fisa.bank.domains.common.config.security.resource.RequiredAuthenticationEntryPoint;
 import com.fisa.bank.domains.common.config.security.resource.UnknownEndPointFilter;
+import com.fisa.bank.domains.common.config.security.resource.LogoutCookieFilter;
+import com.fisa.bank.domains.common.config.security.resource.RefreshTokenFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -97,7 +99,8 @@ public class SecurityFilterChainConfig {
   @Order(2)
   // [일반 사용자용] 인증이 필요하지 않은 엔드포인트
   public SecurityFilterChain unAuthenticated(
-      HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter)
+      HttpSecurity http, @Qualifier("unAuthenticatedFilter") AuthenticationFilter loginFilter,
+      LogoutCookieFilter logoutCookieFilter, RefreshTokenFilter refreshTokenFilter)
       throws Exception {
     commonConfiguration(http);
 
@@ -112,11 +115,19 @@ public class SecurityFilterChainConfig {
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/swagger-resources/**")
-                    .requestMatchers(HttpMethod.POST, "/api/loans", "/api/login", "/api/users")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/loans",
+                        "/api/login",
+                        "/api/users",
+                        "/api/token/refresh",
+                        "/api/logout")
                     .requestMatchers(HttpMethod.DELETE, "/api/loans/products/{loanProductId:\\d+}"))
         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
     http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class); // login 전용 필터
+    http.addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(logoutCookieFilter, UsernamePasswordAuthenticationFilter.class);
     http.oauth2ResourceServer(AbstractHttpConfigurer::disable);
 
     return http.build();
