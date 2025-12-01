@@ -103,8 +103,7 @@ public class AuthorizationConfig {
 
   @Bean("FormLoginSuccessHandler")
   public AuthenticationSuccessHandler formLoginSuccessHandler(
-      UserAuthRepository userAuthRepository,
-      UserJwtGenerator jwtGenerator) {
+      UserAuthRepository userAuthRepository, UserJwtGenerator jwtGenerator) {
     return new RequestAwareLoginSuccessHandler(jwtGenerator, userAuthRepository);
   }
 

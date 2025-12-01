@@ -21,12 +21,10 @@ import com.fisa.bank.domains.common.config.security.jwt.UserJwtGenerator;
 import com.fisa.bank.domains.common.presentation.util.CookieUtils;
 import com.fisa.bank.domains.user.persistence.repository.UserAuthRepository;
 
-/**
- * 폼 로그인 성공 시 JWT 쿠키를 심은 뒤, SavedRequest로 리다이렉트한다.
- */
-  @Slf4j
-  @RequiredArgsConstructor
-  public class RequestAwareLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+/** 폼 로그인 성공 시 JWT 쿠키를 심은 뒤, SavedRequest로 리다이렉트한다. */
+@Slf4j
+@RequiredArgsConstructor
+public class RequestAwareLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
   private final UserJwtGenerator jwtGenerator;
   private final UserAuthRepository userAuthRepository;
