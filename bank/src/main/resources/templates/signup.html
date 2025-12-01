@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core Bank 회원가입</title>
+  <style>
+    :root {
+      --bg: linear-gradient(140deg, #0a2b64 0%, #0c2f73 45%, #0a2c62 100%);
+      --panel: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #00c3ff;
+      --accent-2: #2a6cf7;
+      --text: #eef4ff;
+      --muted: #a9bfdf;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px 48px;
+      font-family: 'SUIT', 'Pretendard', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container { max-width: 640px; margin: 0 auto; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 26px 64px rgba(5, 26, 71, 0.46);
+      backdrop-filter: blur(12px);
+    }
+    h1 { margin: 0 0 6px; letter-spacing: -0.02em; font-size: 2rem; }
+    p.desc { margin: 0 0 18px; color: var(--muted); font-weight: 500; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    label { display: block; margin-bottom: 6px; font-size: 0.95rem; color: #d7e6ff; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      outline: none;
+    }
+    input:focus { border-color: rgba(0, 195, 255, 0.9); box-shadow: 0 0 0 3px rgba(0, 195, 255, 0.24); }
+    .hint { margin-top: 4px; font-size: 0.85rem; color: var(--muted); }
+    .tooltip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      color: #d7e6ff;
+      font-weight: 800;
+      cursor: help;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .tooltip-bubble {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -4px);
+      top: 110%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #061a3a;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #eef4ff;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      opacity: 0;
+      transform: translate(-50%, -4px);
+      pointer-events: none;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+      z-index: 2;
+    }
+    .tooltip:hover .tooltip-bubble { opacity: 1; transform: translate(-50%, 2px); }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    button {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+    }
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      box-shadow: 0 18px 34px rgba(6, 88, 197, 0.32);
+      flex: 1;
+      min-width: 180px;
+    }
+    .primary:hover { transform: translateY(-1px); box-shadow: 0 22px 38px rgba(6, 88, 197, 0.4); }
+    .secondary { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
+    .status {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: #ffdd8f;
+      min-height: 20px;
+      white-space: pre-line;
+    }
+    .nav { margin-top: 14px; color: var(--muted); font-size: 0.95rem; }
+    .nav a { color: #72c8ff; font-weight: 700; text-decoration: none; }
+    .nav a:hover { text-decoration: underline; }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-weight: 800; letter-spacing: -0.01em; color: #dff1ff; }
+    .brand-dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, #00c6ff, #2e6df6); box-shadow: 0 0 0 6px rgba(0, 198, 255, 0.12); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="brand"><span class="brand-dot"></span>Core Bank 디지털</div>
+      <h1>회원가입</h1>
+      <p class="desc">필수 정보를 입력하면 안전하게 계정을 만들 수 있습니다.</p>
+      <form id="signup-form">
+        <div class="grid">
+          <div>
+            <label for="name">이름</label>
+            <input id="name" type="text" placeholder="김코어" required />
+          </div>
+          <div>
+            <label for="loginId">아이디</label>
+            <input id="loginId" type="text" placeholder="core01" required />
+          </div>
+          <div>
+            <label for="password">비밀번호</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="영문/숫자/특수문자 조합 (8~15자)"
+              required
+            />
+            <div class="hint">
+              <span class="tooltip">i
+                <span class="tooltip-bubble">사용 가능한 특수문자: ! @ # $ % ^ * + = -</span>
+              </span>
+              영문, 숫자, 특수문자를 포함한 8~15자.
+            </div>
+          </div>
+          <div>
+            <label for="birthday">생년월일</label>
+            <input id="birthday" type="date" required />
+          </div>
+          <div>
+            <label for="address">주소</label>
+            <input id="address" type="text" placeholder="서울특별시 마포구 상암동" required />
+          </div>
+          <div>
+            <label for="job">직업</label>
+            <input id="job" type="text" placeholder="개발자" required />
+          </div>
+          <div>
+            <label for="salary">연봉</label>
+            <input
+              id="salary"
+              type="text"
+              inputmode="numeric"
+              min="0"
+              placeholder="50,000,000"
+              required
+            />
+            <div class="hint">단위: 원</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="submit">회원가입 요청</button>
+          <button class="secondary" type="button" onclick="document.getElementById('signup-form').reset()">초기화</button>
+        </div>
+      </form>
+      <div id="status" class="status"></div>
+      <div class="nav">이미 계정이 있나요? <a href="/login">로그인하기</a></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('signup-form');
+    const statusBox = document.getElementById('status');
+    const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
+    const salaryInput = document.getElementById('salary');
+
+    const formatSalary = (value) => {
+      const digits = value.replace(/[^0-9]/g, '');
+      return digits ? Number(digits).toLocaleString('en-US') : '';
+    };
+
+    salaryInput.addEventListener('input', () => {
+      const cursorPos = salaryInput.selectionStart;
+      const before = salaryInput.value;
+      salaryInput.value = formatSalary(before);
+      // 기본 커서 위치 복원은 생략 (단순 입력 기준)
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusBox.textContent = '가입 요청을 보내는 중입니다...';
+
+      const birthdayValue = document.getElementById('birthday').value;
+      if (!birthdayValue) {
+        statusBox.textContent = '생년월일을 입력해주세요.';
+        return;
+      }
+
+      const password = document.getElementById('password').value;
+      if (!PASSWORD_REGEX.test(password)) {
+        statusBox.textContent = '비밀번호는 영문, 숫자, 특수문자(!@#$%^*+=-)를 포함한 8~15자로 입력하세요.';
+        return;
+      }
+
+      const payload = {
+        birthday: new Date(birthdayValue).getTime(),
+        name: document.getElementById('name').value.trim(),
+        loginId: document.getElementById('loginId').value.trim(),
+        password,
+        address: document.getElementById('address').value.trim(),
+        job: document.getElementById('job').value.trim(),
+        salary: Number((salaryInput.value || '').replace(/,/g, '') || 0),
+      };
+
+      try {
+        const res = await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const text = await res.text();
+        if (res.ok) {
+          statusBox.textContent = '가입이 완료되었습니다. 로그인 화면으로 이동해주세요.';
+        } else {
+          statusBox.textContent = '가입 실패: ' + (text || res.status);
+        }
+      } catch (err) {
+        statusBox.textContent = '요청 중 오류가 발생했습니다: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

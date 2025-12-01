@@ -249,11 +249,16 @@ public class SecurityFilterChainConfig {
       throws Exception {
 
     http.securityMatchers(
-            matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
+            matcher -> matcher.requestMatchers("/login", "/signup", "/default-ui.css", "/error/**"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.authenticationProvider(authenticationProvider);
-    http.formLogin(Customizer.withDefaults()); // form Login 활성화
+    http.formLogin(
+        form ->
+            form
+                .loginPage("/login") // 커스텀 템플릿
+                .loginProcessingUrl("/login")
+                .permitAll());
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     http.csrf(AbstractHttpConfigurer::disable);
 

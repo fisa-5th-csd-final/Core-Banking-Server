@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>우리은행 로그인</title>
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 18% 18%, rgba(0, 158, 255, 0.14), transparent 32%),
+            radial-gradient(circle at 82% 8%, rgba(39, 91, 213, 0.24), transparent 34%),
+            linear-gradient(150deg, #0a2b64 0%, #0b366e 45%, #0a2c62 100%);
+      --panel: rgba(255, 255, 255, 0.06);
+      --accent: #00b8ff;
+      --accent-2: #2a6cf7;
+      --text: #eef4ff;
+      --muted: #a9bfdf;
+      --border: rgba(255, 255, 255, 0.14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      font-family: 'SUIT', 'Pretendard', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px;
+      border-radius: 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 28px 70px rgba(5, 26, 71, 0.46);
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 0%, rgba(0, 184, 255, 0.16), transparent 45%),
+                  radial-gradient(circle at 78% 18%, rgba(42, 108, 247, 0.18), transparent 42%);
+      pointer-events: none;
+    }
+    h1 { margin: 0 0 4px; font-size: 1.9rem; letter-spacing: -0.02em; }
+    p { margin: 0 0 20px; color: var(--muted); font-weight: 500; }
+    label { display: block; margin: 12px 0 6px; font-size: 0.95rem; color: #d7e6ff; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+    }
+    input:focus { border-color: #67c9ff; box-shadow: 0 0 0 3px rgba(0, 184, 255, 0.25); }
+    .action {
+      width: 100%;
+      margin-top: 18px;
+      padding: 13px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      box-shadow: 0 16px 32px rgba(0, 84, 214, 0.35);
+    }
+    .action:hover { transform: translateY(-1px); box-shadow: 0 20px 36px rgba(0, 84, 214, 0.42); }
+    .meta {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.94rem;
+      color: var(--muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .link { color: #72c8ff; text-decoration: none; font-weight: 700; }
+    .link:hover { text-decoration: underline; }
+    .status { margin-top: 12px; font-size: 0.95rem; color: #ffdd8f; min-height: 20px; }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-weight: 800; letter-spacing: -0.01em; color: #dff1ff; }
+    .brand-dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, #00c6ff, #2e6df6); box-shadow: 0 0 0 6px rgba(0, 198, 255, 0.12); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand"><span class="brand-dot"></span>Core Bank</div>
+    <h1>환영합니다</h1>
+    <p>아이디와 비밀번호를 입력해 안전하게 로그인하세요.</p>
+    <form method="post" action="/login">
+      <label for="username">아이디</label>
+      <input id="username" name="username" type="text" autocomplete="username" required />
+
+      <label for="password">비밀번호</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+
+      <button class="action" type="submit">로그인</button>
+    </form>
+
+    <div class="meta">
+      <span>계정이 없으신가요?</span>
+      <a class="link" href="/signup">회원가입하기</a>
+    </div>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('error')) {
+      status.textContent = '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.';
+    } else if (params.has('logout')) {
+      status.textContent = '로그아웃 되었습니다.';
+    }
+  </script>
+</body>
+</html>
