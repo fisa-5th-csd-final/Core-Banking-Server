@@ -67,6 +67,7 @@
     }
     .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #041021; border: none; box-shadow: 0 18px 34px rgba(6, 88, 197, 0.32); }
     .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 22px 38px rgba(6, 88, 197, 0.4); }
+    .btn.ghost { background: rgba(255, 255, 255, 0.05); color: #eef4ff; }
     .btn:hover { border-color: rgba(255, 255, 255, 0.22); }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
     .card {
@@ -79,38 +80,74 @@
     }
     .card h3 { margin: 0 0 8px; letter-spacing: -0.01em; }
     .card p { margin: 0; color: var(--muted); line-height: 1.5; }
-    .user-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px 12px; margin-top: 8px; }
-    .user-field { display: flex; flex-direction: column; gap: 4px; }
-    .user-label { font-size: 0.9rem; color: #c9dcff; }
-    .user-value { font-weight: 700; color: #eef4ff; }
+    .info-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #eef4ff;
+      font-weight: 800;
+      cursor: pointer;
+      position: relative;
+    }
+    .info-dot { width: 10px; height: 10px; border-radius: 50%; background: #00c6ff; box-shadow: 0 0 0 6px rgba(0, 198, 255, 0.16); }
+    .info-pop {
+      position: absolute;
+      left: 0;
+      top: 115%;
+      min-width: 260px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #061a3a;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: all 0.16s ease;
+      z-index: 3;
+      text-align: left;
+    }
+    .info-chip:hover .info-pop,
+    .info-chip:focus-within .info-pop { opacity: 1; transform: translateY(2px); pointer-events: auto; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px 10px; }
+    .info-field { display: flex; flex-direction: column; gap: 2px; }
+    .info-label { font-size: 0.9rem; color: #c9dcff; }
+    .info-value { font-weight: 800; color: #eef4ff; }
   </style>
 </head>
 <body>
   <div class="shell">
     <div class="hero">
       <div class="brand"><span class="brand-dot"></span>Core Bank 디지털</div>
-      <h1>코어뱅킹 서비스에 오신 것을 환영합니다</h1>
-      <p class="lead">계좌 개설, 대출, 송금, 카드결제까지 하나의 플랫폼에서 안전하게 이용하세요. 신규 고객이라면 회원가입 후 로그인하여 서비스를 시작할 수 있습니다.</p>
+      <h1 id="hero-title">코어뱅킹 서비스에 오신 것을 환영합니다</h1>
+      <p class="lead" id="hero-lead">계좌 개설, 대출, 송금, 카드결제까지 하나의 플랫폼에서 안전하게 이용하세요. 신규 고객이라면 회원가입 후 로그인하여 서비스를 시작할 수 있습니다.</p>
       <div class="actions">
         <a class="btn primary" href="/signup">회원가입</a>
-        <a class="btn" href="/login">로그인</a>
+        <a class="btn" id="login-btn" href="/login">로그인</a>
+        <button class="info-chip" id="info-chip" style="display:none">
+          <span class="info-dot"></span>내 정보
+          <div class="info-pop" id="info-pop">
+            <div class="info-grid">
+              <div class="info-field"><span class="info-label">이름</span><span class="info-value" id="info-name">-</span></div>
+              <div class="info-field"><span class="info-label">주소</span><span class="info-value" id="info-address">-</span></div>
+              <div class="info-field"><span class="info-label">생년월일</span><span class="info-value" id="info-birthday">-</span></div>
+              <div class="info-field"><span class="info-label">직업</span><span class="info-value" id="info-job">-</span></div>
+              <div class="info-field"><span class="info-label">연봉</span><span class="info-value" id="info-income">-</span></div>
+              <div class="info-field"><span class="info-label">신용등급</span><span class="info-value" id="info-credit">-</span></div>
+              <div class="info-field"><span class="info-label">고객등급</span><span class="info-value" id="info-customer">-</span></div>
+            </div>
+          </div>
+        </button>
+        <button class="btn ghost" id="logout-btn" style="display:none">로그아웃</button>
         <a class="btn" href="/swagger-ui/index.html">API 문서</a>
       </div>
     </div>
 
-      <div class="cards">
-      <div class="card" id="user-card" style="display:none">
-        <h3>내 정보</h3>
-        <div class="user-grid">
-          <div class="user-field"><span class="user-label">이름</span><span class="user-value" id="user-name">-</span></div>
-          <div class="user-field"><span class="user-label">주소</span><span class="user-value" id="user-address">-</span></div>
-          <div class="user-field"><span class="user-label">생년월일</span><span class="user-value" id="user-birthday">-</span></div>
-          <div class="user-field"><span class="user-label">직업</span><span class="user-value" id="user-job">-</span></div>
-          <div class="user-field"><span class="user-label">연봉</span><span class="user-value" id="user-income">-</span></div>
-          <div class="user-field"><span class="user-label">신용등급</span><span class="user-value" id="user-credit">-</span></div>
-          <div class="user-field"><span class="user-label">고객등급</span><span class="user-value" id="user-customer">-</span></div>
-        </div>
-      </div>
+    <div class="cards">
       <div class="card">
         <h3>간편 로그인</h3>
         <p>커스텀 로그인 페이지를 통해 안전하게 인증하고, JWT 기반으로 보호된 API에 접근합니다.</p>
@@ -126,15 +163,19 @@
     </div>
   </div>
   <script>
-    const userCard = document.getElementById('user-card');
-    const ui = {
-      name: document.getElementById('user-name'),
-      address: document.getElementById('user-address'),
-      birthday: document.getElementById('user-birthday'),
-      job: document.getElementById('user-job'),
-      income: document.getElementById('user-income'),
-      credit: document.getElementById('user-credit'),
-      customer: document.getElementById('user-customer'),
+    const heroTitle = document.getElementById('hero-title');
+    const heroLead = document.getElementById('hero-lead');
+    const loginBtn = document.getElementById('login-btn');
+    const infoChip = document.getElementById('info-chip');
+    const logoutBtn = document.getElementById('logout-btn');
+    const info = {
+      name: document.getElementById('info-name'),
+      address: document.getElementById('info-address'),
+      birthday: document.getElementById('info-birthday'),
+      job: document.getElementById('info-job'),
+      income: document.getElementById('info-income'),
+      credit: document.getElementById('info-credit'),
+      customer: document.getElementById('info-customer'),
     };
 
     const fmtDate = (s) => (s ? new Date(s).toLocaleDateString('ko-KR') : '-');
@@ -148,20 +189,31 @@
         const body = await res.json();
         const data = body?.data ?? body?.body?.data ?? null;
         if (!data) return;
-        ui.name.textContent = data.name ?? '-';
-        ui.address.textContent = data.address ?? '-';
-        ui.birthday.textContent = fmtDate(data.birthday);
-        ui.job.textContent = data.job ?? '-';
-        ui.income.textContent = fmtCurrency(Number(data.income));
-        ui.credit.textContent = data.creditLevel ?? '-';
-        ui.customer.textContent = data.customerLevel ?? '-';
-        userCard.style.display = 'block';
+        info.name.textContent = data.name ?? '-';
+        info.address.textContent = data.address ?? '-';
+        info.birthday.textContent = fmtDate(data.birthday);
+        info.job.textContent = data.job ?? '-';
+        info.income.textContent = fmtCurrency(Number(data.income));
+        info.credit.textContent = data.creditLevel ?? '-';
+        info.customer.textContent = data.customerLevel ?? '-';
+        heroTitle.textContent = `안녕하세요 ${data.name ?? ''}님, 좋은 하루 되세요`;
+        heroLead.textContent = '로그인되었습니다. 아래에서 서비스를 계속 이용하거나 내 정보를 확인하세요.';
+        loginBtn.style.display = 'none';
+        infoChip.style.display = 'inline-flex';
+        logoutBtn.style.display = 'inline-flex';
       } catch (_) {
         // 무시: 비로그인 상태일 가능성
       }
     }
 
     loadMyInfo();
+
+    logoutBtn?.addEventListener('click', async () => {
+      try {
+        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      } catch (_) {}
+      window.location.href = '/';
+    });
   </script>
 </body>
 </html>
