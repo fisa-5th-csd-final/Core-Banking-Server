@@ -112,6 +112,7 @@ public class SecurityFilterChainConfig {
                 matcher
                     .requestMatchers(
                         HttpMethod.GET,
+                        "/",
                         "/api/loans/products",
                         "/api/loans/{loanProductId:\\d+}",
                         "/api/interests/{loanProductId:\\d+}",
