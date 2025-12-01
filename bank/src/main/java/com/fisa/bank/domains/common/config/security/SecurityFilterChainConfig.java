@@ -245,11 +245,11 @@ public class SecurityFilterChainConfig {
   /** 시큐리티 기본 로그인 및 에러 리다이렉트 필터체인 */
   @Bean
   @Order(5)
-  public SecurityFilterChain loginFilterChain(
+  public SecurityFilterChain securityDefaultLoginFilterChain(
       HttpSecurity http,
       @Qualifier("UsernamePasswordAuthenticationProvider")
           AuthenticationProvider authenticationProvider,
-      @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
+      @Qualifier("FormLoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
       @Qualifier("LoginFailureHandler") AuthenticationFailureHandler loginFailureHandler)
       throws Exception {
 

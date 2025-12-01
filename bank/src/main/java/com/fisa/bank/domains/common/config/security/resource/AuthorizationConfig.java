@@ -101,6 +101,13 @@ public class AuthorizationConfig {
     return new LoginSuccessHandler(jwtGenerator, objectMapper, userAuthRepository);
   }
 
+  @Bean("FormLoginSuccessHandler")
+  public AuthenticationSuccessHandler formLoginSuccessHandler(
+      UserAuthRepository userAuthRepository,
+      UserJwtGenerator jwtGenerator) {
+    return new RequestAwareLoginSuccessHandler(jwtGenerator, userAuthRepository);
+  }
+
   @Bean("UsernamePasswordAuthenticationConverter")
   public AuthenticationConverter usernamePasswordAuthenticationConverter(ObjectMapper om) {
     return new UsernamePasswordAuthenticationConverter(om);
