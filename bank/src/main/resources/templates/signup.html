@@ -229,7 +229,7 @@
         password,
         address: document.getElementById('address').value.trim(),
         job: document.getElementById('job').value.trim(),
-        salary: Number((salaryInput.value || '').replace(/,/g, '') || 0),
+          salary: Number(salaryInput.value.replace(/,/g, '')),
       };
 
       try {
