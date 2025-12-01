@@ -14,6 +14,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
@@ -246,7 +248,9 @@ public class SecurityFilterChainConfig {
   public SecurityFilterChain loginFilterChain(
       HttpSecurity http,
       @Qualifier("UsernamePasswordAuthenticationProvider")
-          AuthenticationProvider authenticationProvider)
+          AuthenticationProvider authenticationProvider,
+      @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
+      @Qualifier("LoginFailureHandler") AuthenticationFailureHandler loginFailureHandler)
       throws Exception {
 
     http.securityMatchers(
@@ -259,6 +263,8 @@ public class SecurityFilterChainConfig {
             form
                 .loginPage("/login") // 커스텀 템플릿
                 .loginProcessingUrl("/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
                 .permitAll());
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     http.csrf(AbstractHttpConfigurer::disable);
