@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core Bank - 온라인</title>
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 20% 12%, rgba(0, 158, 255, 0.18), transparent 32%),
+            radial-gradient(circle at 80% 0%, rgba(42, 108, 247, 0.18), transparent 34%),
+            linear-gradient(150deg, #0a2b64 0%, #0b366e 45%, #0a2c62 100%);
+      --panel: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.14);
+      --accent: #00b8ff;
+      --accent-2: #2a6cf7;
+      --text: #eef4ff;
+      --muted: #a9bfdf;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 18px 48px;
+      font-family: 'SUIT', 'Pretendard', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+    .hero {
+      grid-column: span 2;
+      padding: 30px;
+      border-radius: 22px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 80px rgba(5, 26, 71, 0.46);
+      backdrop-filter: blur(12px);
+    }
+    @media (max-width: 820px) { .hero { grid-column: span 1; } }
+    .brand { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); font-weight: 800; letter-spacing: -0.01em; }
+    .brand-dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, #00c6ff, #2e6df6); box-shadow: 0 0 0 6px rgba(0, 198, 255, 0.12); }
+    h1 { margin: 14px 0 10px; font-size: 2.1rem; letter-spacing: -0.02em; }
+    p.lead { margin: 0 0 18px; color: var(--muted); font-size: 1.05rem; line-height: 1.6; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+    .btn {
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #041021; border: none; box-shadow: 0 18px 34px rgba(6, 88, 197, 0.32); }
+    .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 22px 38px rgba(6, 88, 197, 0.4); }
+    .btn.ghost { background: rgba(255, 255, 255, 0.05); color: #eef4ff; }
+    .btn:hover { border-color: rgba(255, 255, 255, 0.22); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .card {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 50px rgba(5, 26, 71, 0.36);
+      backdrop-filter: blur(10px);
+    }
+    .card h3 { margin: 0 0 8px; letter-spacing: -0.01em; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .info-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #eef4ff;
+      font-weight: 800;
+      cursor: pointer;
+      position: relative;
+    }
+    .info-dot { width: 10px; height: 10px; border-radius: 50%; background: #00c6ff; box-shadow: 0 0 0 6px rgba(0, 198, 255, 0.16); }
+    .info-pop {
+      position: absolute;
+      left: 0;
+      top: 115%;
+      min-width: 260px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #061a3a;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: all 0.16s ease;
+      z-index: 3;
+      text-align: left;
+    }
+    .info-chip:hover .info-pop,
+    .info-chip:focus-within .info-pop { opacity: 1; transform: translateY(2px); pointer-events: auto; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px 10px; }
+    .info-field { display: flex; flex-direction: column; gap: 2px; }
+    .info-label { font-size: 0.9rem; color: #c9dcff; }
+    .info-value { font-weight: 800; color: #eef4ff; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hero">
+      <div class="brand"><span class="brand-dot"></span>Core Bank 디지털</div>
+      <h1 id="hero-title">코어뱅킹 서비스에 오신 것을 환영합니다</h1>
+      <p class="lead" id="hero-lead">계좌 개설, 대출, 송금, 카드결제까지 하나의 플랫폼에서 안전하게 이용하세요. 신규 고객이라면 회원가입 후 로그인하여 서비스를 시작할 수 있습니다.</p>
+      <div class="actions">
+        <a class="btn primary" href="/signup">회원가입</a>
+        <a class="btn" id="login-btn" href="/login">로그인</a>
+        <button class="info-chip" id="info-chip" style="display:none">
+          <span class="info-dot"></span>내 정보
+          <div class="info-pop" id="info-pop">
+            <div class="info-grid">
+              <div class="info-field"><span class="info-label">이름</span><span class="info-value" id="info-name">-</span></div>
+              <div class="info-field"><span class="info-label">주소</span><span class="info-value" id="info-address">-</span></div>
+              <div class="info-field"><span class="info-label">생년월일</span><span class="info-value" id="info-birthday">-</span></div>
+              <div class="info-field"><span class="info-label">직업</span><span class="info-value" id="info-job">-</span></div>
+              <div class="info-field"><span class="info-label">연봉</span><span class="info-value" id="info-income">-</span></div>
+              <div class="info-field"><span class="info-label">신용등급</span><span class="info-value" id="info-credit">-</span></div>
+              <div class="info-field"><span class="info-label">고객등급</span><span class="info-value" id="info-customer">-</span></div>
+            </div>
+          </div>
+        </button>
+        <button class="btn ghost" id="logout-btn" style="display:none">로그아웃</button>
+        <a class="btn" href="/swagger-ui/index.html">API 문서</a>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>간편 로그인</h3>
+        <p>커스텀 로그인 페이지를 통해 안전하게 인증하고, JWT 기반으로 보호된 API에 접근합니다.</p>
+      </div>
+      <div class="card">
+        <h3>통합 회원가입</h3>
+        <p>생년월일, 직업, 연봉 등 필수 정보를 입력하면 바로 계정이 생성됩니다. 입력 연봉은 자동으로 천 단위 콤마를 지원합니다.</p>
+      </div>
+      <div class="card">
+        <h3>API 기반 코어</h3>
+        <p>/api/users, /api/accounts, /api/loans 등 REST 엔드포인트로 코어뱅킹 기능을 제공합니다. Swagger 문서에서 바로 확인하세요.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const heroTitle = document.getElementById('hero-title');
+    const heroLead = document.getElementById('hero-lead');
+    const loginBtn = document.getElementById('login-btn');
+    const infoChip = document.getElementById('info-chip');
+    const logoutBtn = document.getElementById('logout-btn');
+    const info = {
+      name: document.getElementById('info-name'),
+      address: document.getElementById('info-address'),
+      birthday: document.getElementById('info-birthday'),
+      job: document.getElementById('info-job'),
+      income: document.getElementById('info-income'),
+      credit: document.getElementById('info-credit'),
+      customer: document.getElementById('info-customer'),
+    };
+
+    const fmtDate = (s) => (s ? new Date(s).toLocaleDateString('ko-KR') : '-');
+    const fmtCurrency = (n) =>
+      typeof n === 'number' ? n.toLocaleString('ko-KR', { maximumFractionDigits: 0 }) + '원' : '-';
+
+    async function loadMyInfo() {
+      try {
+        const res = await fetch('/api/users/me', { credentials: 'include' });
+        if (!res.ok) return;
+        const body = await res.json();
+        const data = body?.data ?? body?.body?.data ?? null;
+        if (!data) return;
+        info.name.textContent = data.name ?? '-';
+        info.address.textContent = data.address ?? '-';
+        info.birthday.textContent = fmtDate(data.birthday);
+        info.job.textContent = data.job ?? '-';
+        info.income.textContent = fmtCurrency(Number(data.income));
+        info.credit.textContent = data.creditLevel ?? '-';
+        info.customer.textContent = data.customerLevel ?? '-';
+        heroTitle.textContent = `안녕하세요 ${data.name ?? ''}님, 좋은 하루 되세요`;
+        heroLead.textContent = '로그인되었습니다. 아래에서 서비스를 계속 이용하거나 내 정보를 확인하세요.';
+        loginBtn.style.display = 'none';
+        infoChip.style.display = 'inline-flex';
+        logoutBtn.style.display = 'inline-flex';
+      } catch (_) {
+        // 무시: 비로그인 상태일 가능성
+      }
+    }
+
+    loadMyInfo();
+
+    logoutBtn?.addEventListener('click', async () => {
+      try {
+        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      } catch (_) {}
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

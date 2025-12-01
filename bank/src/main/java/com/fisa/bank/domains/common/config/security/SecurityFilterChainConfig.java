@@ -21,7 +21,9 @@ import org.springframework.security.oauth2.server.authorization.oidc.OidcClientR
 import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcClientRegistrationAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
@@ -112,6 +114,7 @@ public class SecurityFilterChainConfig {
                 matcher
                     .requestMatchers(
                         HttpMethod.GET,
+                        "/",
                         "/api/loans/products",
                         "/api/loans/{loanProductId:\\d+}",
                         "/api/interests/{loanProductId:\\d+}",
@@ -245,15 +248,23 @@ public class SecurityFilterChainConfig {
   public SecurityFilterChain loginFilterChain(
       HttpSecurity http,
       @Qualifier("UsernamePasswordAuthenticationProvider")
-          AuthenticationProvider authenticationProvider)
+          AuthenticationProvider authenticationProvider,
+      @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
+      @Qualifier("LoginFailureHandler") AuthenticationFailureHandler loginFailureHandler)
       throws Exception {
 
     http.securityMatchers(
-            matcher -> matcher.requestMatchers("/login", "/default-ui.css", "/error/**"))
+            matcher -> matcher.requestMatchers("/login", "/signup", "/default-ui.css", "/error/**"))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll());
 
     http.authenticationProvider(authenticationProvider);
-    http.formLogin(Customizer.withDefaults()); // form Login 활성화
+    http.formLogin(
+        form ->
+            form.loginPage("/login") // 커스텀 템플릿
+                .loginProcessingUrl("/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
+                .permitAll());
     http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     http.csrf(AbstractHttpConfigurer::disable);
 
