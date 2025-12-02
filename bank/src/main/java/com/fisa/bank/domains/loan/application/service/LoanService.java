@@ -447,6 +447,7 @@ public class LoanService {
               .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
               .loanProductName(loanLedger.getLoanProduct().getName())
               .earlyRepayment(earlyRepayment.getEarlyPaidCost())
+              .mustPaidAmount(earlyRepayment.getMustPaidAmount())
               .interestDetailResponses(interestDetailResponses)
               .build();
 
