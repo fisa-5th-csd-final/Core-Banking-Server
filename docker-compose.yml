@@ -67,15 +67,13 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    restart: "no"
+    restart: "  no"
     networks:
       - core-bank-internal
 
   core-bank-server:
     container_name: core-bank-server
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: wjdjoonim/core-bank-fisa:latest
     env_file:
       - .env
     ports:
