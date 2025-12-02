@@ -442,6 +442,8 @@ public class LoanService {
       List<InterestDetailResponse> interestDetailResponses =
           calculatorService.calculateRemainingInterests(loanLedger);
 
+        BigDecimal balance = loanLedger.getAccount().getBalance();
+
       PrepaymentInfoResponse prepaymentInfoResponse =
           PrepaymentInfoResponse.builder()
               .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
@@ -449,6 +451,7 @@ public class LoanService {
               .earlyRepayment(earlyRepayment.getEarlyPaidCost())
               .mustPaidAmount(earlyRepayment.getMustPaidAmount())
               .interestDetailResponses(interestDetailResponses)
+                  .balance(balance)
               .build();
 
       prepaymentInfoResponses.add(prepaymentInfoResponse);
