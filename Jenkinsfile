@@ -52,12 +52,13 @@ pipeline {
                 ]){
                     sh """
                         echo '🚧 Docker 이미지 빌드 시작'
-                        docker build -t ${DOCKER_IMAGE}:latest -f Dockerfile .
+                        docker build -t "${DOCKER_IMAGE}:${env.BUILD_NUMBER}" -t "${DOCKER_IMAGE}:latest" -f Dockerfile .
 
                         echo '🔐 Docker Hub 로그인'
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
                         echo '🚀 Docker Push'
+                        docker push "${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                         docker push ${DOCKER_IMAGE}:latest
 
                         echo '🎉 Docker Push 완료'
@@ -79,7 +80,7 @@ pipeline {
                     sshagent(['from-jenkins-to-aws-ec2-access-key']) {
                         sh """
                             ssh -o StrictHostKeyChecking=yes $SSH_USER@$DEPLOY_HOST_CORE \\
-                                'cd ~/Loan-Mate-Backend && ./deploy.sh'
+                                'cd ~/Loan-Mate-Backend && ./deploy.sh ${env.BUILD_NUMBER}'
                         """
                     }
                 }
