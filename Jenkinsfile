@@ -41,6 +41,9 @@ pipeline {
         }
 
         stage('Docker Build & Push'){
+            when {
+                branch 'develop'
+            }
             steps{
                 // Docker Hub id, pwd
                 withCredentials([
