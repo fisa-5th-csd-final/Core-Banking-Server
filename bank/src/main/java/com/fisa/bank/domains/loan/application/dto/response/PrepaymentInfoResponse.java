@@ -12,5 +12,6 @@ public class PrepaymentInfoResponse {
   private final Long loanLedgerId;
   private final String loanProductName;
   private final BigDecimal earlyRepayment;
+  private final BigDecimal mustPaidAmount;
   private final List<InterestDetailResponse> interestDetailResponses;
 }
