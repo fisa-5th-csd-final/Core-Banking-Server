@@ -4,6 +4,7 @@ pipeline {
     environment {
         // Gradle 캐시 디렉토리 (속도 향상)
         GRADLE_USER_HOME = "${WORKSPACE}/.gradle"
+        DOCKER_IMAGE = "wjdjoonim/core-bank-fisa"   // Docker Hub Repository
     }
 
     stages {
@@ -39,6 +40,56 @@ pipeline {
             }
         }
 
+        stage('Docker Build & Push'){
+            when {
+                branch 'develop'
+            }
+            steps{
+                // Docker Hub id, pwd
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'docker-hub-cred',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]){
+                    sh """
+                        echo '🚧 Docker 이미지 빌드 시작'
+                        docker build -t "${DOCKER_IMAGE}:${env.BUILD_NUMBER}" -t "${DOCKER_IMAGE}:latest" -f Dockerfile .
+
+                        echo '🔐 Docker Hub 로그인'
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+                        echo '🚀 Docker Push'
+                        docker push "${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                        docker push ${DOCKER_IMAGE}:latest
+
+                        echo '🎉 Docker Push 완료'
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to EC2') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                echo '🚀 Deploying to EC2...'
+                withCredentials([
+                    string(credentialsId: 'SSH_USER', variable: 'SSH_USER'),
+                    string(credentialsId: 'DEPLOY_HOST_CORE', variable: 'DEPLOY_HOST_CORE')
+                ]) {
+                    sshagent(['from-jenkins-to-aws-ec2-access-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=yes $SSH_USER@$DEPLOY_HOST_CORE \\
+                                'cd ~/Loan-Mate-Backend && ./deploy.sh ${env.BUILD_NUMBER}'
+                        """
+                    }
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
                     environment {
                         SONAR_SCANNER_HOME = tool 'SonarScanner'
@@ -61,6 +112,14 @@ pipeline {
     post {
         success {
             echo 'Spotless & Build succeeded! Merge allowed.'
+            withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
+                discordSend(
+                    description: "배포 성공했습니다.",
+                    link: env.BUILD_URL,
+                    title: env.JOB_NAME,
+                    webhookURL: DISCORD_WEBHOOK
+                )
+            }
         }
         failure {
             echo 'Spotless or Build failed. Merge not allowed!'

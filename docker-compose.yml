@@ -73,9 +73,7 @@ services:
 
   core-bank-server:
     container_name: core-bank-server
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: wjdjoonim/core-bank-fisa:${IMAGE_TAG:-latest}
     env_file:
       - .env
     ports:
