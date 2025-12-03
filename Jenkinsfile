@@ -91,6 +91,26 @@ pipeline {
                     }
                 }
             }
+
+            post {
+                success {
+                    withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
+                        discordSend description: "✅ **[${env.BRANCH_NAME}]** 배포 성공했습니다.",
+                            link: env.BUILD_URL,
+                            title: env.JOB_NAME,
+                            webhookURL: DISCORD_WEBHOOK
+                    }
+                }
+                failure {
+                    withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
+                        discordSend description: "❌ **[${env.BRANCH_NAME}]** 배포 실패했습니다.",
+                            link: env.BUILD_URL,
+                            title: env.JOB_NAME,
+                            result: 'FAILURE',
+                            webhookURL: DISCORD_WEBHOOK
+                    }
+                }
+            }
         }
 
         stage('SonarQube Analysis') {
@@ -115,14 +135,6 @@ pipeline {
     post {
         success {
             echo 'Spotless & Build succeeded! Merge allowed.'
-            withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
-                discordSend(
-                    description: "배포 성공했습니다.",
-                    link: env.BUILD_URL,
-                    title: env.JOB_NAME,
-                    webhookURL: DISCORD_WEBHOOK
-                )
-            }
         }
         failure {
             echo 'Spotless or Build failed. Merge not allowed!'
