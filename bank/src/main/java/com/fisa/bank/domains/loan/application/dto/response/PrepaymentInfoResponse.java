@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 public class PrepaymentInfoResponse {
   private final Long loanLedgerId;
-    private BigDecimal balance;
+  private BigDecimal balance;
   private final String loanProductName;
   private final BigDecimal earlyRepayment;
   private final BigDecimal mustPaidAmount;
