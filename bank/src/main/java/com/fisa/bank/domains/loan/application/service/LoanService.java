@@ -442,8 +442,15 @@ public class LoanService {
       List<InterestDetailResponse> interestDetailResponses =
           calculatorService.calculateRemainingInterests(loanLedger);
 
+      Account account = loanLedger.getAccount();
       BigDecimal balance = loanLedger.getAccount().getBalance();
       String accountNumber = loanLedger.getAccount().getAccountNumber();
+
+      if (account != null) {
+        balance = account.getBalance();
+        accountNumber = account.getAccountNumber();
+      }
+
       PrepaymentInfoResponse prepaymentInfoResponse =
           PrepaymentInfoResponse.builder()
               .loanLedgerId(loanLedger.getLoanLedgerId().getValue())
