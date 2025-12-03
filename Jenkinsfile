@@ -82,9 +82,32 @@ pipeline {
                 ]) {
                     sshagent(['from-jenkins-to-aws-ec2-access-key']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=yes $SSH_USER@$DEPLOY_HOST_CORE \\
-                                'cd ~/Loan-Mate-Backend && ./deploy.sh ${env.BUILD_NUMBER}'
+                            scp -o StrictHostKeyChecking=yes deploy.sh $SSH_USER@$DEPLOY_HOST_CORE:~/Core-Banking-Server/
                         """
+                        sh """
+                            ssh -o StrictHostKeyChecking=yes $SSH_USER@$DEPLOY_HOST_CORE \\
+                                'cd ~/Core-Banking-Server && ./deploy.sh ${env.BUILD_NUMBER}'
+                        """
+                    }
+                }
+            }
+
+            post {
+                success {
+                    withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
+                        discordSend description: "✅ **[${env.BRANCH_NAME}]** 배포 성공했습니다.",
+                            link: env.BUILD_URL,
+                            title: env.JOB_NAME,
+                            webhookURL: DISCORD_WEBHOOK
+                    }
+                }
+                failure {
+                    withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
+                        discordSend description: "❌ **[${env.BRANCH_NAME}]** 배포 실패했습니다.",
+                            link: env.BUILD_URL,
+                            title: env.JOB_NAME,
+                            result: 'FAILURE',
+                            webhookURL: DISCORD_WEBHOOK
                     }
                 }
             }
@@ -112,14 +135,6 @@ pipeline {
     post {
         success {
             echo 'Spotless & Build succeeded! Merge allowed.'
-            withCredentials([string(credentialsId: 'core-discord-webhook', variable: 'DISCORD_WEBHOOK')]) {
-                discordSend(
-                    description: "배포 성공했습니다.",
-                    link: env.BUILD_URL,
-                    title: env.JOB_NAME,
-                    webhookURL: DISCORD_WEBHOOK
-                )
-            }
         }
         failure {
             echo 'Spotless or Build failed. Merge not allowed!'
