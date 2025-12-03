@@ -82,8 +82,11 @@ pipeline {
                 ]) {
                     sshagent(['from-jenkins-to-aws-ec2-access-key']) {
                         sh """
+                            scp -o StrictHostKeyChecking=yes deploy.sh $SSH_USER@$DEPLOY_HOST_CORE:~/Core-Banking-Server/
+                        """
+                        sh """
                             ssh -o StrictHostKeyChecking=yes $SSH_USER@$DEPLOY_HOST_CORE \\
-                                'cd ~/Loan-Mate-Backend && ./deploy.sh ${env.BUILD_NUMBER}'
+                                'cd ~/Core-Banking-Server && ./deploy.sh ${env.BUILD_NUMBER}'
                         """
                     }
                 }
